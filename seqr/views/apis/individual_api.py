@@ -2,6 +2,8 @@
 APIs for retrieving, updating, creating, and deleting Individual records
 """
 
+from __future__ import unicode_literals
+
 import json
 import logging
 import re
@@ -663,7 +665,7 @@ def save_hpo_table_handler(request, project_guid, upload_file_id):
     return create_json_response({
         'individualsByGuid': {
             individual['individualGuid']: individual for individual in _get_json_for_individuals(
-            individuals_by_guid.values(), user=request.user, add_hpo_details=True,
+            list(individuals_by_guid.values()), user=request.user, add_hpo_details=True,
         )},
     })
 

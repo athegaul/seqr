@@ -69,7 +69,7 @@ class IndividualAPITest(AuthenticationTestCase):
 
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertListEqual(response_json.keys(), [INDIVIDUAL_UPDATE_GUID])
+        self.assertListEqual(list(response_json.keys()), [INDIVIDUAL_UPDATE_GUID])
         individual = Individual.objects.get(guid=INDIVIDUAL_UPDATE_GUID)
         self.assertEqual(response_json[INDIVIDUAL_UPDATE_GUID]['displayName'], 'NA20870')
         self.assertEqual(individual.display_name, '')
@@ -86,7 +86,7 @@ class IndividualAPITest(AuthenticationTestCase):
                                     data=json.dumps({'caseReviewStatus': 'A'}))
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertListEqual(response_json.keys(), [INDIVIDUAL_UPDATE_GUID])
+        self.assertListEqual(list(response_json.keys()), [INDIVIDUAL_UPDATE_GUID])
         self.assertEqual(response_json[INDIVIDUAL_UPDATE_GUID]['caseReviewStatus'], 'A')
         self.assertEqual(response_json[INDIVIDUAL_UPDATE_GUID]['caseReviewStatusLastModifiedDate'], '2020-01-01T00:00:00')
         self.assertEqual(response_json[INDIVIDUAL_UPDATE_GUID]['caseReviewStatusLastModifiedBy'], 'test_user@test.com')
@@ -100,7 +100,7 @@ class IndividualAPITest(AuthenticationTestCase):
 
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertListEqual(response_json.keys(), [INDIVIDUAL_UPDATE_GUID])
+        self.assertListEqual(list(response_json.keys()), [INDIVIDUAL_UPDATE_GUID])
         self.assertEqual(response_json[INDIVIDUAL_UPDATE_GUID]['displayName'], 'NA20870')
         self.assertListEqual(response_json[INDIVIDUAL_UPDATE_GUID]['features'], [
             {
@@ -168,7 +168,7 @@ class IndividualAPITest(AuthenticationTestCase):
         }))
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertListEqual(response_json.keys(), ['individualsByGuid', 'familiesByGuid'])
+        self.assertListEqual(list(response_json.keys()), ['individualsByGuid', 'familiesByGuid'])
 
     def test_individuals_table_handler(self):
         individuals_url = reverse(receive_individuals_table_handler, args=[PROJECT_GUID])
@@ -184,14 +184,14 @@ class IndividualAPITest(AuthenticationTestCase):
         response = self.client.post(individuals_url, {'f': f})
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertListEqual(response_json.keys(), ['info', 'errors', 'warnings', 'uploadedFileId'])
+        self.assertListEqual(list(response_json.keys()), ['info', 'errors', 'warnings', 'uploadedFileId'])
 
         url = reverse(save_individuals_table_handler, args=[PROJECT_GUID, response_json['uploadedFileId']])
 
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertListEqual(response_json.keys(), ['individualsByGuid', 'familiesByGuid'])
+        self.assertListEqual(list(response_json.keys()), ['individualsByGuid', 'familiesByGuid'])
 
     def test_hpo_table_handler(self):
         url = reverse(receive_hpo_table_handler, args=['R0001_1kg'])
@@ -252,8 +252,8 @@ class IndividualAPITest(AuthenticationTestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
-        self.assertListEqual(response_json.keys(), ['individualsByGuid'])
-        self.assertListEqual(response_json['individualsByGuid'].keys(), ['I000001_na19675'])
+        self.assertListEqual(list(response_json.keys()), ['individualsByGuid'])
+        self.assertListEqual(list(response_json['individualsByGuid'].keys()), ['I000001_na19675'])
         self.assertSetEqual(set(response_json['individualsByGuid']['I000001_na19675'].keys()), INDIVIDUAL_FIELDS)
         self.assertListEqual(
             response_json['individualsByGuid']['I000001_na19675']['features'],
