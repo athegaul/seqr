@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+from builtins import str as unicode_str
+
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils.deprecation import MiddlewareMixin
 from requests import HTTPError
@@ -33,10 +36,13 @@ class JsonErrorMiddleware(MiddlewareMixin):
     @staticmethod
     def process_exception(request, exception):
         if request.path.startswith('/api'):
-            exception_json = {'message': str(exception)}
+            try:
+                exception_json = {'message': str(exception)}
+            except Exception:
+                exception_json = {'message': unicode_str(exception)}
             traceback_message = traceback.format_exc()
             logger.error(traceback_message)
             if DEBUG:
-                exception_json['traceback'] = traceback_message.split('\n')
+                    exception_json['traceback'] = traceback_message
             return create_json_response(exception_json, status=_get_exception_status_code(exception))
         return None
