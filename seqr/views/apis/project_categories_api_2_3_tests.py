@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import json
 from django.urls.base import reverse
 from seqr.views.apis.project_categories_api import update_project_categories_handler
@@ -25,8 +27,8 @@ class ProjectCategoriesAPITest(AuthenticationTestCase):
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
 
-        self.assertListEqual(response_json.keys(), ['projectsByGuid', 'projectCategoriesByGuid'])
-        self.assertListEqual(response_json['projectsByGuid'].keys(), [PROJECT_GUID])
+        self.assertSetEqual(set(response_json.keys()), {'projectsByGuid', 'projectCategoriesByGuid'})
+        self.assertListEqual(list(response_json['projectsByGuid'].keys()), [PROJECT_GUID])
         updated_guid_set = set(response_json['projectCategoriesByGuid'].keys())
 
         project = Project.objects.get(guid=PROJECT_GUID)
@@ -38,8 +40,6 @@ class ProjectCategoriesAPITest(AuthenticationTestCase):
         self.assertIn(project_categories[1].guid, updated_guid_set)
         new_guid = project_categories[1].guid
 
-        self.assertIsNone(response_json['projectCategoriesByGuid'][PROJECT_CAT_GUID3])
-
         self.assertEqual(len(response_json['projectsByGuid'][PROJECT_GUID]['projectCategoryGuids']), 2)
         self.assertListEqual([PROJECT_CAT_GUID2, new_guid], response_json['projectsByGuid'][PROJECT_GUID]['projectCategoryGuids'])
 
@@ -49,8 +49,8 @@ class ProjectCategoriesAPITest(AuthenticationTestCase):
         self.assertEqual(response.status_code, 200)
         response_json = response.json()
 
-        self.assertListEqual(response_json.keys(), ['projectsByGuid', 'projectCategoriesByGuid'])
-        self.assertListEqual(response_json['projectsByGuid'].keys(), [PROJECT_GUID])
+        self.assertSetEqual(set(response_json.keys()), {'projectsByGuid', 'projectCategoriesByGuid'})
+        self.assertListEqual(list(response_json['projectsByGuid'].keys()), [PROJECT_GUID])
 
         self.assertEqual(len(response_json['projectsByGuid'][PROJECT_GUID]['projectCategoryGuids']), 0)
 
