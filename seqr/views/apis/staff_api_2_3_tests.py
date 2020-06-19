@@ -601,10 +601,10 @@ class StaffAPITest(AuthenticationTestCase):
         mock_write_zip = mock_zip.return_value.__enter__.return_value.writestr
         self.assertEqual(mock_write_zip.call_count, 4)
         mock_write_zip.assert_has_calls([
-            mock.call(u'1kg project n\xe5me with uni\xe7\xf8de_PI_Subject.tsv', mock.ANY),
-            mock.call(u'1kg project n\xe5me with uni\xe7\xf8de_PI_Sample.tsv', mock.ANY),
-            mock.call(u'1kg project n\xe5me with uni\xe7\xf8de_PI_Family.tsv', mock.ANY),
-            mock.call(u'1kg project n\xe5me with uni\xe7\xf8de_PI_Discovery.tsv', mock.ANY),
+            mock.call('1kg project n\xe5me with uni\xe7\xf8de_PI_Subject.tsv', mock.ANY),
+            mock.call('1kg project n\xe5me with uni\xe7\xf8de_PI_Sample.tsv', mock.ANY),
+            mock.call('1kg project n\xe5me with uni\xe7\xf8de_PI_Family.tsv', mock.ANY),
+            mock.call('1kg project n\xe5me with uni\xe7\xf8de_PI_Discovery.tsv', mock.ANY),
         ])
 
         subject_file = mock_write_zip.call_args_list[0][0][1].split('\n')
@@ -662,7 +662,8 @@ class StaffAPITest(AuthenticationTestCase):
         responses.add(responses.GET, '{}/Samples'.format(AIRTABLE_URL), status=200)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 500)
-        self.assertEqual(response.json()['message'], 'Unable to retrieve airtable data: No JSON object could be decoded')
+        self.assertIn(response.json()['message'], ['Unable to retrieve airtable data: No JSON object could be decoded',
+                                        'Unable to retrieve airtable data: Expecting value: line 1 column 1 (char 0)'])
 
         responses.reset()
         responses.add(responses.GET, '{}/Samples'.format(AIRTABLE_URL),
@@ -797,7 +798,7 @@ class StaffAPITest(AuthenticationTestCase):
 
         response = self.client.get(url, HTTP_TEST_HEADER='some/value')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'Test response')
+        self.assertEqual(response.content.decode('utf-8'), 'Test response')
         self.assertEqual(response.get('content-type'), 'text/custom')
         self.assertEqual(response.get('x-test-header'), 'test')
         self.assertIsNone(response.get('keep-alive'))
@@ -816,7 +817,7 @@ class StaffAPITest(AuthenticationTestCase):
         self.assertEqual(post_request.headers['Host'], 'localhost:5601')
         self.assertEqual(post_request.headers['Content-Type'], 'application/json')
         self.assertEqual(post_request.headers['Content-Length'], '24')
-        self.assertEqual(post_request.body, data)
+        self.assertEqual(post_request.body.decode('utf-8'), data)
 
         # Test with connection error
         response = self.client.get('{}/bad_path'.format(url))
