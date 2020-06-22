@@ -91,7 +91,7 @@ def elasticsearch_status(request):
         index['docType'] = doc_type
 
         projects_for_index = []
-        for index_prefix in seqr_index_projects.keys():
+        for index_prefix in list(seqr_index_projects.keys()):
             if index_name.startswith(index_prefix):
                 projects_for_index += list(seqr_index_projects.pop(index_prefix).keys())
         index['projects'] = [{'projectGuid': project.guid, 'projectName': project.name} for project in projects_for_index]
@@ -1030,9 +1030,9 @@ def _update_variant_inheritance(variant, affected_individual_guids, unaffected_i
 def _get_genotype_zygosity(genotype):
     num_alt = genotype.get('numAlt')
     cn = genotype.get('cn')
-    if num_alt == 2 or cn == 0 or cn > 3:
+    if (num_alt and num_alt == 2) or (cn is not None and (cn == 0 or cn > 3)):
         return HOM_ALT
-    if num_alt == 1 or cn == 1 or cn == 3:
+    if (num_alt and num_alt == 1) or (cn and (cn == 1 or cn == 3)):
         return HET
     return None
 

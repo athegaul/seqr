@@ -8,6 +8,7 @@ from datetime import datetime
 import responses
 from settings import AIRTABLE_URL
 import json
+import requests.utils as urls
 
 from django.urls.base import reverse
 
@@ -593,9 +594,10 @@ class StaffAPITest(AuthenticationTestCase):
                       json=AIRTABLE_COLLABORATOR_RECORDS, status=200)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        content = response.get('content-disposition')
         self.assertEqual(
-            response.get('content-disposition'),
-            'attachment; filename="1kg project n\xe5me with uni\xe7\xf8de_AnVIL_Metadata.zip"'
+            content.decode('ascii', errors='ignore') if isinstance(content, bytes) else content.encode('ascii', errors='ignore').decode(),
+            'attachment; filename="1kg project nme with unide_AnVIL_Metadata.zip"'
         )
 
         mock_write_zip = mock_zip.return_value.__enter__.return_value.writestr
@@ -678,8 +680,10 @@ class StaffAPITest(AuthenticationTestCase):
             response.json()['message'],
             'Found multiple airtable records for sample NA19675 with mismatched values in field dbgap_study_id')
         self.assertEqual(len(responses.calls), 2)
-        self.assertIsNone(responses.calls[0].request.params.get('offset'))
-        self.assertEqual(responses.calls[1].request.params.get('offset'), 'abc123')
+        queries = {key: value for key, value in [x.split('=') for x in urls.urlparse(responses.calls[0].request.url).query.split('&')]}
+        self.assertIsNone(queries.get('offset'))
+        queries = {key: value for key, value in [x.split('=') for x in urls.urlparse(responses.calls[1].request.url).query.split('&')]}
+        self.assertEqual(queries.get('offset'), 'abc123')
 
         # Test success
         responses.add(responses.GET, '{}/Collaborator'.format(AIRTABLE_URL),
@@ -736,7 +740,9 @@ class StaffAPITest(AuthenticationTestCase):
         mock_file_iter.return_value = SAMPLE_QC_DATA_MORE_DATA_TYPE
         response = self.client.post(url, content_type='application/json', data=request_data)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.reason_phrase, 'Multiple dataset types detected: wes ,wgs')
+        reason_phrase = response.reason_phrase.split(':')
+        self.assertEqual(reason_phrase[0], 'Multiple dataset types detected')
+        self.assertSetEqual(set(reason_phrase[1].strip().split(' ,')), {'wes', 'wgs'})
 
         # Test unexpected data type error
         mock_file_iter.return_value = SAMPLE_QC_DATA_UNEXPECTED_DATA_TYPE

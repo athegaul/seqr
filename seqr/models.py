@@ -255,6 +255,9 @@ class Family(ModelWithGUID):
     def __unicode__(self):
         return self.family_id.strip()
 
+    def __str__(self):
+        return self.family_id.strip()
+
     def _compute_guid(self):
         return 'F%06d_%s' % (self.id, _slugify(str(self)))
 
