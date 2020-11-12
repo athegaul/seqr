@@ -4,11 +4,12 @@ The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.9/topics/http/urls/
 """
 from seqr.views.react_app import main_app, no_login_main_app
+from seqr.views.status import status_view
 from seqr.views.apis.dataset_api import \
     update_individual_igv_sample, \
     add_variants_dataset_handler, \
     receive_igv_table_handler
-from settings import ENABLE_DJANGO_DEBUG_TOOLBAR, MEDIA_ROOT, API_LOGIN_REQUIRED_URL
+from settings import ENABLE_DJANGO_DEBUG_TOOLBAR, MEDIA_ROOT, API_LOGIN_REQUIRED_URL, DEBUG
 from django.conf.urls import url, include
 from django.contrib import admin
 import django.contrib.admindocs.urls
@@ -96,6 +97,7 @@ from seqr.views.apis.users_api import \
     update_project_collaborator, \
     delete_project_collaborator, \
     set_password, \
+    update_policies, \
     forgot_password, \
     create_staff_user
 
@@ -138,6 +140,9 @@ no_login_react_app_pages = [
     'users/set_password/(?P<user_token>.+)',
     'matchmaker/matchbox',
     'matchmaker/disclaimer',
+    'privacy_policy',
+    'terms_of_service',
+
 ]
 
 # NOTE: the actual url will be this with an '/api' prefix
@@ -231,6 +236,7 @@ api_endpoints = {
     'login': login_view,
     'users/forgot_password': forgot_password,
     'users/(?P<username>[^/]+)/set_password': set_password,
+    'users/update_policies': update_policies,
 
     'users/get_all': get_all_collaborators,
     'users/get_all_staff': get_all_staff,
@@ -261,7 +267,7 @@ api_endpoints = {
 
 }
 
-urlpatterns = []
+urlpatterns = [url('^status', status_view)]
 
 # core react page templates
 urlpatterns += [url("^%(url_endpoint)s$" % locals(), main_app) for url_endpoint in react_app_pages]
@@ -277,13 +283,11 @@ urlpatterns += [
     url(API_LOGIN_REQUIRED_URL.lstrip('/'), login_required_error)
 ]
 
-#urlpatterns += [
-#   url("^api/v1/%(url_endpoint)s$" % locals(), handler_function) for url_endpoint, handler_function in api_endpoints.items()]
-
-kibana_urls = '^(?:%s)' % ('|'.join([
-    "app", "bundles", "elasticsearch", "plugins", "ui", "api/apm", "api/console", "api/index_management", "api/index_patterns",
-    "api/kibana", "api/monitoring", "api/reporting", "api/saved_objects", "api/telemetry", "api/timelion", "api/xpack",
-    "es_admin",
+kibana_urls = '^(?:{})'.format('|'.join([
+    'app', '\d+/built_assets', '\d+/bundles', 'bundles', 'elasticsearch', 'es_admin', 'node_modules/@kbn', 'internal',
+    'plugins', 'translations', 'ui', 'api/apm', 'api/console', 'api/core', 'api/index_management', 'api/index_patterns',
+    'api/kibana', 'api/licensing', 'api/monitoring', 'api/reporting', 'api/saved_objects', 'api/telemetry',
+    'api/timelion', 'api/ui_metric', 'api/xpack',
 ]))
 
 urlpatterns += [
@@ -291,13 +295,21 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    url(r'^hijack/', include('hijack.urls')),
     url(r'^admin/doc/', include(django.contrib.admindocs.urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^media/(?P<path>.*)$', django.views.static.serve, {
         'document_root': MEDIA_ROOT,
     }),
 ]
+
+urlpatterns += [
+    url('', include('social_django.urls')),
+]
+
+if DEBUG:
+    urlpatterns += [
+        url(r'^hijack/', include('hijack.urls')),
+    ]
 
 # django debug toolbar
 if ENABLE_DJANGO_DEBUG_TOOLBAR:

@@ -1,5 +1,5 @@
+import base64
 from collections import defaultdict
-from elasticsearch_dsl import Index
 import json
 import logging
 import re
@@ -16,7 +16,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from requests.exceptions import ConnectionError as RequestConnectionError
 
-from seqr.utils.elasticsearch.utils import get_es_client
+from seqr.utils.elasticsearch.utils import get_es_client, get_index_metadata
 from seqr.utils.file_utils import file_iter
 from seqr.utils.gene_utils import get_genes
 from seqr.utils.xpos_utils import get_chrom_pos
@@ -38,7 +38,8 @@ from seqr.models import Project, Family, VariantTag, VariantTagType, Sample, Sav
     LocusList
 from reference_data.models import Omim, HumanPhenotypeOntology
 
-from settings import ELASTICSEARCH_SERVER, KIBANA_SERVER, API_LOGIN_REQUIRED_URL, AIRTABLE_API_KEY, AIRTABLE_URL
+from settings import ELASTICSEARCH_SERVER, KIBANA_SERVER, API_LOGIN_REQUIRED_URL, AIRTABLE_API_KEY, AIRTABLE_URL, \
+    KIBANA_ELASTICSEARCH_PASSWORD
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ MAX_SAVED_VARIANTS = 10000
 def elasticsearch_status(request):
     client = get_es_client()
 
-    disk_fields = ['node', 'disk.avail', 'disk.used', 'disk.percent']
+    disk_fields = ['node', 'shards', 'disk.avail', 'disk.used', 'disk.percent']
     disk_status = [{
         _to_camel_case(field.replace('.', '_')): disk[field] for field in disk_fields
     } for disk in client.cat.allocation(format="json", h=','.join(disk_fields))]
@@ -68,7 +69,7 @@ def elasticsearch_status(request):
     for alias in client.cat.aliases(format="json", h='alias,index'):
         aliases[alias['alias']].append(alias['index'])
 
-    mappings = Index('_all', using=client).get_mapping(doc_type='variant,structural_variant')
+    index_metadata = get_index_metadata('_all', client, use_cache=False)
 
     active_samples = Sample.objects.filter(is_active=True).select_related('individual__family__project')
 
@@ -86,10 +87,7 @@ def elasticsearch_status(request):
 
     for index in indices:
         index_name = index['index']
-        index_mappings = mappings[index_name]['mappings']
-        doc_type = 'variant' if 'variant' in index_mappings else 'structural_variant'
-        index.update(index_mappings[doc_type].get('_meta', {}))
-        index['docType'] = doc_type
+        index.update(index_metadata[index_name])
 
         projects_for_index = []
         for index_prefix in list(seqr_index_projects.keys()):
@@ -174,6 +172,8 @@ DISCOVERY_TABLE_VARIANT_COLUMNS = [
     'Gene', 'Gene_Class', 'inheritance_description', 'Zygosity', 'variant_genome_build', 'Chrom', 'Pos', 'Ref',
     'Alt', 'hgvsc', 'hgvsp', 'Transcript', 'sv_name', 'sv_type', 'significance',
 ]
+DISCOVERY_TABLE_METADATA_VARIANT_COLUMNS = DISCOVERY_TABLE_VARIANT_COLUMNS + [
+    'novel_mendelian_gene', 'phenotype_class']
 
 PHENOTYPE_PROJECT_CATEGORIES = [
     'Muscle', 'Eye', 'Renal', 'Neuromuscular', 'IBD', 'Epilepsy', 'Orphan', 'Hematologic',
@@ -236,18 +236,17 @@ def anvil_export(request, project_guid):
         project, request.GET.get('loadedBefore'),
     )
 
-    subject_rows, sample_rows, family_rows, discovery_rows, max_saved_variants = _parse_anvil_metadata(
+    subject_rows, sample_rows, family_rows, discovery_rows = _parse_anvil_metadata(
         project, individual_samples, include_collaborator=False)
 
-    variant_columns = []
-    for i in range(max_saved_variants):
-        variant_columns += ['{}-{}'.format(k, i + 1) for k in DISCOVERY_TABLE_VARIANT_COLUMNS]
+    # Flatten lists of discovery rows so there is one row per variant
+    discovery_rows = [row for row_group in discovery_rows for row in row_group if row]
 
     return export_multiple_files([
         ['{}_PI_Subject'.format(project.name), SUBJECT_TABLE_COLUMNS, subject_rows],
         ['{}_PI_Sample'.format(project.name), SAMPLE_TABLE_COLUMNS, sample_rows],
         ['{}_PI_Family'.format(project.name), FAMILY_TABLE_COLUMNS, family_rows],
-        ['{}_PI_Discovery'.format(project.name), DISCOVERY_TABLE_CORE_COLUMNS + variant_columns, discovery_rows],
+        ['{}_PI_Discovery'.format(project.name), DISCOVERY_TABLE_CORE_COLUMNS + DISCOVERY_TABLE_VARIANT_COLUMNS, discovery_rows],
     ], '{}_AnVIL_Metadata'.format(project.name), add_header_prefix=True, file_format='tsv', blank_value='-')
 
 
@@ -260,15 +259,22 @@ def sample_metadata_export(request, project_guid):
     individual_samples = _get_loaded_before_date_project_individual_samples(
         project, request.GET.get('loadedBefore') or datetime.now().strftime('%Y-%m-%d'))
 
-    subject_rows, sample_rows, family_rows, discovery_rows, _ = _parse_anvil_metadata(
+    subject_rows, sample_rows, family_rows, discovery_rows = _parse_anvil_metadata(
         project, individual_samples, include_collaborator=True)
     family_rows_by_id = {row['family_id']: row for row in family_rows}
 
     rows_by_subject_id = {row['subject_id']: row for row in subject_rows}
-    for rows in [sample_rows, discovery_rows]:
-        for row in rows:
-            rows_by_subject_id[row['subject_id']].update(row)
+    for row in sample_rows:
+        rows_by_subject_id[row['subject_id']].update(row)
 
+    for rows in discovery_rows:
+        for i, row in enumerate(rows):
+            if row:
+                parsed_row = {k: row[k] for k in DISCOVERY_TABLE_CORE_COLUMNS}
+                parsed_row.update({
+                    '{}-{}'.format(k, i + 1): row[k] for k in DISCOVERY_TABLE_METADATA_VARIANT_COLUMNS if row.get(k)
+                })
+                rows_by_subject_id[row['subject_id']].update(parsed_row)
 
     rows = list(rows_by_subject_id.values())
     all_features = set()
@@ -309,7 +315,7 @@ def _parse_anvil_metadata(project, individual_samples, include_collaborator=Fals
     sample_airtable_metadata = _get_sample_airtable_metadata(list(sample_ids), include_collaborator=include_collaborator)
 
     saved_variants_by_family = _get_parsed_saved_discovery_variants_by_family(list(samples_by_family.keys()))
-    compound_het_gene_id_by_family, gene_ids, max_saved_variants = _process_saved_variants(
+    compound_het_gene_id_by_family, gene_ids = _process_saved_variants(
         saved_variants_by_family, family_individual_affected_guids)
     genes_by_id = get_genes(gene_ids)
 
@@ -384,10 +390,10 @@ def _parse_anvil_metadata(project, individual_samples, include_collaborator=Fals
             sample_row = _get_sample_row(sample, has_dbgap_submission, airtable_metadata)
             sample_rows.append(sample_row)
 
-            discovery_row = _get_discovery_row(sample, parsed_variants, male_individual_guids)
+            discovery_row = _get_discovery_rows(sample, parsed_variants, male_individual_guids)
             discovery_rows.append(discovery_row)
 
-    return subject_rows, sample_rows, family_rows, discovery_rows, max_saved_variants
+    return subject_rows, sample_rows, family_rows, discovery_rows
 
 
 def _get_variant_main_transcript(variant):
@@ -422,9 +428,7 @@ def _get_loaded_before_date_project_individual_samples(project, max_loaded_date)
 def _process_saved_variants(saved_variants_by_family, family_individual_affected_guids):
     compound_het_gene_id_by_family = {}
     gene_ids = set()
-    max_saved_variants = 1
     for family_guid, saved_variants in saved_variants_by_family.items():
-        max_saved_variants = max(max_saved_variants, len(saved_variants))
         potential_com_het_gene_variants = defaultdict(list)
         for variant in saved_variants:
             variant['main_transcript'] = _get_variant_main_transcript(variant)
@@ -452,7 +456,7 @@ def _process_saved_variants(saved_variants_by_family, family_individual_affected
                         if all(gene_id in variant['transcripts'] for variant in comp_het_variants):
                             compound_het_gene_id_by_family[family_guid] = gene_id
                             gene_ids.add(gene_id)
-    return compound_het_gene_id_by_family, gene_ids, max_saved_variants
+    return compound_het_gene_id_by_family, gene_ids
 
 
 def _parse_anvil_family_saved_variant(variant, family, compound_het_gene_id_by_family, genes_by_id):
@@ -550,14 +554,15 @@ def _get_sample_row(sample, has_dbgap_submission, airtable_metadata):
         sample_row['dbgap_sample_id'] = airtable_metadata.get('dbgap_sample_id', '')
     return sample_row
 
-def _get_discovery_row(sample, parsed_variants, male_individual_guids):
+def _get_discovery_rows(sample, parsed_variants, male_individual_guids):
     individual = sample.individual
     discovery_row = {
         'entity:discovery_id': individual.individual_id,
         'subject_id': individual.individual_id,
         'sample_id': sample.sample_id,
     }
-    for i, (genotypes, parsed_variant) in enumerate(parsed_variants):
+    discovery_rows = []
+    for genotypes, parsed_variant in parsed_variants:
         genotype = genotypes.get(individual.guid, {})
         is_x_linked = "X" in parsed_variant.get('Chrom', '')
         zygosity = _get_genotype_zygosity(
@@ -567,8 +572,11 @@ def _get_discovery_row(sample, parsed_variants, male_individual_guids):
                 'Zygosity': zygosity,
             }
             variant_discovery_row.update(parsed_variant)
-            discovery_row.update({'{}-{}'.format(k, i + 1): v for k, v in variant_discovery_row.items()})
-    return discovery_row
+            variant_discovery_row.update(discovery_row)
+            discovery_rows.append(variant_discovery_row)
+        else:
+            discovery_rows.append(None)
+    return discovery_rows
 
 
 MAX_FILTER_IDS = 500
@@ -651,37 +659,35 @@ def _fetch_airtable_records(record_type, fields=None, filter_formula=None, offse
     logger.info('Fetched {} {} records from airtable'.format(len(records), record_type))
     return records
 
-
 # HPO categories are direct children of HP:0000118 "Phenotypic abnormality".
-# See http://compbio.charite.de/hpoweb/showterm?id=HP:0000118
-HPO_CATEGORY_NAMES = {
-    'HP:0000478': 'Eye Defects',
-    'HP:0025142': 'Constitutional Symptom',
-    'HP:0002664': 'Neoplasm',
-    'HP:0000818': 'Endocrine System',
-    'HP:0000152': 'Head or Neck',
-    'HP:0002715': 'Immune System',
-    'HP:0001507': 'Growth',
-    'HP:0045027': 'Thoracic Cavity',
-    'HP:0001871': 'Blood',
-    'HP:0002086': 'Respiratory',
-    'HP:0000598': 'Ear Defects',
-    'HP:0001939': 'Metabolism/Homeostasis',
-    'HP:0003549': 'Connective Tissue',
-    'HP:0001608': 'Voice',
-    'HP:0000707': 'Nervous System',
-    'HP:0000769': 'Breast',
-    'HP:0001197': 'Prenatal development or birth',
-    'HP:0040064': 'Limbs',
-    'HP:0025031': 'Abdomen',
-    'HP:0003011': 'Musculature',
-    'HP:0001626': 'Cardiovascular System',
-    'HP:0000924': 'Skeletal System',
-    'HP:0500014': 'Test Result',
-    'HP:0001574': 'Integument',
-    'HP:0000119': 'Genitourinary System',
-    'HP:0025354': 'Cellular Phenotype',
+# See https://hpo.jax.org/app/browse/term/HP:0000118
+HPO_CATEGORY_DISCOVERY_COLUMNS = {
+    'HP:0000478': 'eye_defects',
+    'HP:0002664': 'neoplasm',
+    'HP:0000818': 'endocrine_system',
+    'HP:0000152': 'head_or_neck',
+    'HP:0002715': 'immune_system',
+    'HP:0001507': 'growth',
+    'HP:0045027': 'thoracic_cavity',
+    'HP:0001871': 'blood',
+    'HP:0002086': 'respiratory',
+    'HP:0000598': 'ear_defects',
+    'HP:0001939': 'metabolism_homeostasis',
+    'HP:0003549': 'connective_tissue',
+    'HP:0001608': 'voice',
+    'HP:0000707': 'nervous_system',
+    'HP:0000769': 'breast',
+    'HP:0001197': 'prenatal_development_or_birth',
+    'HP:0040064': 'limbs',
+    'HP:0025031': 'abdomen',
+    'HP:0033127': 'musculature',
+    'HP:0001626': 'cardiovascular_system',
+    'HP:0000924': 'skeletal_system',
+    'HP:0001574': 'integument',
+    'HP:0000119': 'genitourinary_system',
 }
+DISCOVERY_SKIP_HPO_CATEGORIES = {'HP:0025354', 'HP:0025142'}
+
 
 DEFAULT_ROW = {
     "t0": None,
@@ -715,31 +721,7 @@ DEFAULT_ROW = {
     "posted_publicly": "NS",
     "komp_early_release": "NS",
 }
-DEFAULT_ROW.update({hpo_category: 'N' for hpo_category in [
-    "connective_tissue",
-    "voice",
-    "nervous_system",
-    "breast",
-    "eye_defects",
-    "prenatal_development_or_birth",
-    "neoplasm",
-    "endocrine_system",
-    "head_or_neck",
-    "immune_system",
-    "growth",
-    "limbs",
-    "thoracic_cavity",
-    "blood",
-    "musculature",
-    "cardiovascular_system",
-    "abdomen",
-    "skeletal_system",
-    "respiratory",
-    "ear_defects",
-    "metabolism_homeostasis",
-    "genitourinary_system",
-    "integument",
-]})
+DEFAULT_ROW.update({hpo_category: 'N' for hpo_category in HPO_CATEGORY_DISCOVERY_COLUMNS.values()})
 
 ADDITIONAL_KINDREDS_FIELD = "n_unrelated_kindreds_with_causal_variants_in_gene"
 OVERLAPPING_KINDREDS_FIELD = "n_kindreds_overlapping_sv_similar_phenotype"
@@ -1221,10 +1203,11 @@ def _update_hpo_categories(rows, errors):
             if not category:
                 category_not_set_on_some_features = True
                 continue
+            if category in DISCOVERY_SKIP_HPO_CATEGORIES:
+                continue
 
-            hpo_category_name = HPO_CATEGORY_NAMES[category]
-            key = hpo_category_name.lower().replace(" ", "_").replace("/", "_")
-            row[key] = "Y"
+            hpo_category_column_key = HPO_CATEGORY_DISCOVERY_COLUMNS[category]
+            row[hpo_category_column_key] = "Y"
 
         if category_not_set_on_some_features:
             errors.append('HPO category field not set for some HPO terms in {}'.format(row['family_id']))
@@ -1257,7 +1240,7 @@ def saved_variants_page(request, tag):
     if gene:
         saved_variant_models = saved_variant_models.filter(saved_variant_json__transcripts__has_key=gene)
     elif saved_variant_models.count() > MAX_SAVED_VARIANTS:
-        return create_json_response({'message': 'Select a gene to filter variants'}, status=400)
+        return create_json_response({'error': 'Select a gene to filter variants'}, status=400)
 
     prefetch_related_objects(saved_variant_models, 'family__project')
     response_json = get_json_for_saved_variants_with_tags(saved_variant_models, add_details=True, include_missing_variants=True)
@@ -1304,7 +1287,6 @@ def saved_variants_page(request, tag):
 
 
 @staff_member_required(login_url=API_LOGIN_REQUIRED_URL)
-@csrf_exempt
 def upload_qc_pipeline_output(request):
     file_path = json.loads(request.body)['file']
     raw_records = parse_file(file_path, file_iter(file_path))
@@ -1383,9 +1365,9 @@ def upload_qc_pipeline_output(request):
     ]
 
     if dataset_type == Sample.DATASET_TYPE_SV_CALLS:
-        _update_individuals_sv_qc(records_with_individuals)
+        _update_individuals_sv_qc(records_with_individuals, request.user)
     else:
-        _update_individuals_variant_qc(records_with_individuals, data_type, warnings)
+        _update_individuals_variant_qc(records_with_individuals, data_type, warnings, request.user)
 
     message = 'Found and updated matching seqr individuals for {} samples'.format(len(json_records) - len(missing_sample_ids))
     info.append(message)
@@ -1427,7 +1409,7 @@ def _parse_raw_qc_records(json_records):
     return Sample.DATASET_TYPE_VARIANT_CALLS, data_type, records_by_sample_id
 
 
-def _update_individuals_variant_qc(json_records, data_type, warnings):
+def _update_individuals_variant_qc(json_records, data_type, warnings, user):
     unknown_filter_flags = set()
     unknown_pop_filter_flags = set()
 
@@ -1451,13 +1433,14 @@ def _update_individuals_variant_qc(json_records, data_type, warnings):
                 unknown_pop_filter_flags.add(flag)
 
         if filter_flags or pop_platform_filters:
-            Individual.objects.filter(id__in=record['individual_ids']).update(
-                filter_flags=filter_flags or None, pop_platform_filters=pop_platform_filters or None)
+            Individual.bulk_update(user, {
+                'filter_flags': filter_flags or None, 'pop_platform_filters': pop_platform_filters or None,
+            }, id__in=record['individual_ids'])
 
         inidividuals_by_population[record['qc_pop'].upper()] += record['individual_ids']
 
     for population, indiv_ids in inidividuals_by_population.items():
-        Individual.objects.filter(id__in=indiv_ids).update(population=population)
+        Individual.bulk_update(user, {'population': population}, id__in=indiv_ids)
 
     if unknown_filter_flags:
         message = 'The following filter flags have no known corresponding value and were not saved: {}'.format(
@@ -1472,7 +1455,7 @@ def _update_individuals_variant_qc(json_records, data_type, warnings):
         warnings.append(message)
 
 
-def _update_individuals_sv_qc(json_records):
+def _update_individuals_sv_qc(json_records, user):
     inidividuals_by_qc = defaultdict(list)
     for record in json_records:
         inidividuals_by_qc[(record['lt100_raw_calls'], record['lt10_highQS_rare_calls'])] += record['individual_ids']
@@ -1484,7 +1467,7 @@ def _update_individuals_sv_qc(json_records):
             sv_flags.append('raw_calls:_>100')
         if lt10_highQS_rare_calls == 'FALSE':
             sv_flags.append('high_QS_rare_calls:_>10')
-        Individual.objects.filter(id__in=indiv_ids).update(sv_flags=sv_flags or None)
+        Individual.bulk_update(user, {'sv_flags': sv_flags or None}, id__in=indiv_ids)
 
 
 FILTER_FLAG_COL_MAP = {
@@ -1523,6 +1506,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 def proxy_to_kibana(request):
     headers = _convert_django_meta_to_http_headers(request.META)
     headers['Host'] = KIBANA_SERVER
+    if KIBANA_ELASTICSEARCH_PASSWORD:
+        token = base64.b64encode('kibana:{}'.format(KIBANA_ELASTICSEARCH_PASSWORD).encode('utf-8'))
+        headers['Authorization'] = 'Basic {}'.format(token.decode('utf-8'))
 
     url = "{scheme}://{host}{path}".format(scheme=request.scheme, host=KIBANA_SERVER, path=request.get_full_path())
 
@@ -1555,7 +1541,7 @@ def proxy_to_kibana(request):
 
 
 def _convert_django_meta_to_http_headers(request_meta_dict):
-    """Converts django request.META dictionary into a dictionary of HTTP headers"""
+    """Converts django request.META dictionary into a dictionary of HTTP headers."""
 
     def convert_key(key):
         # converting Django's all-caps keys (eg. 'HTTP_RANGE') to regular HTTP header keys (eg. 'Range')

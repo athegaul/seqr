@@ -40,11 +40,10 @@ def authenticate_mme_request(view_func):
             }, status=401)
 
         return view_func(request, originating_node['name'], *args, **kwargs)
-    return _wrapped_view
+    return csrf_exempt(_wrapped_view)
 
 
 @authenticate_mme_request
-@csrf_exempt
 def mme_metrics_proxy(request, originating_node_name):
     """
     -Proxies public metrics endpoint
@@ -56,7 +55,6 @@ def mme_metrics_proxy(request, originating_node_name):
 
 
 @authenticate_mme_request
-@csrf_exempt
 def mme_match_proxy(request, originating_node_name):
     """
     -Looks for matches for the given individual ONLY in the local MME DB.
@@ -73,9 +71,9 @@ def mme_match_proxy(request, originating_node_name):
         query_patient_data = json.loads(request.body)
         _validate_patient_data(query_patient_data)
     except json.JSONDecodeError:
-        return create_json_response({'message': 'No JSON object could be decoded'}, status = 400)
+        return create_json_response({'error': 'No JSON object could be decoded'}, status = 400)
     except Exception as e:
-        return create_json_response({'message': str(e)}, status=400)
+        return create_json_response({'error': str(e)}, status=400)
 
     results, incoming_query = get_mme_matches(
         patient_data=query_patient_data, origin_request_host=originating_node_name,

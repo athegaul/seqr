@@ -18,16 +18,16 @@ const HeaderMenu = styled(Menu)`
 const PageHeader = React.memo(({ user }) =>
   <HeaderMenu borderless inverted attached>
     <Menu.Item as={Link} to="/"><Header size="medium" inverted>seqr</Header></Menu.Item>
-    {Object.keys(user).length && [
+    {Object.keys(user).length ? [
       <Menu.Item key="gene" as={Link} to="/gene_info" content="Gene Info" />,
       <Menu.Item key="gene_lists" as={Link} to="/gene_lists" content="Gene Lists" />,
       user.isStaff ? <Menu.Item key="staff" as={Link} to="/staff" content="Staff Pages" /> : null,
       <Menu.Item key="awesomebar" fitted="vertically"><AwesomeBar newWindow inputwidth="350px" /></Menu.Item>,
       <Menu.Item key="user" position="right">
-        <p>Logged in as &nbsp; <b>{user ? (user.displayName || user.email) : null}</b></p>
+        <p>Logged in as &nbsp; <b>{user && (user.displayName || user.email) + (user.isAnvil ? '(AnVIL)' : '')}</b></p>
       </Menu.Item>,
       <Menu.Item key="logout" as="a" href="/logout">Log out</Menu.Item>,
-    ]}
+    ] : <Menu.Item as="a" href="/login" position="right">Log in</Menu.Item>}
   </HeaderMenu>,
 )
 

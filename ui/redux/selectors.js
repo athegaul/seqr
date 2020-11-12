@@ -42,6 +42,8 @@ export const getUser = state => state.user
 export const getUsersByUsername = state => state.usersByUsername
 export const getUserOptionsIsLoading = state => state.userOptionsLoading.isLoading
 export const getVersion = state => state.meta.version
+export const getGoogleLoginEnabled = state => state.meta.googleLoginEnabled
+export const getHijakEnabled = state => state.meta.hijakEnabled
 export const getProjectGuid = state => state.currentProjectGuid
 export const getSavedVariantsIsLoading = state => state.savedVariantsLoading.isLoading
 export const getSavedVariantsLoadingError = state => state.savedVariantsLoading.errorMessage
@@ -415,7 +417,7 @@ export const getTagTypesByProject = createSelector(
   getProjectsByGuid,
   projectsByGuid => Object.values(projectsByGuid).reduce((acc, project) => ({
     ...acc,
-    [project.projectGuid]: project.variantTagTypes.filter(vtt => vtt.name !== NOTE_TAG_NAME),
+    [project.projectGuid]: (project.variantTagTypes || []).filter(vtt => vtt.name !== NOTE_TAG_NAME),
   }), {}),
 )
 
