@@ -18,4 +18,8 @@ inventory = inventory
 private_key_file = ~/.ssh/ansible
 ```
 
-To verify that ansible configuration is working and is able to connect to the server run the `ansible` command with the `ping` module `ansible all -m ping`.
+To verify that ansible configuration is working and is able to connect to the server run the `ansible` command with the `ping` module. 
+
+```
+ansible all -m ping
+```
