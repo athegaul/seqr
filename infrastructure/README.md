@@ -15,7 +15,8 @@ regions = us_east-1
 ## Ansible
 To install ansible you can do one of the following:
 1. `pip3 install ansible`
-2. `brew install ansible`
+2. `sudo apt update && sudo apt install -y ansible`
+3. `brew install ansible`
 
 
 ## SSH to machine
