@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+    pipeline-runner:
+        container_name: pipeline-runner
+        image: gcr.io/seqr-project/pipeline-runner:gcloud-prod
+        volumes:
+            - seqr-reference-data:/seqr-reference-data
+            - vep-data:/vep_data
+            - input-vcf:/input_vcfs
+
+volumes:
+    seqr-reference-data:
+    vep-data:
+    input-vcf:
