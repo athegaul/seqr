@@ -23,3 +23,9 @@ To verify that ansible configuration is working and is able to connect to the se
 ```
 ansible all -m ping
 ```
+
+## Running ansible playbook
+```
+ansible-playbook docker.yml
+ansible-playbook elasticsearch-container.yml
+```

@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+    elasticsearch:
+        container_name: elasticsearch
+        image: gcr.io/seqr-project/elasticsearch:gcloud-prod-elasticsearch
+        volumes:
+            - data-elasticsearch:/usr/share/elasticsearch/data
+        environment:
+            - http.host=0.0.0.0
+            - discovery.type=single-node
+            - cluster.routing.allocation.disk.threshold_enabled=false
+        healthcheck:
+            test: bash -c "curl -s elasticsearch:9200/_cat/health | grep green"
+            interval: 3s
+            timeout: 5s
+            retries: 100
+        ports:
+            - 9200:9200
+
+volumes:
+    data-elasticsearch:
