@@ -28,4 +28,5 @@ ansible all -m ping
 ```
 ansible-playbook docker.yml
 ansible-playbook elasticsearch-container.yml
+ansible-playbook kibana-container.yml
 ```

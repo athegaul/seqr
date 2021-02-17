@@ -1,0 +1,13 @@
+- name: Copy docker-compose.yml file
+  copy:
+    src: "{{ file_name }}"
+    dest: "{{ compose_file_location }}/{{ file_name }}"
+    owner: ansible
+    group: ansible
+    mode: 0644
+
+- name: Set up kibana container
+  docker_compose:
+    project_src: "{{ compose_file_location }}"
+    files:
+      - "{{ file_name }}"
