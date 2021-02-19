@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+    redis:
+        container_name: redis
+        image: gcr.io/seqr-project/redis:gcloud-prod
+        healthcheck:
+            test: redis-cli ping
+            interval: 3s
+            timeout: 5s
+            retries: 100
+        ports:
+            - 6379:6379
