@@ -6,7 +6,7 @@ services:
         image: gcr.io/seqr-project/postgres:gcloud-prod
         environment:
             - POSTGRES_USER=seqr
-            - POSTGRES_DB=seqr
+            - POSTGRES_DB=seqrdb
             - POSTGRES_PASSWORD=
         volumes:
             - pg-data:/var/lib/postgresql/data
