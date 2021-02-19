@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+    postgres:
+        container_name: postgres
+        image: gcr.io/seqr-project/postgres:gcloud-prod
+        environment:
+            - POSTGRES_USER=seqr
+            - POSTGRES_DB=seqr
+            - POSTGRES_PASSWORD=
+        volumes:
+            - pg-data:/var/lib/postgresql/data
+        healthcheck:
+            test: pg_isready -h postgres -U postgres
+            interval: 5s
+            timeout: 10s
+            retries: 100
+        ports:
+            - 5432:5432
+
+volumes:
+    pg-data:
