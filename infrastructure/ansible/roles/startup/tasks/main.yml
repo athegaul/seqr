@@ -1,0 +1,23 @@
+- name: Copy docker-container-start shell script
+  copy:
+    src: "{{ shell_script_file_name }}"
+    dest: "{{ shell_script_destination }}/{{ shell_script_file_name }}"
+    owner: ansible
+    group: ansible
+    mode: 0755
+
+- name: Copy docker-container-services service script
+  template:
+    src: "{{ service_script_file_name }}.j2"
+    dest: "{{ service_script_destination }}/{{ service_script_file_name }}.service"
+    owner: ansible
+    group: ansible
+    mode: 0644
+
+- name: Enable docker-container-services service script
+  systemd:
+    name: docker-container-services
+    enabled: True
+
+- name: Reboot a machine
+  reboot:

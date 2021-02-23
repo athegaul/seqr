@@ -1,0 +1,8 @@
+[Unit]
+Description=Start docker container on startup
+
+[Service]
+ExecStart={{ shell_script_destination }}/{{ shell_script_file_name }}
+
+[Install]
+WantedBy=multi-user.target
