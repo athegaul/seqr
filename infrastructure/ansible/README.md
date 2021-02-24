@@ -33,6 +33,7 @@ ansible-playbook kibana-container.yml
 ansible-playbook pipeline-runner.yml
 ansible-playbook postgres-container.yml
 ansible-playbook startup-script.yml
+ansible-playbook node.yml
 ```
 
 From here you can follow [local install](https://github.com/broadinstitute/seqr/blob/master/deploy/LOCAL_INSTALL.md) guide for pipeline-runner.
