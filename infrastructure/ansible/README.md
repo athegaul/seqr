@@ -25,6 +25,8 @@ ansible all -m ping
 ```
 
 ## Running ansible playbook
+**Note:** Make sure you generate ssh key on server for deployment with the name ansible and copy/paste generate public key to your github account.
+
 Run ansible playbooks with the following order
 ```
 ansible-playbook docker.yml

@@ -1,0 +1,39 @@
+- name: "Check if seqr-ui service is running on port {{ seqr_ui_port }}"
+  wait_for:
+    port: "{{ seqr_ui_port }}"
+    timeout: 10
+    state: stopped
+    msg: "seqr-ui is running on port {{ seqr_ui_port }}"
+  register: seqr_ui_status
+  ignore_errors: yes
+
+- name: Stop seqr-ui if running
+  shell: fuser -k {{ seqr_ui_port }}/tcp
+  become: true
+  when: seqr_ui_status.failed == true
+
+- name: "Check if seqr service is running on port {{ seqr_port }}"
+  wait_for:
+    port: "{{ seqr_ui_port }}"
+    timeout: 10
+    state: stopped
+    msg: "seqr is running on port {{ seqr_port }}"
+  register: seqr_status
+  ignore_errors: yes
+
+- name: Stop seqr if running
+  shell: sudo fuser -k {{ seqr_port }}/tcp
+  when: seqr_status.failed == true
+
+- name: Remove repository athegaul/seqr
+  file:
+    path: "{{ repo_dest }}/seqr"
+    state: absent
+
+- name: Clone repository athegaul/seqr
+  git:
+    repo: git@github.com:athegaul/seqr.git
+    dest: "{{ repo_dest }}/seqr"
+    clone: yes
+    key_file: "{{ key_file }}"
+    accept_hostkey: yes
