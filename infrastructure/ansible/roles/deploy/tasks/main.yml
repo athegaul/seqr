@@ -37,3 +37,34 @@
     clone: yes
     key_file: "{{ key_file }}"
     accept_hostkey: yes
+
+- name: Install psycopg2 for Python3
+  apt:
+    name: python3-psycopg2
+    state: latest
+    update_cache: yes
+
+- name: Install requirements.txt
+  command:
+    chdir: "{{ repo_dest }}/seqr"
+    cmd: pip3 install -r requirements.txt
+  become: false
+
+- name: Install requirements-dev.txt
+  command:
+    chdir: "{{ repo_dest }}/seqr"
+    cmd: pip3 install -r requirements-dev.txt
+
+- name: Add POSTGRES_USERNAME variable
+  lineinfile:
+    dest: "{{ repo_dest }}/.bashrc"
+    line: "export POSTGRES_USERNAME={{ postgres_username }}"
+    insertafter: "EOF"
+    state: present
+
+- name: Add POSTGRES_PASSWORD variable
+  lineinfile:
+    dest: "{{ repo_dest }}/.bashrc"
+    line: "export POSTGRES_PASSWORD={{ postgres_password }}"
+    insertafter: "EOF"
+    state: present
