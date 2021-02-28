@@ -1,0 +1,89 @@
+- name: Stop seqr-ui if running
+  shell: fuser -k {{ seqr_ui_port }}/tcp
+  ignore_errors: yes
+  become: true
+
+- name: Stop seqr if running
+  shell: fuser -k {{ seqr_port }}/tcp
+  ignore_errors: yes
+  become: true
+
+- name: Remove repository athegaul/seqr
+  file:
+    path: "{{ repo_dest }}/seqr"
+    state: absent
+
+- name: Clone repository athegaul/seqr
+  git:
+    repo: git@github.com:athegaul/seqr.git
+    dest: "{{ repo_dest }}/seqr"
+    clone: yes
+    key_file: "{{ key_file }}"
+    accept_hostkey: yes
+
+- name: Install node modules
+  shell: >
+    ln -sf {{ repo_dest }}/.nvm/versions/node/v10.15.3/bin/node /usr/bin/node &&
+    sudo {{ repo_dest }}/.nvm/versions/node/v10.15.3/bin/npm install
+  args:
+    chdir: "{{ repo_dest }}/seqr/ui"
+  ignore_errors: yes
+  become: true
+
+- name: Install psycopg2 for Python3
+  apt:
+    name: python3-psycopg2
+    state: latest
+    update_cache: yes
+
+- name: Install requirements.txt
+  command:
+    chdir: "{{ repo_dest }}/seqr"
+    cmd: pip3 install -r requirements.txt
+  become: false
+
+- name: Install requirements-dev.txt
+  command:
+    chdir: "{{ repo_dest }}/seqr"
+    cmd: pip3 install -r requirements-dev.txt
+  become: false
+
+- name: Add POSTGRES_USERNAME variable
+  lineinfile:
+    dest: "{{ repo_dest }}/.bashrc"
+    line: "export POSTGRES_USERNAME={{ postgres_username }}"
+    insertafter: "EOF"
+    state: present
+
+- name: Add POSTGRES_PASSWORD variable
+  lineinfile:
+    dest: "{{ repo_dest }}/.bashrc"
+    line: "export POSTGRES_PASSWORD={{ postgres_password }}"
+    insertafter: "EOF"
+    state: present
+
+- name: Set environment variables into temp file
+  shell: env > /opt/.ansible_env_file
+  environment:
+   - POSTGRES_USERNAME: "{{ postgres_username }}"
+   - POSTGRES_PASSWORD: "{{ postgres_password }}"
+  become: true
+
+- name: "Start seqr-ui at port {{ seqr_ui_port }}"
+  shell: >
+    nohup {{ repo_dest }}/.nvm/versions/node/v10.15.3/bin/npm start &
+  args:
+    chdir: "{{ repo_dest }}/seqr/ui"
+  register: status
+  async: 10
+  poll: 0
+  become: true
+
+- name: "Start seqr server at port {{ seqr_port }}"
+  shell: nohup python3 -m manage runserver 0.0.0.0:8000 &
+  args:
+    chdir: "{{ repo_dest }}/seqr"
+  environment:
+   - POSTGRES_USERNAME: "{{ postgres_username }}"
+   - POSTGRES_PASSWORD: "{{ postgres_password }}"
+  become: false

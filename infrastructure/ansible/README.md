@@ -25,12 +25,20 @@ ansible all -m ping
 ```
 
 ## Running ansible playbook
+**Note:** Make sure you generate ssh key on server for deployment with the name ansible and copy/paste generate public key to your github account. Also for POSTGRES_PASSWORD environment variable in vars you will need to set password.
+
 Run ansible playbooks with the following order
 ```
 ansible-playbook docker.yml
 ansible-playbook elasticsearch-container.yml
 ansible-playbook kibana-container.yml
 ansible-playbook pipeline-runner.yml
+ansible-playbook postgres-container.yml
+ansible-playbook startup-script.yml
+ansible-playbook node.yml
+ansible-playbook deploy.yml
+ansible-playbook node-startup.yml
+ansible-playbook seqr-startup.yml
 ```
 
 From here you can follow [local install](https://github.com/broadinstitute/seqr/blob/master/deploy/LOCAL_INSTALL.md) guide for pipeline-runner.

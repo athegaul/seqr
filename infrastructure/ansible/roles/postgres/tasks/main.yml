@@ -6,7 +6,7 @@
     group: ansible
     mode: 0644
 
-- name: Set up redis container
+- name: Set up postgres container
   docker_compose:
     project_src: "{{ compose_file_location }}"
     files:

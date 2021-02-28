@@ -69,8 +69,24 @@ resource "aws_security_group" "seqr-sg" {
 
     ingress {
         description = "Kibana"
-        from_port   = 80
+        from_port   = 5601
         to_port     = 5601
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        description = "Postgres"
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        description = "Seqr UI"
+        from_port   = 3000
+        to_port     = 3000
         protocol    = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }

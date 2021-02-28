@@ -1,0 +1,28 @@
+# - name: Get latest nvm install from github
+#   get_url:
+#     url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh
+#     dest: "{{ nvm_location }}"
+#     group: ansible
+#     owner: ansible
+#     mode: 0755
+
+# - name: Install nvm
+#   command: "{{ nvm_location }}/install.sh"
+
+- name: Download and install nvm
+  shell: >
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+  args:
+    executable: /bin/bash
+    chdir: "{{ ansible_env.HOME }}"
+    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+- name: "Install node {{ node_version }}"
+  shell: >
+    . {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install {{ node_version }}
+  args:
+    executable: /bin/bash
+    chdir: "{{ ansible_env.HOME }}"
+    creates: "{{ ansible_env.HOME }}/.nvm/versions/{{ node_version }}"
+  loop:
+    - node

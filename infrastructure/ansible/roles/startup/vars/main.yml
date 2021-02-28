@@ -1,0 +1,5 @@
+shell_script_file_name: docker-container-start.sh
+shell_script_destination: /usr/local/sbin
+
+service_script_file_name: docker-container-services
+service_script_destination: /etc/systemd/system

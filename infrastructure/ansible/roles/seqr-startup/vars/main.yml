@@ -1,0 +1,3 @@
+repo_dest: /home/ansible/seqr/
+service_script_file_name: seqr-service
+service_script_destination: /etc/systemd/system
