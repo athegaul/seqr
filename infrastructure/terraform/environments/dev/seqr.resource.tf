@@ -72,8 +72,7 @@ resource "aws_security_group" "seqr-sg" {
         from_port   = 5601
         to_port     = 5601
         protocol    = "tcp"
-        cidr_
-        blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     ingress {
@@ -81,8 +80,15 @@ resource "aws_security_group" "seqr-sg" {
         from_port   = 5432
         to_port     = 5432
         protocol    = "tcp"
-        cidr_
-        blocks = ["0.0.0.0/0"]
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        description = "Seqr UI"
+        from_port   = 3000
+        to_port     = 3000
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     egress {
