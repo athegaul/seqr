@@ -1,0 +1,3 @@
+repo_dest: /home/ansible/seqr/ui/
+service_script_file_name: ui-seqr-services
+service_script_destination: /etc/systemd/system

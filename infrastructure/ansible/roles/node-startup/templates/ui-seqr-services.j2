@@ -1,0 +1,9 @@
+[Unit]
+Description=Start seqr ui
+
+[Service]
+WorkingDirectory={{ repo_dest }}
+ExecStart=/home/ansible/.nvm/versions/node/v10.15.3/bin/npm start
+
+[Install]
+WantedBy=multi-user.target
