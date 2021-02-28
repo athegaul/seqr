@@ -4,4 +4,4 @@ seqr_port: 8000
 key_file: /home/ansible/.ssh/ansible
 
 postgres_username: seqr
-postgres_password: NB9hWfXCyzq43B
+postgres_password: 

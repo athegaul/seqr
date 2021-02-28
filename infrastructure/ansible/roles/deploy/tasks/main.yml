@@ -62,6 +62,13 @@
     insertafter: "EOF"
     state: present
 
+- name: Set environment variables into temp file
+  shell: env > /opt/.ansible_env_file
+  environment:
+   - POSTGRES_USERNAME: "{{ postgres_username }}"
+   - POSTGRES_PASSWORD: "{{ postgres_password }}"
+  become: true
+
 - name: "Start seqr-ui at port {{ seqr_ui_port }}"
   shell: >
     nohup {{ repo_dest }}/.nvm/versions/node/v10.15.3/bin/npm start &

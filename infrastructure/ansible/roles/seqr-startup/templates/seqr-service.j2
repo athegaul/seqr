@@ -1,0 +1,12 @@
+[Unit]
+Description=Start seqr
+
+[Service]
+User=ansible
+WorkingDirectory={{ repo_dest }}
+ExecStartPre=/bin/sleep 40
+ExecStart=python3 -m manage runserver 0.0.0.0:8000
+EnvironmentFile=/opt/.ansible_env_file
+
+[Install]
+WantedBy=multi-user.target

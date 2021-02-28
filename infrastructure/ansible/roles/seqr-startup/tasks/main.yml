@@ -1,4 +1,4 @@
-- name: Copy ui-seqr-service service script
+- name: Copy seqr-service service script
   template:
     src: "{{ service_script_file_name }}.j2"
     dest: "{{ service_script_destination }}/{{ service_script_file_name }}.service"
@@ -6,9 +6,9 @@
     group: ansible
     mode: 0644
 
-- name: Enable ui-seqr-service service script
+- name: Enable seqr-service service script
   systemd:
-    name: ui-seqr-service
+    name: seqr-service
     enabled: True
 
 - name: Reboot a machine
