@@ -80,7 +80,7 @@ const ACMG_Criteria = (props) => {
                     <Table.Row>
                         <Table.Cell rowSpan="3"><span style={{ writingMode: "sideways-lr", marginLeft: "-10px" }}>Population Data</span></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="pink">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BA1</Table.Cell>
@@ -112,7 +112,7 @@ const ACMG_Criteria = (props) => {
                         </Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM2_P</Table.Cell>
@@ -143,7 +143,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM2</Table.Cell>
@@ -179,7 +179,7 @@ const ACMG_Criteria = (props) => {
 
                     <Table.Row>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="pink">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BS1</Table.Cell>
@@ -210,7 +210,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="blue">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BS1_P</Table.Cell>
@@ -241,7 +241,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS4_P</Table.Cell>
@@ -272,7 +272,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS4_M</Table.Cell>
@@ -303,7 +303,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS4</Table.Cell>
@@ -338,7 +338,7 @@ const ACMG_Criteria = (props) => {
 
                     <Table.Row>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="pink">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BS2</Table.Cell>
@@ -379,7 +379,7 @@ const ACMG_Criteria = (props) => {
                         <Table.Cell rowSpan="4"><span style={{ writingMode: "sideways-lr", marginLeft: "-10px" }}>Computational and Predictive Data</span></Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="blue">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BP1</Table.Cell>
@@ -412,11 +412,11 @@ const ACMG_Criteria = (props) => {
                         <Table.Cell></Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS1</Table.Cell>
-                                        <Table.Cell width={2}>SAME AA change as<br />establish pathogenic variant</Table.Cell>
+                                        <Table.Cell width={2}>Same AA change as<br />establish pathogenic variant</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
                                                 value={criteriaUsed["PS1"] ? "Y" : ""}
@@ -448,7 +448,7 @@ const ACMG_Criteria = (props) => {
                     <Table.Row>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="blue">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BP3</Table.Cell>
@@ -480,7 +480,7 @@ const ACMG_Criteria = (props) => {
                         </Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM5</Table.Cell>
@@ -511,7 +511,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM5_S</Table.Cell>
@@ -546,7 +546,7 @@ const ACMG_Criteria = (props) => {
 
                     <Table.Row>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="pink">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BP4_S</Table.Cell>
@@ -577,7 +577,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="blue">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BP4</Table.Cell>
@@ -608,7 +608,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PP3</Table.Cell>
@@ -639,7 +639,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PVS1_M</Table.Cell>
@@ -670,7 +670,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PVS1_S</Table.Cell>
@@ -701,7 +701,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PVS1</Table.Cell>
@@ -736,7 +736,7 @@ const ACMG_Criteria = (props) => {
                     <Table.Row>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="blue">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BP7</Table.Cell>
@@ -767,7 +767,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM4_S</Table.Cell>
@@ -798,7 +798,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM4</Table.Cell>
@@ -837,7 +837,7 @@ const ACMG_Criteria = (props) => {
                         <Table.Cell></Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PP2</Table.Cell>
@@ -868,7 +868,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM1</Table.Cell>
@@ -903,7 +903,7 @@ const ACMG_Criteria = (props) => {
 
                     <Table.Row>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="pink">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BS3</Table.Cell>
@@ -935,7 +935,7 @@ const ACMG_Criteria = (props) => {
                         </Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS3_P</Table.Cell>
@@ -966,7 +966,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS3_M</Table.Cell>
@@ -997,7 +997,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS3</Table.Cell>
@@ -1033,7 +1033,7 @@ const ACMG_Criteria = (props) => {
                     <Table.Row>
                         <Table.Cell><span style={{ writingMode: "sideways-lr", marginLeft: "-10px" }}>Segregation Data</span></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="pink">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BS4</Table.Cell>
@@ -1065,7 +1065,7 @@ const ACMG_Criteria = (props) => {
                         </Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PP1</Table.Cell>
@@ -1096,7 +1096,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PP1_M</Table.Cell>
@@ -1127,7 +1127,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PP1_S</Table.Cell>
@@ -1166,7 +1166,7 @@ const ACMG_Criteria = (props) => {
                         <Table.Cell></Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM6</Table.Cell>
@@ -1197,7 +1197,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM6_S</Table.Cell>
@@ -1236,7 +1236,7 @@ const ACMG_Criteria = (props) => {
                         <Table.Cell></Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS2</Table.Cell>
@@ -1267,7 +1267,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PS2_VS</Table.Cell>
@@ -1303,7 +1303,7 @@ const ACMG_Criteria = (props) => {
                         <Table.Cell><span style={{ writingMode: "sideways-lr", marginLeft: "-10px" }}>Alleleic Data</span></Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="blue">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BP2</Table.Cell>
@@ -1334,7 +1334,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM3_P</Table.Cell>
@@ -1365,7 +1365,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="orange">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM3</Table.Cell>
@@ -1396,7 +1396,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM3_S</Table.Cell>
@@ -1427,7 +1427,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="red">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PM3_VS</Table.Cell>
@@ -1463,7 +1463,7 @@ const ACMG_Criteria = (props) => {
                         <Table.Cell><span style={{ writingMode: "sideways-lr", marginLeft: "-10px" }}>Other Data</span></Table.Cell>
                         <Table.Cell></Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="blue">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>BP5</Table.Cell>
@@ -1494,7 +1494,7 @@ const ACMG_Criteria = (props) => {
                             </Table>
                         </Table.Cell>
                         <Table.Cell>
-                            <Table size="small">
+                            <Table size="small" color="green">
                                 <Table.Body>
                                     <Table.Row textAlign="center">
                                         <Table.Cell width={1}>PP4</Table.Cell>
