@@ -1,6 +1,20 @@
 import React from 'react';
 import { Table } from 'semantic-ui-react';
 
+const formatCriteria = (criteria) => {
+    const formattedCriteria = [];
+    
+    for (let i = 0; i < criteria.length; i++) {
+        formattedCriteria.push(criteria[i]);
+
+        if (i !== criteria.length - 1) {
+            formattedCriteria[i] += ", ";
+        }
+    }
+
+    return formattedCriteria;
+}
+
 const ACMG_ScoreCriteria = (props) => {
     const { score, criteria } = props;
 
@@ -16,8 +30,8 @@ const ACMG_ScoreCriteria = (props) => {
                 
                 <Table.Body>
                     <Table.Row>
-                        <Table.Cell>{score}</Table.Cell>
-                        <Table.Cell>{criteria.length === 0 ? "No criteria applied" : criteria}</Table.Cell>
+                        <Table.Cell width="5">{score}</Table.Cell>
+                        <Table.Cell>{criteria.length === 0 ? "No criteria applied" : formatCriteria(criteria)}</Table.Cell>
                     </Table.Row>
                 </Table.Body>
             </Table>

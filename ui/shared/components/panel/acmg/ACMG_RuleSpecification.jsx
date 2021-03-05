@@ -12,11 +12,11 @@ const ACMG_RuleSpecification = () => {
                         <Table.Cell textAlign="center">BA1</Table.Cell>
                         <Table.Cell colSpan="2">
                             <List bulleted>
-                                <List.Item>{"HCM/DCM: >= 0.1%"}</List.Item>
-                                <List.Item>{"Noonan: >= 0.05%"}</List.Item>
-                                <List.Item>{"Default: >= 0.6%"}</List.Item>
-                                <List.Item>{"HL (Autosomal recessive): >= 0.5%"}</List.Item>
-                                <List.Item>{"HL (Autosomal dominant): >= 0.1%"}</List.Item>
+                                <List.Item key="rs_hcm_dcm_01">{"HCM/DCM: >= 0.1%"}</List.Item>
+                                <List.Item key="rs_noonan_005">{"Noonan: >= 0.05%"}</List.Item>
+                                <List.Item key="rs_default_06">{"Default: >= 0.6%"}</List.Item>
+                                <List.Item key="rs_autosomal_recessive_05">{"HL (Autosomal recessive): >= 0.5%"}</List.Item>
+                                <List.Item key="hl_autosomal_dominan_01">{"HL (Autosomal dominant): >= 0.1%"}</List.Item>
                             </List>
                         </Table.Cell>
                     </Table.Row>
@@ -25,11 +25,11 @@ const ACMG_RuleSpecification = () => {
                         <Table.Cell textAlign="center">BS1</Table.Cell>
                         <Table.Cell colSpan="2">
                             <List bulleted>
-                                <List.Item>{"HCM/DCM: >= 0.2%"}</List.Item>
-                                <List.Item>{"Noonan: >= 0.025%"}</List.Item>
-                                <List.Item>{"Default: >= 0.3%"}</List.Item>
-                                <List.Item>{"HL (Autosomal recessive): >= 0.3%"}</List.Item>
-                                <List.Item>{"HL (Autosomal dominant): >= 0.02%"}</List.Item>
+                                <List.Item key="rs_hcm_dcm_02">{"HCM/DCM: >= 0.2%"}</List.Item>
+                                <List.Item key="rs_noonan_0025">{"Noonan: >= 0.025%"}</List.Item>
+                                <List.Item key="rs_default_03">{"Default: >= 0.3%"}</List.Item>
+                                <List.Item key="rs_autosomal_recessive_03">{"HL (Autosomal recessive): >= 0.3%"}</List.Item>
+                                <List.Item key="hl_autosomal_dominan_02">{"HL (Autosomal dominant): >= 0.02%"}</List.Item>
                             </List>
                         </Table.Cell>
                     </Table.Row>
@@ -38,7 +38,7 @@ const ACMG_RuleSpecification = () => {
                         <Table.Cell textAlign="center">BS1_P</Table.Cell>
                         <Table.Cell colSpan="2">
                             <List bulleted>
-                                <List.Item>{"HL (Autosomal recessive): 0.07-0.3%"}</List.Item>
+                                <List.Item key="rs_autosomal_recessive_0703">{"HL (Autosomal recessive): 0.07-0.3%"}</List.Item>
                             </List>
                         </Table.Cell>
                     </Table.Row>
@@ -47,8 +47,8 @@ const ACMG_RuleSpecification = () => {
                         <Table.Cell textAlign="center">PM2_P</Table.Cell>
                         <Table.Cell colSpan="2">
                             <List bulleted>
-                                <List.Item>{"HL (Autosomal recessive): <= 0.007%"}</List.Item>
-                                <List.Item>{"HL (Autosomal dominant): <= 0.002%"}</List.Item>
+                                <List.Item key="rs_autosomal_recessive_007">{"HL (Autosomal recessive): <= 0.007%"}</List.Item>
+                                <List.Item key="hl_autosomal_dominan_002">{"HL (Autosomal dominant): <= 0.002%"}</List.Item>
                             </List>
                         </Table.Cell>
                     </Table.Row>
@@ -118,8 +118,8 @@ const ACMG_RuleSpecification = () => {
                                         <Table.Cell>
                                             <Label color="blue">Increase to PM3_Strong if observed in trans</Label>
                                             <List bulleted>
-                                                <List.Item>{"2x and >= 1 variant in PATH"}</List.Item>
-                                                <List.Item>{"3x if other variants are LP"}</List.Item>
+                                                <List.Item key="rs_2x_and_1_variant_path">{"2x and >= 1 variant in PATH"}</List.Item>
+                                                <List.Item key="rs_3x_other_variants_lp">{"3x if other variants are LP"}</List.Item>
                                             </List>
                                         </Table.Cell>
                                     </Table.Row>
@@ -134,8 +134,8 @@ const ACMG_RuleSpecification = () => {
                                         <Table.Cell>
                                             <Label color="blue">Increase to VeryStrong if observed in trans</Label>
                                             <List bulleted>
-                                                <List.Item>{"4x and >= 2 variant in PATH (can be same variant)"}</List.Item>
-                                                <List.Item>{"4x if LP/P variants are all different"}</List.Item>
+                                                <List.Item key="rs_4x_and_2_variant_path">{"4x and >= 2 variant in PATH (can be same variant)"}</List.Item>
+                                                <List.Item key="rs_4x_lpp_different">{"4x if LP/P variants are all different"}</List.Item>
                                             </List>
                                         </Table.Cell>
                                     </Table.Row>
@@ -206,7 +206,7 @@ const ACMG_RuleSpecification = () => {
                             <Table color="blue">
                                 <Table.Header>
                                     <Table.Row textAlign="center">
-                                        <Table.HeaderCell colspan="12">General Recommendations (Phenocopy not an issue)</Table.HeaderCell>
+                                        <Table.HeaderCell colSpan="12">General Recommendations (Phenocopy not an issue)</Table.HeaderCell>
                                     </Table.Row>
 
                                     <Table.Row textAlign="center">
@@ -448,9 +448,9 @@ const ACMG_RuleSpecification = () => {
                                     <Table.Cell textAlign="left">
                                         A combination of the following adding to 1 point:
                                         <List bulleted>
-                                            <List.Item>Observations with LP/P but phase unknown</List.Item>
-                                            <List.Item>Compound het with rare VUS</List.Item>
-                                            <List.Item>Hom w/ ADO rules out</List.Item>
+                                            <List.Item key="rs_observations_with_lpp">Observations with LP/P but phase unknown</List.Item>
+                                            <List.Item key="rs_compund_rare_vus">Compound het with rare VUS</List.Item>
+                                            <List.Item key="rs_hom_ado_rules_out">Hom w/ ADO rules out</List.Item>
                                         </List>
                                     </Table.Cell>
                                 </Table.Row>
@@ -462,10 +462,10 @@ const ACMG_RuleSpecification = () => {
                                     <Table.Cell textAlign="left">
                                         A combination of the following adding to 2 points:
                                         <List bulleted>
-                                            <List.Item>Comp het with LP/P</List.Item>
-                                            <List.Item>Hom w/ ADO rules out</List.Item>
-                                            <List.Item>Observations with different LP/P but phase unknown</List.Item>
-                                            <List.Item>Compund het with rare VUS</List.Item>
+                                            <List.Item key="rs_comp_lpp">Comp het with LP/P</List.Item>
+                                            <List.Item key="rs_hom_ado_rules_out_2">Hom w/ ADO rules out</List.Item>
+                                            <List.Item key="rs_observations_lpp_phase_unknown">Observations with different LP/P but phase unknown</List.Item>
+                                            <List.Item key="rs_compund_rare_vus_2">Compund het with rare VUS</List.Item>
                                         </List>
                                     </Table.Cell>
                                 </Table.Row>
@@ -477,10 +477,10 @@ const ACMG_RuleSpecification = () => {
                                     <Table.Cell textAlign="left">
                                         A combination of the following adding to 4 points:
                                         <List bulleted>
-                                            <List.Item>Comp hets with LP/P</List.Item>
-                                            <List.Item>Different observations with LP/P but phase unknown</List.Item>
-                                            <List.Item>Compound het with rare VUS</List.Item>
-                                            <List.Item>How w/ ADO ruled out</List.Item>
+                                            <List.Item key="rs_comp_lpp_2">Comp hets with LP/P</List.Item>
+                                            <List.Item key="rs_different_observations_lpp_phase_unknown">Different observations with LP/P but phase unknown</List.Item>
+                                            <List.Item key="rs_compund_rare_vus_3">Compound het with rare VUS</List.Item>
+                                            <List.Item key="rs_hom_ado_rules_out_3">How w/ ADO ruled out</List.Item>
                                         </List>
                                     </Table.Cell>
                                 </Table.Row>

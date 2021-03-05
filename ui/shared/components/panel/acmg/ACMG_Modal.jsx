@@ -7,6 +7,16 @@ const ACMG_Modal = (props) => {
     const { score, setScore, active, setActive } = props;
     const [ criteria, setCriteria ] = useState([]);
 
+    const [ acmgCalculationValue, setAcmgCalculationValue ] = useState({
+        "PVS": 0,
+        "PS": 0,
+        "PM": 0,
+        "PP": 0,
+        "BA": 0,
+        "BS": 0,
+        "BP": 0
+    });
+
     return (
         <div>
             <div className="ui blue labels">
@@ -19,7 +29,7 @@ const ACMG_Modal = (props) => {
                     <Modal.Content>
                         <ACMG_ScoreCriteria score={score} criteria={criteria} />
                         <br />
-                        <ACMG_Criteria />
+                        <ACMG_Criteria criteria={criteria} setCriteria={setCriteria} acmgCalculationValue={acmgCalculationValue} setAcmgCalculationValue={setAcmgCalculationValue} />
                     </Modal.Content>
                 </Modal>
             </div>
