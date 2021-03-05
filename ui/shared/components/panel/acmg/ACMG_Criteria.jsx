@@ -1,10 +1,11 @@
 import React from 'react';
-import { Table, Dropdown } from 'semantic-ui-react';
+import { Table, Dropdown, Button } from 'semantic-ui-react';
 import ACMG_RuleSpecification from "./ACMG_RuleSpecification";
 
 const ACMG_Criteria = (props) => {
     const { criteria, setCriteria } = props;
     const { acmgCalculationValue, setAcmgCalculationValue } = props;
+    const { getScore, setScore } = props;
 
     const criteriaUsed = {};
     criteria.forEach(item => criteriaUsed[item] = true);
@@ -35,10 +36,27 @@ const ACMG_Criteria = (props) => {
             setCriteria(criteriaCopy);
             setAcmgCalculationValue(acmgCalculationValueCopy);
         }
+
+        setScore(getScore(acmgCalculationValueCopy));
+    }
+
+    const clearFields = () => {
+        setAcmgCalculationValue({
+            "PVS": 0,
+            "PS": 0,
+            "PM": 0,
+            "PP": 0,
+            "BA": 0,
+            "BS": 0,
+            "BP": 0
+        });
+        setCriteria([]);
+        setScore("Unknown");
     }
 
     return (
         <div>
+            <Button primary onClick={clearFields}>Clear Form</Button>
             <Table celled structured textAlign="center" style={{ fontSize: "13px" }}>
                 <Table.Header>
                     <Table.Row>
@@ -69,6 +87,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>MAF too high<br />(Stand Alone)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BA1"] ? "Y" : ""}
                                                 key="dropdown0"
                                                 placeholder="N"
                                                 options={[
@@ -100,6 +119,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Low AF in pop db</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM2_Supporting"] ? "Y" : ""}
                                                 key="dropdown1"
                                                 placeholder="N"
                                                 options={[
@@ -130,6 +150,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Absent (or rare) in<br />pop db with coverage<br />{">20x"}</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM2"] ? "Y" : ""}
                                                 key="dropdown2"
                                                 placeholder="N"
                                                 options={[
@@ -165,6 +186,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>MAF too high<br />(Stand Alone)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BS1"] ? "Y" : ""}
                                                 key="dropdown3"
                                                 placeholder="N"
                                                 options={[
@@ -195,6 +217,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>MAF too high<br />(Supporting)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BS1_Supporting"] ? "Y" : ""}
                                                 key="dropdown4"
                                                 placeholder="N"
                                                 options={[
@@ -225,6 +248,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Proband Count -<br />Supporting</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS4_Supporting"] ? "Y" : ""}
                                                 key="dropdown5"
                                                 placeholder="N"
                                                 options={[
@@ -255,6 +279,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Proband Count -<br />Moderate</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS4_Moderate"] ? "Y" : ""}
                                                 key="dropdown6"
                                                 placeholder="N"
                                                 options={[
@@ -285,6 +310,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Case-control OR<br />Proband Count</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS4"] ? "Y" : ""}
                                                 key="dropdown7"
                                                 placeholder="N"
                                                 options={[
@@ -319,6 +345,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>MAF too high<br />(Stand Alone)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BS2"] ? "Y" : ""}
                                                 key="dropdown8"
                                                 placeholder="N"
                                                 options={[
@@ -359,6 +386,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Truncating disease causing<br />variant missense</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BP1"] ? "Y" : ""}
                                                 key="dropdown9"
                                                 placeholder="N"
                                                 options={[
@@ -391,6 +419,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>SAME AA change as<br />establish pathogenic variant</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS1"] ? "Y" : ""}
                                                 key="dropdown10"
                                                 placeholder="N"
                                                 options={[
@@ -426,6 +455,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>In-frame indel in repeat<br />region w/out known function</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BP3"] ? "Y" : ""}
                                                 key="dropdown11"
                                                 placeholder="N"
                                                 options={[
@@ -457,6 +487,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Diff pathogenic<br />missense variant at<br />codon</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM5"] ? "Y" : ""}
                                                 key="dropdown12"
                                                 placeholder="N"
                                                 options={[
@@ -487,6 +518,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>{">=2 diff path"}<br />missense variants at<br />codon</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM5_Strong"] ? "Y" : ""}
                                                 key="dropdown13"
                                                 placeholder="N"
                                                 options={[
@@ -521,6 +553,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Variant AA found<br />{"in >=3 mammals"}</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BP4_Strong"] ? "Y" : ""}
                                                 key="dropdown14"
                                                 placeholder="N"
                                                 options={[
@@ -536,7 +569,7 @@ const ACMG_Criteria = (props) => {
                                                     }
                                                 ]}
                                                 onChange={addOrRemoveCriteria}
-                                                text={criteriaUsed["PB4_Strong"] ? "Y" : ""}
+                                                text={criteriaUsed["BP4_Strong"] ? "Y" : ""}
                                             />
                                         </Table.Cell>
                                     </Table.Row>
@@ -551,6 +584,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Computational evidence<br />suggests no impact</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BP4"] ? "Y" : ""}
                                                 key="dropdown15"
                                                 placeholder="N"
                                                 options={[
@@ -581,6 +615,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Computational<br />evidente suggests<br />impact</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PP3"] ? "Y" : ""}
                                                 key="dropdown16"
                                                 placeholder="N"
                                                 options={[
@@ -611,6 +646,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Null variant -<br />Moderate</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PVS1_Moderate"] ? "Y" : ""}
                                                 key="dropdown17"
                                                 placeholder="N"
                                                 options={[
@@ -641,6 +677,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Null variant -<br />Strong</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PVS1_Strong"] ? "Y" : ""}
                                                 key="dropdown18"
                                                 placeholder="N"
                                                 options={[
@@ -671,6 +708,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Null variant & LOF<br />known mechanism</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PVS1"] ? "Y" : ""}
                                                 key="dropdown19"
                                                 placeholder="N"
                                                 options={[
@@ -705,6 +743,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Silent or noncons splice<br />(see below) with no<br />predicted splice impact</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BP7"] ? "Y" : ""}
                                                 key="dropdown20"
                                                 placeholder="N"
                                                 options={[
@@ -735,6 +774,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>In-frame indel of 1-2<br />AA</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM4_Supporting"] ? "Y" : ""}
                                                 key="dropdown21"
                                                 placeholder="N"
                                                 options={[
@@ -765,6 +805,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Pritein length<br />changing variant{">2"}<br />AA) in non-repeat<br />region</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM4"] ? "Y" : ""}
                                                 key="dropdown22"
                                                 placeholder="N"
                                                 options={[
@@ -803,6 +844,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Missense in a gene<br />with low rate of<br />benign missense &<br />path missense<br />common</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PP2"] ? "Y" : ""}
                                                 key="dropdown23"
                                                 placeholder="N"
                                                 options={[
@@ -833,6 +875,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Mutation hotspot or<br />fxnl domain</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM1"] ? "Y" : ""}
                                                 key="dropdown24"
                                                 placeholder="N"
                                                 options={[
@@ -867,6 +910,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Established fxnl<br />study shows no<br />deleterious effect</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BS3"] ? "Y" : ""}
                                                 key="dropdown25"
                                                 placeholder="N"
                                                 options={[
@@ -898,6 +942,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Functional assay -<br />Supporting</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS3_Supporting"] ? "Y" : ""}
                                                 key="dropdown26"
                                                 placeholder="N"
                                                 options={[
@@ -928,6 +973,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Functional assay -<br />Moderate</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS3_Moderate"] ? "Y" : ""}
                                                 key="dropdown27"
                                                 placeholder="N"
                                                 options={[
@@ -958,6 +1004,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Established fxnl<br />study shows<br />deleterious effect</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS3"] ? "Y" : ""}
                                                 key="dropdown28"
                                                 placeholder="N"
                                                 options={[
@@ -993,6 +1040,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Lack of<br />segregation in<br />affected</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BS4"] ? "Y" : ""}
                                                 key="dropdown29"
                                                 placeholder="N"
                                                 options={[
@@ -1024,6 +1072,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Coseg with disease<br />Dominant: 3 segs<br />Recessive:</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PP1"] ? "Y" : ""}
                                                 key="dropdown30"
                                                 placeholder="N"
                                                 options={[
@@ -1054,6 +1103,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Coseg with disease<br />Dominant: 5 segs<br />Recessive:</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PP1_Moderate"] ? "Y" : ""}
                                                 key="dropdown31"
                                                 placeholder="N"
                                                 options={[
@@ -1084,6 +1134,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Coseg with disease<br />Dominant: 7 segs<br />Recessive</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PP1_Strong"] ? "Y" : ""}
                                                 key="dropdown32"
                                                 placeholder="N"
                                                 options={[
@@ -1122,6 +1173,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>De novo (neither<br />paternity or maternity<br />confirmed)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM6"] ? "Y" : ""}
                                                 key="dropdown33"
                                                 placeholder="N"
                                                 options={[
@@ -1152,6 +1204,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>{">=2"} independent<br />occurences of PM6</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM6_Strong"] ? "Y" : ""}
                                                 key="dropdown34"
                                                 placeholder="N"
                                                 options={[
@@ -1190,6 +1243,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>De novo (paternity<br />and maternity<br />confirmed)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS2"] ? "Y" : ""}
                                                 key="dropdown35"
                                                 placeholder="N"
                                                 options={[
@@ -1220,6 +1274,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>{">=2"} independent<br />occurences of PS2</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PS2_VeryStrong"] ? "Y" : ""}
                                                 key="dropdown36"
                                                 placeholder="N"
                                                 options={[
@@ -1235,7 +1290,7 @@ const ACMG_Criteria = (props) => {
                                                     }
                                                 ]}
                                                 onChange={addOrRemoveCriteria}
-                                                text={criteriaUsed["PS2_VeryString"] ? "Y" : ""}
+                                                text={criteriaUsed["PS2_VeryStrong"] ? "Y" : ""}
                                             />
                                         </Table.Cell>
                                     </Table.Row>
@@ -1255,6 +1310,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Observed in trans with<br />dominant variant OR<br />observed in cis with<br />path variant</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BP2"] ? "Y" : ""}
                                                 key="dropdown37"
                                                 placeholder="N"
                                                 options={[
@@ -1285,6 +1341,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Variant in trans does<br />not meet LP/P criteria</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM3_Supporting"] ? "Y" : ""}
                                                 key="dropdown38"
                                                 placeholder="N"
                                                 options={[
@@ -1315,6 +1372,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Detected in trans with<br />P/LP variant<br />(recessive disorders)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM3"] ? "Y" : ""}
                                                 key="dropdown39"
                                                 placeholder="N"
                                                 options={[
@@ -1345,6 +1403,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>2-3 occurences of<br />PM3 (see below)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM3_Strong"] ? "Y" : ""}
                                                 key="dropdown40"
                                                 placeholder="N"
                                                 options={[
@@ -1375,6 +1434,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>{">=4"} occurences of<br />PM3 (see below)</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PM3_VeryStrong"] ? "Y" : ""}
                                                 key="dropdown41"
                                                 placeholder="N"
                                                 options={[
@@ -1410,6 +1470,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Found in case with an<br />alternative cause</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["BP5"] ? "Y" : ""}
                                                 key="dropdown42"
                                                 placeholder="N"
                                                 options={[
@@ -1440,6 +1501,7 @@ const ACMG_Criteria = (props) => {
                                         <Table.Cell width={2}>Patient phenotype or<br />FH high specific for<br />gene</Table.Cell>
                                         <Table.Cell width={1}>
                                             <Dropdown
+                                                value={criteriaUsed["PP4"] ? "Y" : ""}
                                                 key="dropdown43"
                                                 placeholder="N"
                                                 options={[
