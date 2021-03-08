@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import ACMG_Modal from "./ACMG_Modal";
+import React, { useState } from 'react'
+import AcmgModal from './AcmgModal'
 
-const ACMG = () => {
-    const [score, setScore] = useState("Unknown");
-    const [active, setActive] = useState(false);
+const Acmg = () => {
+  const [score, setScore] = useState('Unknown')
+  const [active, setActive] = useState(false)
 
-    return (
-        <div>
-            <ACMG_Modal score={score} setScore={setScore} active={active} setActive={setActive} />
-        </div>
-    );
+  return (
+    <div>
+      <AcmgModal score={score} setScore={setScore} active={active} setActive={setActive} />
+    </div>
+  )
 }
 
-export default ACMG;
+export default Acmg
