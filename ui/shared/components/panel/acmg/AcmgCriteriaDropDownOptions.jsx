@@ -73,6 +73,30 @@ export default [
   ],
   [
     {
+      key: 'PM_PS4-M-Moderate_Yes',
+      text: 'Y',
+      value: 'PM_PS4-M-Moderate_Yes',
+    },
+    {
+      key: 'PM_PS4-M-Moderate_No',
+      text: 'N',
+      value: 'PM_PS4-M-Moderate_No',
+    },
+  ],
+  [
+    {
+      key: 'PS_PS4_Yes',
+      text: 'Y',
+      value: 'PS_PS4_Yes',
+    },
+    {
+      key: 'PS_PS4_No',
+      text: 'N',
+      value: 'PS_PS4_No',
+    },
+  ],
+  [
+    {
       key: 'BS_BS2_Yes',
       text: 'Y',
       value: 'BS_BS2_Yes',

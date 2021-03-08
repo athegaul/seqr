@@ -1,5 +1,6 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
+import PropTypes from 'prop-types'
 
 const formatCriteria = (criteria) => {
   const formattedCriteria = []
@@ -23,7 +24,7 @@ const AcmgScoreCriteria = (props) => {
       <Table celled padded>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell singleLine>Score</Table.HeaderCell>
+            <Table.HeaderCell singleLine>Score</Table.HeaderCell>a
             <Table.HeaderCell>Criteria Applied</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
@@ -40,8 +41,8 @@ const AcmgScoreCriteria = (props) => {
 }
 
 AcmgScoreCriteria.propTypes = {
-  score: React.PropTypes.string.isRequired,
-  criteria: React.PropTypes.array.isRequired,
+  score: PropTypes.string.isRequired,
+  criteria: PropTypes.array.isRequired,
 }
 
 export default AcmgScoreCriteria
