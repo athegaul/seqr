@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Table, Dropdown, Button } from 'semantic-ui-react'
 import AcmgRuleSpecification from './AcmgRuleSpecification'
 import dropDownOptions from './AcmgCriteriaDropDownOptions'
@@ -1065,12 +1066,12 @@ const AcmgCriteria = (props) => {
 }
 
 AcmgCriteria.propTypes = {
-  criteria: React.PropTypes.array.isRequired,
-  setCriteria: React.PropTypes.func.isRequired,
-  acmgCalculationValue: React.PropTypes.object.isRequired,
-  setAcmgCalculationValue: React.PropTypes.func.isRequired,
-  getScore: React.PropTypes.string.isRequired,
-  setScore: React.PropTypes.func.isRequired,
+  criteria: PropTypes.array.isRequired,
+  setCriteria: PropTypes.func.isRequired,
+  acmgCalculationValue: PropTypes.object.isRequired,
+  setAcmgCalculationValue: PropTypes.func.isRequired,
+  getScore: PropTypes.func.isRequired,
+  setScore: PropTypes.func.isRequired,
 }
 
 export default AcmgCriteria

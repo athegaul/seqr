@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import { Icon, Modal } from 'semantic-ui-react'
 import AcmgScoreCriteria from './AcmgScoreCriteria'
 import AcmgCriteria from './AcmgCriteria'
@@ -144,10 +145,10 @@ const AcmgModal = (props) => {
 }
 
 AcmgModal.propTypes = {
-  score: React.PropTypes.string.isRequired,
-  setScore: React.PropTypes.func.isRequired,
-  active: React.PropTypes.bool.isRequired,
-  setActive: React.PropTypes.func.isRequired,
+  score: PropTypes.string.isRequired,
+  setScore: PropTypes.func.isRequired,
+  active: PropTypes.bool.isRequired,
+  setActive: PropTypes.func.isRequired,
 }
 
 export default AcmgModal
