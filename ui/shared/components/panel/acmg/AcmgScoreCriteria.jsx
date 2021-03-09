@@ -24,7 +24,7 @@ const AcmgScoreCriteria = (props) => {
       <Table celled padded>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell singleLine>Score</Table.HeaderCell>
+            <Table.HeaderCell singleLine>Score</Table.HeaderCell>a
             <Table.HeaderCell>Criteria Applied</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
