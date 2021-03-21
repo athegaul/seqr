@@ -83,7 +83,7 @@ const Variant = React.memo(({ variant, isCompoundHet, mainGeneId, linkToSavedVar
               displayAnnotationFirst
             />}
           />
-      }
+        }
       </Grid.Column>
       {variant.familyGuids.map(familyGuid =>
         <Grid.Column key={familyGuid} width={16}>
@@ -95,7 +95,7 @@ const Variant = React.memo(({ variant, isCompoundHet, mainGeneId, linkToSavedVar
         {!isCompoundHet && mainGeneId && <VariantGene geneId={mainGeneId} variant={variant} />}
         {!isCompoundHet && mainGeneId && Object.keys(variant.transcripts || {}).length > 1 && <Divider />}
         <VariantGenes mainGeneId={mainGeneId} variant={variant} />
-        <Acmg />
+        <Acmg variantId={variant.variantId} />
         {isCompoundHet && Object.keys(variant.transcripts || {}).length > 1 && <VerticalSpacer height={20} />}
         {isCompoundHet && <VariantIndividuals variant={variant} isCompoundHet />}
         {isCompoundHet && showReads}
@@ -104,10 +104,10 @@ const Variant = React.memo(({ variant, isCompoundHet, mainGeneId, linkToSavedVar
       <Grid.Column><Predictions variant={variant} /></Grid.Column>
       <Grid.Column><Frequencies variant={variant} /></Grid.Column>
       {!isCompoundHet &&
-      <Grid.Column width={16}>
-        <VariantIndividuals variant={variant} />
-        {showReads}
-      </Grid.Column>}
+        <Grid.Column width={16}>
+          <VariantIndividuals variant={variant} />
+          {showReads}
+        </Grid.Column>}
       <Grid.Column width={16}>
         {reads}
       </Grid.Column>
