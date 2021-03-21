@@ -104,8 +104,7 @@ const getScore = (acmgCalculationValue) => {
 }
 
 const AcmgModal = (props) => {
-  const { score, setScore, active, setActive } = props
-  const [criteria, setCriteria] = useState([])
+  const { score, setScore, active, setActive, criteria, setCriteria } = props
 
   const [acmgCalculationValue, setAcmgCalculationValue] = useState({
     PVS: 0,
@@ -149,6 +148,8 @@ AcmgModal.propTypes = {
   setScore: PropTypes.func.isRequired,
   active: PropTypes.bool.isRequired,
   setActive: PropTypes.func.isRequired,
+  criteria: PropTypes.array.isRequired,
+  setCriteria: PropTypes.func.isRequired,
 }
 
 export default AcmgModal

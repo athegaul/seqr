@@ -34,6 +34,11 @@ const EXT_CONFIG = {
 
 const escapeExportItem = item => (item.replace ? item.replace(/"/g, '\'\'') : item)
 
+const acmgCriteria = {}
+export const updateAcmgCriteriaForFileDownload = (variantId, score, criteria) => {
+  acmgCriteria[variantId] = { score, criteria }
+}
+
 export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
   const extConfig = EXT_CONFIG[ext]
   if (!linkContent) {
@@ -48,7 +53,7 @@ export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
     if (data.headers) {
       content = `${data.headers.join(extConfig.delimiter)}\n${content}`
     }
-    const href = URL.createObjectURL(new Blob([content], {  type: 'application/octet-stream' }))
+    const href = URL.createObjectURL(new Blob([content], { type: 'application/octet-stream' }))
 
     return <a href={href} download={`${data.filename}.${extConfig.dataExt || ext}`}>{linkContent}</a>
   }
@@ -59,7 +64,7 @@ export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
   if (!url.endsWith('?')) {
     url += '&'
   }
-  return <a href={`${url}file_format=${ext}`}>{linkContent}</a>
+  return <a href={`${url}file_format=${ext}&acmg_criteria=${btoa(JSON.stringify(acmgCriteria))}`}>{linkContent}</a>
 })
 
 FileLink.propTypes = {
