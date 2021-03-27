@@ -366,113 +366,145 @@ export const LOCATION_FIELDS = [
   },
 ]
 
+export const SEARCH_HELP_CONTENT = 'Using this search, you can find additional annotations that are relevant to you and filter the data by them'
+
 export const ANNOTATION_FILTER_OPTIONS_LIST = [
   {
     name: 'cadd',
     label: 'CADD',
     labelHelp: 'Cadd value',
-    isDefault: true,
-    optionType: 'float',
+    value: '',
+    operator: '',
   },
   {
     name: 'revel',
     label: 'Revel',
     labelHelp: 'Revel value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'primate_ai',
     label: 'Primate AI',
     labelHelp: 'Primate AI value',
-    isDefault: true,
-    optionType: 'double',
+    value: '',
+    operator: '',
   },
   {
     name: 'mpc',
     label: 'MPC',
     labelHelp: 'MPC value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'splice_ai',
     label: 'Splice AI',
     labelHelp: 'Splice AI value',
-    isDefault: true,
-    optionType: 'double',
+    value: '',
+    operator: '',
   },
   {
     name: 'eigen',
     label: 'Eigen',
     labelHelp: 'Eigen value',
-    isDefault: true,
-    optionType: 'double',
+    value: '',
+    operator: '',
   },
   {
     name: 'dann',
     label: 'Dann',
     labelHelp: 'Dann value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'strvctvre',
     label: 'STRVCTVRE',
     labelHelp: 'STRVCTVRE value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'polyphen',
     label: 'Polyphen',
     labelHelp: 'Polyphen value',
-    isDefault: true,
-    optionType: 'integer',
+    value: '',
+    operator: '',
   },
   {
     name: 'sift',
     label: 'Sift',
     labelHelp: 'Sift value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'mut_taster',
     label: 'Mut Taster',
     labelHelp: 'Mut Taster value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'fathmm',
     label: 'FATHMM',
     labelHelp: 'FATHMM value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'metasvm',
     label: 'METASVM',
     labelHelp: 'METASVM value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'gerp_rs',
     label: 'GERP RS',
     labelHelp: 'GERP RS value',
-    isDefault: true,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
   {
     name: 'phastcons_100_vert',
     label: 'Phastcons 100 Vert',
     labelHelp: 'Phastcons 100 Vert value',
-    isDefault: false,
-    optionType: 'string',
+    value: '',
+    operator: '',
   },
 ]
+
+
+export const COMPARE_OPTIONS = [
+  {
+    key: 'Option_Less',
+    text: '<',
+    value: 'LT',
+  },
+  {
+    key: 'Option_Greater',
+    text: '>',
+    value: 'GT',
+  },
+  {
+    key: 'Option_LessEqual',
+    text: '<=',
+    value: 'LEQ',
+  },
+  {
+    key: 'Option_GreaterEqual',
+    text: '>=',
+    value: 'GEQ',
+  },
+  {
+    key: 'Option_Equal',
+    text: '=',
+    value: 'EQ',
+  },
+]
+
 
 export const ANNOTATION_FILTER_OPTION_LIST = [
   {
@@ -484,6 +516,8 @@ export const ANNOTATION_FILTER_OPTION_LIST = [
 const ANNOTATION_FILTER_FIELD = {
   name: 'annotationFilterField',
   options: ANNOTATION_FILTER_OPTION_LIST,
+  compareOptions: COMPARE_OPTIONS,
+  searchHelpText: SEARCH_HELP_CONTENT,
   width: 9,
 }
 
