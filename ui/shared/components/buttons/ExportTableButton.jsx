@@ -30,6 +30,10 @@ const EXT_CONFIG = {
     delimiter: ',',
     dataExt: 'csv',
   },
+  doc: {
+    dataType: 'doc',
+    dataExt: 'doc',
+  },
 }
 
 const escapeExportItem = item => (item.replace ? item.replace(/"/g, '\'\'') : item)
@@ -91,6 +95,9 @@ const ExportTableButton = React.memo(({ downloads, buttonText, ...buttonProps })
                   </NameCell>
                 </Table.Row>,
                 <Table.Row key={2}>
+                  <LinkCell>
+                    <FileLink url={url} data={data} ext="doc" />
+                  </LinkCell>
                   <LinkCell>
                     <FileLink url={url} data={data} ext="xls" />
                   </LinkCell>

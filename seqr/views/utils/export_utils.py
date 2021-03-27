@@ -3,6 +3,10 @@ import json
 import openpyxl as xl
 from tempfile import NamedTemporaryFile
 import zipfile
+from io import BytesIO
+from docxtpl import DocxTemplate
+import calendar
+from datetime import date
 
 from django.http.response import HttpResponse
 
@@ -13,6 +17,35 @@ DELIMITERS = {
     'tsv': '\t',
 }
 
+def get_date():
+    todays_date = date.today()
+    return f"{calendar.month_name[todays_date.month]}, {todays_date.day}, {todays_date.year}"
+
+def get_doc_template():
+    template = DocxTemplate("")
+    return template
+
+def get_doc_response(rows, header):
+    document_template = get_doc_template()
+
+    generated_file = BytesIO()
+
+    data = {
+        "date": get_date()
+    }
+
+    document_template.render(data)
+    document_template.save(generated_file)
+    content_length = generated_file.tell()
+    generated_file.seek(0)
+
+    response = HttpResponse(
+        generated_file.getvalue(),
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+    response["Content-Disposition"] = "attachment; filename=" + "report.docx"
+    response["Content-Length"] = content_length
+    return response
 
 def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True):
     """Generates an HTTP response for a table with the given header and rows, exported into the given file_format.
@@ -60,6 +93,8 @@ def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_hea
             response = HttpResponse(temporary_file.read(), content_type="application/ms-excel")
             response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(filename_prefix).encode('ascii', 'ignore')
             return response
+    elif file_format == "doc":
+        return get_doc_response(rows, header)
     else:
         raise ValueError("Invalid file_format: %s" % file_format)
 
