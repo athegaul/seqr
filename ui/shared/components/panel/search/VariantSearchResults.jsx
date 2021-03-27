@@ -17,7 +17,7 @@ import { VARIANT_SORT_FIELD_NO_FAMILY_SORT, VARIANT_PAGINATION_FIELD } from '../
 import DataLoader from '../../DataLoader'
 import { QueryParamsEditor } from '../../QueryParamEditor'
 import { HorizontalSpacer } from '../../Spacers'
-import ExportTableButton from '../../buttons/ExportTableButton'
+import ExportTableButton, { updateRowsToIncludeInReport } from '../../buttons/ExportTableButton'
 import ReduxFormWrapper from '../../form/ReduxFormWrapper'
 import Variants from '../variants/Variants'
 import GeneBreakdown from './GeneBreakdown'
@@ -92,7 +92,9 @@ const filterVariants = (variants) => {
         filterVariantExpression += ' && '
       }
 
-      filterVariantExpression += `${variantPredictionValue} ${filteredPredictionOperator} ${filteredPredictionValue}`
+      if (variant.predictions[predictionKey] !== undefined) {
+        filterVariantExpression += `${variantPredictionValue} ${filteredPredictionOperator} ${filteredPredictionValue}`
+      }
     }
 
     /* eslint no-eval: 0 */
@@ -107,6 +109,20 @@ const filterVariants = (variants) => {
   return filteredVariants
 }
 
+const getRowsToIncludeInReport = (source, target) => {
+  const indicies = []
+  for (let targetIdx = 0; targetIdx < target.length; targetIdx++) {
+    for (let sourceIdx = 0; sourceIdx < source.length; sourceIdx++) {
+      if (source[sourceIdx].variantId === target[targetIdx].variantId) {
+        indicies.push(sourceIdx)
+        break
+      }
+    }
+  }
+
+  return indicies
+}
+
 const BaseVariantSearchResultsContent = React.memo((
   { match, variantSearchDisplay, searchedVariantExportConfig, onSubmit, totalVariantsCount, additionalDisplayEdit, displayVariants }) => {
   const { searchHash } = match.params
@@ -118,6 +134,7 @@ const BaseVariantSearchResultsContent = React.memo((
   let filteredVariants = []
   try {
     filteredVariants = filterVariants(displayVariants)
+    updateRowsToIncludeInReport(getRowsToIncludeInReport(displayVariants, filteredVariants))
 
     return [
       <LargeRow key="resultsSummary">
@@ -269,4 +286,3 @@ LoadedVariantSearchResults.propTypes = {
 }
 
 export default LoadedVariantSearchResults
-
