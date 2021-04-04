@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Grid, Message, Button } from 'semantic-ui-react'
@@ -21,6 +21,7 @@ import ExportTableButton from '../../buttons/ExportTableButton'
 import ReduxFormWrapper from '../../form/ReduxFormWrapper'
 import Variants from '../variants/Variants'
 import GeneBreakdown from './GeneBreakdown'
+import { UploadExcelFileModal } from '../reporting/ReportUploadModal'
 
 const LargeRow = styled(Grid.Row)`
   font-size: 1.15em;
@@ -55,9 +56,17 @@ const BaseVariantSearchResultsContent = React.memo((
   const variantDisplayPageOffset = (page - 1) * recordsPerPage
   const paginationFields = totalVariantsCount > recordsPerPage ? [{ ...VARIANT_PAGINATION_FIELD, totalPages: Math.ceil(totalVariantsCount / recordsPerPage) }] : []
   const fields = [...FIELDS, ...paginationFields]
+  const [modalOpen, toggleModal] = useState(false)
+
+  const openModal = () => {
+    toggleModal((prevState) => {
+      return !prevState
+    })
+  }
 
   return [
     <LargeRow key="resultsSummary">
+      <UploadExcelFileModal modalName="upload-excel-file" modalOpen={modalOpen} />
       <Grid.Column width={5}>
         {totalVariantsCount === displayVariants.length ? 'Found ' : `Showing ${variantDisplayPageOffset + 1}-${variantDisplayPageOffset + displayVariants.length} of `}
         <b>{totalVariantsCount}</b> variants
@@ -74,7 +83,7 @@ const BaseVariantSearchResultsContent = React.memo((
           fields={fields}
         />
         <HorizontalSpacer width={10} />
-        <ExportTableButton downloads={searchedVariantExportConfig} buttonText="Download" />
+        <ExportTableButton downloads={searchedVariantExportConfig} buttonText="Download" openModal={openModal} />
         <HorizontalSpacer width={10} />
         <GeneBreakdown searchHash={searchHash} />
       </Grid.Column>

@@ -43,6 +43,20 @@ export const updateAcmgCriteriaForFileDownload = (variantId, score, criteria) =>
   acmgCriteria[variantId] = { score, criteria }
 }
 
+const docFileLinkStyle = {
+  cursor: 'pointer',
+  outline: 'none',
+}
+
+export const DocFileLink = React.memo(({ openModal }) => {
+  const extConfig = EXT_CONFIG.doc
+  return (<a style={docFileLinkStyle} role="button" tabIndex={0} onClick={openModal}><span><img alt="doc" src={`/static/images/table_${extConfig.imageName || 'doc'}.png`} /> .doc</span></a>)
+})
+
+DocFileLink.propTypes = {
+  openModal: PropTypes.func,
+}
+
 export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
   const extConfig = EXT_CONFIG[ext]
   if (!linkContent) {
@@ -78,11 +92,14 @@ FileLink.propTypes = {
   linkContent: PropTypes.node,
 }
 
-const ExportTableButton = React.memo(({ downloads, buttonText, ...buttonProps }) =>
+const style = { zIndex: '2' }
+
+const ExportTableButton = React.memo(({ downloads, buttonText, openModal, ...buttonProps }) =>
   <Popup
     trigger={
       <ButtonLink icon="download" content={buttonText || 'Download Table'} {...buttonProps} />
     }
+    style={style}
     content={
       <NoBorderTable>
         <Table.Body>
@@ -96,7 +113,7 @@ const ExportTableButton = React.memo(({ downloads, buttonText, ...buttonProps })
                 </Table.Row>,
                 <Table.Row key={2}>
                   <LinkCell>
-                    <FileLink url={url} data={data} ext="doc" />
+                    <DocFileLink openModal={openModal} />
                   </LinkCell>
                   <LinkCell>
                     <FileLink url={url} data={data} ext="xls" />
@@ -124,6 +141,7 @@ ExportTableButton.propTypes = {
    */
   downloads: PropTypes.array.isRequired,
   buttonText: PropTypes.string,
+  openModal: PropTypes.func,
 }
 
 export default ExportTableButton
