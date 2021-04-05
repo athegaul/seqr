@@ -1,11 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Divider } from 'semantic-ui-react'
+import { reduxForm } from 'redux-form'
 
 import DispatchRequestButton from 'shared/components/buttons/DispatchRequestButton'
 import { ModalComponent } from 'shared/components/modal/Modal'
 import { connect } from 'react-redux'
 import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReducer'
+import FileUploadField from '../../form/XHRUploaderField'
 
 
 class ReportUploadModal extends React.PureComponent {
@@ -66,14 +68,24 @@ class ReportUploadModal extends React.PureComponent {
         isOpen={this.state.modalOpen}
         open={this.openModal}
         close={this.closeModal}
-        title="Add Gene Lists"
+        title="Upload Excel File"
         modalName={this.modalName}
         size="fullscreen"
-        id="modal"
+        id="reportUploadModal"
       >
-        <span id="hello">Hello</span>
+        <FileUploadField
+          clearTimeOut={0}
+          dropzoneLabel="Click here to upload an excel file, which will be used for generate a report"
+          auto
+          required
+          name="excelUploadField"
+        />
         <Divider />
-        <DispatchRequestButton onSubmit={this.submit} onSuccess={this.closeModal}>
+        <DispatchRequestButton
+          onSubmit={this.submit}
+          onSuccess={this.closeModal}
+          confirmDialog="Are you sure want to generate a report using selected file?"
+        >
           <Button content="Submit" primary />
         </DispatchRequestButton>
       </ModalComponent>
@@ -82,5 +94,6 @@ class ReportUploadModal extends React.PureComponent {
 }
 
 const mapDispatchToProps = { setModalConfirm, closeModal }
-
-export const UploadExcelFileModal = connect(null, mapDispatchToProps)(ReportUploadModal)
+export const UploadExcelFileModal = reduxForm({
+  form: 'reportUploadFormModal',
+})(connect(null, mapDispatchToProps)(ReportUploadModal))
