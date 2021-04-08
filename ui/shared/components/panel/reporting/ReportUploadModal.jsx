@@ -33,6 +33,7 @@ class ReportUploadModal extends React.PureComponent {
       initialUpload: true,
       initialTableDisplay: true,
       checkedOptionKey: null,
+      missingHeadersMessage: null,
     }
     this.modalName = props.modalName
 
@@ -54,6 +55,7 @@ class ReportUploadModal extends React.PureComponent {
       modalToggle: !this.state.modalToggle,
       initialUpload: true,
       checkedOptionKey: null,
+      missingHeadersMessage: null,
     })
   }
 
@@ -64,6 +66,11 @@ class ReportUploadModal extends React.PureComponent {
 
       const headerIsComplete = () => {
         const headerDifference = WORD_REPORT_EXCEL_GENERATION_HEADERS.filter(x => !parsedDataHeaders.includes(x))
+        if (headerDifference.length !== 0) {
+          this.setState({
+            missingHeadersMessage: `Missing fields are: ${headerDifference.join(',')}`,
+          })
+        }
         return headerDifference.length === 0
       }
 
@@ -74,6 +81,7 @@ class ReportUploadModal extends React.PureComponent {
           fileOK: true,
           fileDataHeaders: parsedDataHeaders,
           fileDataContent: parsedDataContent,
+          missingHeadersMessage: null,
         })
       } else {
         this.setState({
@@ -133,6 +141,7 @@ class ReportUploadModal extends React.PureComponent {
     const errorMessageStyle = {
       paddingTop: '15px',
     }
+    const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingHeadersMessage}`
     console.log(this.state.linkData)
     return (
       <ModalComponent
@@ -156,7 +165,7 @@ class ReportUploadModal extends React.PureComponent {
         {!this.state.initialUpload && !this.state.fileOK &&
         <Grid.Row style={errorMessageStyle}>
           <Grid.Column>
-            <Message error content="It seems that the uploaded file is missing some required headers. Please review the file and upload it again" />
+            <Message error content={errorMessageContent} />
           </Grid.Column>
         </Grid.Row>
         }
