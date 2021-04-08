@@ -14,7 +14,7 @@ class ReportUploadModal extends React.PureComponent {
 
   static propTypes = {
     modalName: PropTypes.string,
-    modalOpen: PropTypes.any,
+    modalToggle: PropTypes.any,
   }
 
   constructor(props) {
@@ -22,40 +22,49 @@ class ReportUploadModal extends React.PureComponent {
 
     this.state = {
       linkData: [],
-      modalOpen: props.modalOpen,
-      firstOpen: true,
+      modalToggle: props.modalToggle,
+      modalOpen: false,
+      modalClosing: false,
+      submitActive: false,
     }
     this.modalName = props.modalName
+
+    this.onUpload = this.onUpload.bind(this)
+    this.submit = this.submit.bind(this)
+    this.closeModal = this.closeModal.bind(this)
   }
 
   submit = () => {
     this.state.linkData.push('Hello')
-    console.log('Submit')
+    this.closeModal()
   }
 
   closeModal = () => {
     this.setState({
       modalOpen: false,
-      ownUpdate: true,
-      firstOpen: false,
+      modalClosing: true,
+      modalToggle: !this.state.modalToggle,
     })
   }
 
+  onUpload(e, data) {
+    if (data.uploadedFileId) {
+      this.setState({
+        submitActive: true,
+      })
+    }
+  }
+
   static getDerivedStateFromProps(props, currentState) {
-    if (currentState.ownUpdate) {
-      return {
-        modalOpen: currentState.modalOpen,
-        ownUpdate: false,
-      }
-    }
-    if (currentState.firstOpen && currentState.modalOpen !== props.modalOpen) {
-      return {
-        modalOpen: props.modalOpen,
-      }
-    }
-    if (!currentState.firstOpen) {
+    if (currentState.modalToggle !== props.modalToggle) {
       return {
         modalOpen: true,
+        modalClosing: false,
+      }
+    }
+    if (currentState.modalClosing) {
+      return {
+        modalClosing: false,
       }
     }
 
@@ -79,6 +88,7 @@ class ReportUploadModal extends React.PureComponent {
           auto
           required
           name="excelUploadField"
+          onChange={(e, data) => { this.onUpload(e, data) }}
         />
         <Divider />
         <DispatchRequestButton
@@ -86,7 +96,7 @@ class ReportUploadModal extends React.PureComponent {
           onSuccess={this.closeModal}
           confirmDialog="Are you sure want to generate a report using selected file?"
         >
-          <Button content="Submit" primary />
+          <Button content="Submit" primary disabled={!this.state.submitActive} />
         </DispatchRequestButton>
       </ModalComponent>
     )
