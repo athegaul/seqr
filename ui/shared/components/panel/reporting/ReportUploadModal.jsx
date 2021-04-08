@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReducer'
 import FileUploadField from '../../form/XHRUploaderField'
 import { WORD_REPORT_EXCEL_GENERATION_HEADERS } from '../../../utils/constants'
+import { CheckboxTableGroup } from '../../form/Inputs'
 
 
 class ReportUploadModal extends React.PureComponent {
@@ -22,24 +23,28 @@ class ReportUploadModal extends React.PureComponent {
     super(props)
 
     this.state = {
-      linkData: [],
-      fileDataHeader: [],
+      linkData: null,
+      fileDataHeaders: [],
       fileDataContent: [],
       modalToggle: props.modalToggle,
       modalOpen: false,
       modalClosing: false,
       fileOK: false,
       initialUpload: true,
+      initialTableDisplay: true,
+      checkedOptionKey: null,
     }
     this.modalName = props.modalName
 
     this.handleUpload = this.handleUpload.bind(this)
     this.submit = this.submit.bind(this)
     this.closeModal = this.closeModal.bind(this)
+    this.handleRowOptionClick = this.handleRowOptionClick.bind(this)
+    this.getDataLink = this.getDataLink.bind(this)
   }
 
   submit = () => {
-    this.state.linkData.push('Hello')
+    console.log('We should submit the links here!')
     this.closeModal()
   }
 
@@ -49,6 +54,7 @@ class ReportUploadModal extends React.PureComponent {
       modalClosing: true,
       modalToggle: !this.state.modalToggle,
       initialUpload: true,
+      checkedOptionKey: null,
     })
   }
 
@@ -65,18 +71,46 @@ class ReportUploadModal extends React.PureComponent {
       if (headerIsComplete()) {
         this.setState({
           initialUpload: false,
+          initialTableDisplay: false,
           fileOK: true,
-          fileDataHeader: parsedDataHeaders,
+          fileDataHeaders: parsedDataHeaders,
           fileDataContent: parsedDataContent,
         })
       } else {
         this.setState({
           initialUpload: false,
+          initialTableDisplay: false,
           fileOK: false,
-          fileDataHeader: [],
+          fileDataHeaders: [],
           fileDataContent: [],
         })
       }
+    }
+  }
+
+  getDataLink(rowContent) {
+    const linkData = this.state.fileDataHeaders.map((k, i) => `${k.toLowerCase().trim()}=${rowContent[i]}`)
+    return linkData.join('&').trim().replace(/\s/g, '%20')
+  }
+
+  handleRowOptionClick(rowContent, checkedState) {
+    if (this.state.checkedOptionKey == null) {
+      if (checkedState) {
+        this.setState({
+          checkedOptionKey: rowContent.join(''),
+          linkData: `?${this.getDataLink(rowContent)}`,
+        })
+      } else {
+        this.setState({
+          checkedOptionKey: null,
+          linkData: null,
+        })
+      }
+    } else {
+      this.setState({
+        checkedOptionKey: rowContent.join(''),
+        linkData: `?${this.getDataLink(rowContent)}`,
+      })
     }
   }
 
@@ -100,6 +134,7 @@ class ReportUploadModal extends React.PureComponent {
     const errorMessageStyle = {
       paddingTop: '15px',
     }
+    console.log(this.state.linkData)
     return (
       <ModalComponent
         isOpen={this.state.modalOpen}
@@ -125,6 +160,15 @@ class ReportUploadModal extends React.PureComponent {
             <Message error content="It seems that the uploaded file is missing some required headers. Please review the file and upload it again" />
           </Grid.Column>
         </Grid.Row>
+        }
+        {!this.state.initialTableDisplay && this.state.fileOK &&
+        <CheckboxTableGroup
+          tableHeaders={this.state.fileDataHeaders}
+          tableContent={this.state.fileDataContent}
+          checkedOptionKey={this.state.checkedOptionKey}
+          onRowOptionClick={this.handleRowOptionClick}
+          tableKey="excelUploadCheckboxGroup"
+        />
         }
         <Divider />
         <DispatchRequestButton

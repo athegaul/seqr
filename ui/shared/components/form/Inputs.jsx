@@ -3,7 +3,7 @@
 import React, { createElement } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Form, List, Button, Pagination as PaginationComponent, Search } from 'semantic-ui-react'
+import { Form, List, Button, Pagination as PaginationComponent, Search, Table, TableCell, TableRow } from 'semantic-ui-react'
 import Slider from 'react-rangeslider'
 import { JsonEditor } from 'jsoneditor-react'
 import 'react-rangeslider/lib/index.css'
@@ -292,6 +292,64 @@ CheckboxGroup.propTypes = {
 export const AlignedCheckboxGroup = styled(CheckboxGroup)`
   text-align: left;
 `
+
+export const CheckboxTableGroup = React.memo((props) => {
+  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, ...baseProps } = props
+  return (
+    <Table >
+      <Table.Header>
+        <Table.Row key={tableKey}>
+          <Table.HeaderCell key="clickOption">
+          </Table.HeaderCell>
+          {tableHeaders.map((header) => {
+            return (
+              <Table.HeaderCell key={header}>
+                {header}
+              </Table.HeaderCell>
+            )
+          })}
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {tableContent.map((content, contentIndex) => {
+          return (
+            <TableRow key={content}>
+              <TableCell key={`optionClickCell${content}`}>
+                <BaseSemanticInput
+                  {...baseProps}
+                  inputType="Checkbox"
+                  checked={checkedOptionKey !== null && checkedOptionKey === content.join('')}
+                  /* eslint-disable-next-line react/no-array-index-key */
+                  key={`optionClick${content}${contentIndex}`}
+                  onChange={({ checked }) => {
+                    if (checked) {
+                      onRowOptionClick(content, true)
+                    } else {
+                      onRowOptionClick(content, false)
+                    }
+                  }}
+                />
+              </TableCell>
+              {content.map((contentData, contentDataIndex) =>
+                // eslint-disable-next-line react/no-array-index-key
+                <TableCell key={`${contentData}${contentIndex}${contentDataIndex}`}>
+                  {contentData}
+                </TableCell>,
+              )}
+            </TableRow>)
+          },
+        )}
+      </Table.Body>
+    </Table>)
+})
+
+CheckboxTableGroup.propTypes = {
+  tableHeaders: PropTypes.array,
+  tableContent: PropTypes.array,
+  onRowOptionClick: PropTypes.func,
+  tableKey: PropTypes.string,
+  checkedOptionKey: PropTypes.string,
+}
 
 const BaseRadioGroup = React.memo((props) => {
   const { value, options, label, onChange, margin, widths, getOptionProps, formGroupAs, ...baseProps } = props
