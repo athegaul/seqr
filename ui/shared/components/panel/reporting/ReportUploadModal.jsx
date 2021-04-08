@@ -89,7 +89,7 @@ class ReportUploadModal extends React.PureComponent {
   }
 
   getDataLink(rowContent) {
-    const linkData = this.state.fileDataHeaders.map((k, i) => `${k.toLowerCase().trim()}=${rowContent[i]}`)
+    const linkData = this.state.fileDataHeaders.map((k, i) => `${k.toLowerCase().replace(/\s/g, '_')}=${rowContent[i]}`)
     return linkData.join('&').trim().replace(/\s/g, '%20')
   }
 
