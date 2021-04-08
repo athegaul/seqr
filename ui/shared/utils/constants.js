@@ -83,6 +83,21 @@ export const SAMPLE_TYPE_LOOKUP = SAMPLE_TYPE_OPTIONS.reduce(
   }), {},
 )
 
+export const WORD_REPORT_EXCEL_GENERATION_HEADERS = [
+  'Fam ID',
+  'Sample ID',
+  'Age',
+  'Sex',
+  'Phen',
+  'Test Performed',
+  'MRN',
+  'Referring Facility',
+  'CRGD Acession ID',
+  'Specimen',
+  'Date (Received)',
+  'Test Codes',
+]
+
 // ANALYSIS STATUS
 
 export const FAMILY_STATUS_SOLVED = 'S'
