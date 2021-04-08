@@ -2,10 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Divider, Grid, Message } from 'semantic-ui-react'
 import { reduxForm } from 'redux-form'
-
-import DispatchRequestButton from 'shared/components/buttons/DispatchRequestButton'
-import { ModalComponent } from 'shared/components/modal/Modal'
 import { connect } from 'react-redux'
+
+import DispatchRequestButton from '../../buttons/DispatchRequestButton'
+import { ModalComponent } from '../../modal/Modal'
 import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReducer'
 import FileUploadField from '../../form/XHRUploaderField'
 import { WORD_REPORT_EXCEL_GENERATION_HEADERS, WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES } from '../../../utils/constants'
