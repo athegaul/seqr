@@ -8,7 +8,7 @@ import { ModalComponent } from 'shared/components/modal/Modal'
 import { connect } from 'react-redux'
 import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReducer'
 import FileUploadField from '../../form/XHRUploaderField'
-import { WORD_REPORT_EXCEL_GENERATION_HEADERS } from '../../../utils/constants'
+import { WORD_REPORT_EXCEL_GENERATION_HEADERS, WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES } from '../../../utils/constants'
 import { CheckboxTableGroup } from '../../form/Inputs'
 
 
@@ -40,7 +40,6 @@ class ReportUploadModal extends React.PureComponent {
     this.submit = this.submit.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.handleRowOptionClick = this.handleRowOptionClick.bind(this)
-    this.getDataLink = this.getDataLink.bind(this)
   }
 
   submit = () => {
@@ -88,8 +87,8 @@ class ReportUploadModal extends React.PureComponent {
     }
   }
 
-  getDataLink(rowContent) {
-    const linkData = this.state.fileDataHeaders.map((k, i) => `${k.toLowerCase().replace(/\s/g, '_')}=${rowContent[i]}`)
+  static getDataLink(rowContent) {
+    const linkData = WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES.map((k, i) => `${k}=${rowContent[i]}`)
     return linkData.join('&').trim().replace(/\s/g, '%20')
   }
 
@@ -98,7 +97,7 @@ class ReportUploadModal extends React.PureComponent {
       if (checkedState) {
         this.setState({
           checkedOptionKey: rowContent.join(''),
-          linkData: `?${this.getDataLink(rowContent)}`,
+          linkData: `?${ReportUploadModal.getDataLink(rowContent)}`,
         })
       } else {
         this.setState({
@@ -109,7 +108,7 @@ class ReportUploadModal extends React.PureComponent {
     } else {
       this.setState({
         checkedOptionKey: rowContent.join(''),
-        linkData: `?${this.getDataLink(rowContent)}`,
+        linkData: `?${ReportUploadModal.getDataLink(rowContent)}`,
       })
     }
   }
@@ -176,7 +175,7 @@ class ReportUploadModal extends React.PureComponent {
           onSuccess={this.closeModal}
           confirmDialog="Are you sure want to generate a report using selected file?"
         >
-          <Button content="Generate" primary disabled={!this.state.fileOK} />
+          <Button content="Generate" primary disabled={!this.state.fileOK || this.state.checkedOptionKey === null} />
         </DispatchRequestButton>
       </ModalComponent>
     )

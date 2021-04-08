@@ -98,6 +98,21 @@ export const WORD_REPORT_EXCEL_GENERATION_HEADERS = [
   'Test Codes',
 ]
 
+export const WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES = [
+  'fam_id',
+  'sample_id',
+  'age',
+  'sex',
+  'phen',
+  'test_performed',
+  'mrn',
+  'referring_facility',
+  'crgd_acession_id',
+  'specimen',
+  'received_date',
+  'test_codes',
+]
+
 // ANALYSIS STATUS
 
 export const FAMILY_STATUS_SOLVED = 'S'
