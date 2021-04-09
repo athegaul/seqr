@@ -10,6 +10,7 @@ import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReduce
 import FileUploadField from '../../form/XHRUploaderField'
 import { WORD_REPORT_EXCEL_GENERATION_HEADERS, WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES } from '../../../utils/constants'
 import { CheckboxTableGroup } from '../../form/Inputs'
+import { VerticalSpacer } from '../../../components/Spacers'
 
 
 class ReportUploadModal extends React.PureComponent {
@@ -141,6 +142,10 @@ class ReportUploadModal extends React.PureComponent {
     const errorMessageStyle = {
       paddingTop: '15px',
     }
+    const checkboxTableStyle = {
+      maxHeight: '180px',
+      overflowY: 'auto',
+    }
     const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingHeadersMessage}`
     console.log(this.state.linkData)
     return (
@@ -170,13 +175,19 @@ class ReportUploadModal extends React.PureComponent {
         </Grid.Row>
         }
         {!this.state.initialTableDisplay && this.state.fileOK &&
-        <CheckboxTableGroup
-          tableHeaders={this.state.fileDataHeaders}
-          tableContent={this.state.fileDataContent}
-          checkedOptionKey={this.state.checkedOptionKey}
-          onRowOptionClick={this.handleRowOptionClick}
-          tableKey="excelUploadCheckboxGroup"
-        />
+        <div>
+          <VerticalSpacer height={15} />
+          <div style={checkboxTableStyle}>
+            <CheckboxTableGroup
+              tableHeaders={this.state.fileDataHeaders}
+              tableContent={this.state.fileDataContent}
+              checkedOptionKey={this.state.checkedOptionKey}
+              onRowOptionClick={this.handleRowOptionClick}
+              tableKey="excelUploadCheckboxGroup"
+            />
+          </div>
+          <VerticalSpacer height={5} />
+        </div>
         }
         <Divider />
         <DispatchRequestButton
