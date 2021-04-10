@@ -195,7 +195,7 @@ class ReportUploadModal extends React.PureComponent {
         <DispatchRequestButton
           onSubmit={this.submit}
           onSuccess={this.closeModal}
-          confirmDialog="Are you sure want to generate a report using selected excel file entry?"
+          confirmDialog="Are you sure you want to generate a report using selected excel file entry?"
         >
           <Button content="Generate" primary disabled={!this.state.fileOK || this.state.checkedOptionKey === null} />
         </DispatchRequestButton>
