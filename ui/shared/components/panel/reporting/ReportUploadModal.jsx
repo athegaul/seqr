@@ -83,6 +83,7 @@ class ReportUploadModal extends React.PureComponent {
           fileDataHeaders: parsedDataHeaders,
           fileDataContent: parsedDataContent,
           missingHeadersMessage: null,
+          checkedOptionKey: null,
         })
       } else {
         this.setState({
@@ -91,6 +92,7 @@ class ReportUploadModal extends React.PureComponent {
           fileOK: false,
           fileDataHeaders: [],
           fileDataContent: [],
+          checkedOptionKey: null,
         })
       }
     }
