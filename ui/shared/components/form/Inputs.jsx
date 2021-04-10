@@ -330,11 +330,18 @@ export const CheckboxTableGroup = React.memo((props) => {
                   }}
                 />
               </TableCell>
-              {content.map((contentData, contentDataIndex) =>
-                // eslint-disable-next-line react/no-array-index-key
-                <TableCell key={`${contentData}${contentIndex}${contentDataIndex}`}>
-                  {contentData}
-                </TableCell>,
+              {content.map((contentData, contentDataIndex) => {
+                const returnedDateFormat = /^([0-9]+-?)+T([0-9]+:)+([0-9]+\.?)+$/
+                const validDate = returnedDateFormat.test(contentData)
+                if (validDate) {
+                  contentData = new Date(contentData).toLocaleDateString('en-US')
+                }
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <TableCell key={`${contentData}${contentIndex}${contentDataIndex}`}>
+                    {contentData}
+                  </TableCell>
+                ) },
               )}
             </TableRow>)
           },
