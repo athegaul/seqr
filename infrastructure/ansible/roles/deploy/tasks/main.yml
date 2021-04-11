@@ -10,7 +10,7 @@
 
 - name: Clone proxy repository
   git:
-    repo: github.com/Rob--W/cors-anywhere.git
+    repo: git@github.com:Rob--W/cors-anywhere.git
     dest: "{{ repo_dest }}/cors-anywhere"
     clone: yes
     key_file: "{{ key_file }}"
