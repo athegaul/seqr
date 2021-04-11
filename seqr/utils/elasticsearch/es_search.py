@@ -567,7 +567,7 @@ class EsSearch(object):
             "Content-Type": "application/json",
         }
         data = f'{{ "query": {{ "match": {{ "_id": "{id}" }} }} }}'
-        response = requests.get("http://18.235.115.102:9200/_search", headers=headers, data=data)
+        response = requests.get("http://localhost:9200/_search", headers=headers, data=data)
         results = json.loads(response.text)
         return results
 

@@ -263,7 +263,7 @@ const getElasticSearchIndicies = async () => {
   // Clear searchOptions and get new data
   searchOptions = []
 
-  const url = 'https://cors-anywhere.herokuapp.com/http://18.235.115.102:9200/'
+  const url = 'http://localhost:8080/http://localhost:9200/'
 
   // Get all keys from Elasticsearch
   let response = await fetch(`${url}/_mapping`)

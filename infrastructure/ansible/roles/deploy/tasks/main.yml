@@ -67,6 +67,15 @@
   ignore_errors: yes
   become: true
 
+- name: Build seqr ui
+  shell: >
+    ln -sf {{ repo_dest }}/.nvm/versions/node/v10.15.3/bin/node /usr/bin/node &&
+    sudo {{ repo_dest }}/.nvm/versions/node/v10.15.3/bin/npm run build
+  args:
+    chdir: "{{ repo_dest }}/seqr/ui"
+  ignore_errors: yes
+  become: true
+
 - name: Install psycopg2 for Python3
   apt:
     name: python3-psycopg2
