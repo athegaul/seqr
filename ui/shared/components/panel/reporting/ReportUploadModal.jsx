@@ -144,6 +144,7 @@ class ReportUploadModal extends React.PureComponent {
     }
     const displayGenerateButton = !this.state.fileOK || this.state.checkedOptionKey === null
     const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingHeadersMessage}`
+    const buttonClassName = !displayGenerateButton ? 'ui primary button' : 'ui primary button disabled'
     return (
       <ModalComponent
         isOpen={this.state.modalOpen}
@@ -186,7 +187,7 @@ class ReportUploadModal extends React.PureComponent {
         </div>
         }
         <Divider />
-        <a href={`${this.props.docUrl}${this.state.linkData}`} className="ui primary button" style={{ display: !displayGenerateButton ? 'inline-block' : 'none' }}>Generate</a>
+        <a href={`${this.props.docUrl}${this.state.linkData}`} className={buttonClassName} >Generate</a>
       </ModalComponent>
     )
   }
