@@ -12,6 +12,8 @@ from django.http.response import HttpResponse
 
 from seqr.views.utils.json_utils import _to_title_case
 
+from reference_data.models import GeneInfo
+
 DELIMITERS = {
     'csv': ',',
     'tsv': '\t',
@@ -22,19 +24,72 @@ def get_date():
     return f"{calendar.month_name[todays_date.month]}, {todays_date.day}, {todays_date.year}"
 
 def get_doc_template():
-    template = DocxTemplate("")
+    template = DocxTemplate("/Users/mladen.zeljic/Downloads/diagnostic_report.docx")
     return template
 
-def get_doc_response(rows, header):
+def get_hgvspc(row):
+    header_indices = {
+        "hgvsc": 19,
+        "hgvsp": 20,
+    }
+
+    hgvsc = row[header_indices["hgvsc"]]
+    hgvsp = row[header_indices["hgvsp"]]
+
+    result = ""
+    if hgvsc != "":
+        result += hgvsc
+    if hgvsp != "":
+        result += f"({hgvsp})"
+    return result
+
+def get_gene_type(row):
+    gene_symbol = row[4]
+    query = f"SELECT id, gencode_gene_type FROM reference_data_geneinfo rdg WHERe gene_symbol = '{gene_symbol}'"
+    result = GeneInfo.objects.raw(query)[0]
+    return result.gencode_gene_type
+
+def get_doc_response(rows, header, families, doc_values):
     document_template = get_doc_template()
 
     generated_file = BytesIO()
 
+    notes_indices = []
+    for idx in range(len(header)):
+        if "notes" in header[idx]:
+            notes_indices.append(idx)
+
+    records = []
+    for row in rows:
+        for idx in notes_indices:
+            if row[idx] != "":
+                records.append({
+                    "message": row[idx],
+                    "acmg_criteria": row[len(row) - 2],
+                    "variant": get_hgvspc(row),
+                })
+
+    filtered_records = []
+    for record in records:
+        split_note_message = record["message"].rsplit("  ", 1)
+        filtered_records.append({
+            "message": split_note_message[0],
+            "reference": split_note_message[1].split("(")[0],
+            "classification": record["acmg_criteria"],
+            "variant": record["variant"]
+        })
+
+    families = [str(family) for family in families]
+
     data = {
-        "date": get_date()
+        "date": get_date(),
+        "family_id": ",".join(families),
+        "records": {
+            "based_analysis": filtered_records
+        }
     }
 
-    document_template.render(data)
+    document_template.render({**data, **doc_values})
     document_template.save(generated_file)
     content_length = generated_file.tell()
     generated_file.seek(0)
@@ -43,11 +98,11 @@ def get_doc_response(rows, header):
         generated_file.getvalue(),
         content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
-    response["Content-Disposition"] = "attachment; filename=" + "report.docx"
+    response["Content-Disposition"] = "attachment; filename=" + "diagnostic_report.docx"
     response["Content-Length"] = content_length
     return response
 
-def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True):
+def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True, families=[], doc_values={}):
     """Generates an HTTP response for a table with the given header and rows, exported into the given file_format.
 
     Args:
@@ -94,7 +149,7 @@ def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_hea
             response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(filename_prefix).encode('ascii', 'ignore')
             return response
     elif file_format == "doc":
-        return get_doc_response(rows, header)
+        return get_doc_response(rows, header, families, doc_values)
     else:
         raise ValueError("Invalid file_format: %s" % file_format)
 

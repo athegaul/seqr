@@ -256,6 +256,26 @@ def get_variant_gene_breakdown(request, search_hash):
     })
 
 
+def _get_doc_template_data(request):
+    fam_id = request.GET.get('fam_id')
+    if fam_id is None:
+        return {}
+
+    return {
+        "fam_id": fam_id,
+        "sample_id": request.GET.get('sample_id'),
+        "age": request.GET.get('age'),
+        "sex": request.GET.get('sex'),
+        "test_performed": request.GET.get('test_performed'),
+        "phen": request.GET.get('phen'),
+        "mrn": request.GET.get('mrn'),
+        "referring_facility": request.GET.get('referring_facility'),
+        "crgd_accession_id": request.GET.get('crgd_accession_id'),
+        "specimen": request.GET.get('specimen'),
+        "received_date": request.GET.get('received_date'),
+        "test_codes": request.GET.get('test_codes'),
+    }
+
 @login_required(login_url=API_LOGIN_REQUIRED_URL)
 def export_variants_handler(request, search_hash):
     results_model = VariantSearchResults.objects.get(search_hash=search_hash)
@@ -263,6 +283,8 @@ def export_variants_handler(request, search_hash):
     _check_results_permission(results_model, request.user)
 
     families = results_model.families.all()
+    family_names = [family for family in families]
+
     family_ids_by_guid = {family.guid: family.family_id for family in families}
 
     variants, _ = get_es_variants(results_model, page=1, load_all=True)
@@ -270,6 +292,8 @@ def export_variants_handler(request, search_hash):
 
     acmg_criteria = request.GET.get('acmg_criteria')
     acmg_criteria_json = json.loads(base64.b64decode(acmg_criteria).decode('utf-8'))
+
+    doc_template_export_criteria = _get_doc_template_data(request)
 
     filtered_indexes = base64.b64decode(request.GET.get('filtered_indexes')).decode('utf-8')
     filtered_indexes_arr = [int(idx) for idx in filtered_indexes.split(",")]
@@ -316,7 +340,7 @@ def export_variants_handler(request, search_hash):
 
     file_format = request.GET.get('file_format', 'tsv')
 
-    return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False)
+    return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False, families=family_names, doc_values=doc_template_export_criteria)
 
 
 def _get_field_value(value, config):

@@ -155,8 +155,10 @@ const BaseVariantSearchResultsContent = React.memo((
   const paginationFields = totalVariantsCount > recordsPerPage ? [{ ...VARIANT_PAGINATION_FIELD, totalPages: Math.ceil(totalVariantsCount / recordsPerPage) }] : []
   const fields = [...FIELDS, ...paginationFields]
   const [modalToggle, toggleModal] = useState(false)
+  const [docUrl, setDocUrl] = useState(null)
 
-  const openModal = () => {
+  const openModal = (url) => {
+    setDocUrl(url)
     toggleModal((prevState) => {
       return !prevState
     })
@@ -169,7 +171,7 @@ const BaseVariantSearchResultsContent = React.memo((
 
     return [
       <LargeRow key="resultsSummary">
-        <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} />
+        <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} docUrl={docUrl} />
         <Grid.Column width={5}>
           {totalVariantsCount === displayVariants.length ? 'Found ' : `Showing ${variantDisplayPageOffset + 1}-${variantDisplayPageOffset + displayVariants.length} of `}
           <b>{totalVariantsCount}</b> variants{filteredVariants.length < totalVariantsCount ? <span>, after filtering showing <b>{filteredVariants.length}</b> variants</span> : null}

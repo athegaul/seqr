@@ -54,13 +54,24 @@ const docFileLinkStyle = {
   outline: 'none',
 }
 
-export const DocFileLink = React.memo(({ openModal }) => {
+export const DocFileLink = React.memo(({ openModal, url }) => {
   const extConfig = EXT_CONFIG.doc
-  return (<a style={docFileLinkStyle} role="button" tabIndex={0} onClick={openModal}><span><img alt="doc" src={`/static/images/table_${extConfig.imageName || 'doc'}.png`} /> .doc</span></a>)
+
+  if (!url.includes('?')) {
+    url += '?'
+  }
+  if (!url.endsWith('?')) {
+    url += '&'
+  }
+
+  const newUrl = `${url}file_format=doc&acmg_criteria=${btoa(JSON.stringify(acmgCriteria))}&filtered_indexes=${btoa(rowsToIncludeInReport.toString())}`
+
+  return (<a style={docFileLinkStyle} role="button" tabIndex={0} onClick={() => { openModal(newUrl) }}><span><img alt="doc" src={`/static/images/table_${extConfig.imageName || 'doc'}.png`} /> .doc</span></a>)
 })
 
 DocFileLink.propTypes = {
   openModal: PropTypes.func,
+  url: PropTypes.string,
 }
 
 export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
@@ -120,7 +131,7 @@ const ExportTableButton = React.memo(({ downloads, buttonText, openModal, ...but
                 </Table.Row>,
                 <Table.Row key={2}>
                   <LinkCell>
-                    <DocFileLink openModal={openModal} />
+                    <DocFileLink openModal={openModal} url={url} />
                   </LinkCell>
                   <LinkCell>
                     <FileLink url={url} data={data} ext="xls" />

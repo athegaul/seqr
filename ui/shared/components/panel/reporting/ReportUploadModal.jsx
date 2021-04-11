@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Divider, Grid, Message } from 'semantic-ui-react'
+import { Divider, Grid, Message } from 'semantic-ui-react'
 import { reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
 
-import DispatchRequestButton from '../../buttons/DispatchRequestButton'
 import { ModalComponent } from '../../modal/Modal'
 import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReducer'
 import FileUploadField from '../../form/XHRUploaderField'
@@ -18,6 +17,7 @@ class ReportUploadModal extends React.PureComponent {
   static propTypes = {
     modalName: PropTypes.string,
     modalToggle: PropTypes.any,
+    docUrl: PropTypes.string,
   }
 
   constructor(props) {
@@ -39,14 +39,8 @@ class ReportUploadModal extends React.PureComponent {
     this.modalName = props.modalName
 
     this.handleUpload = this.handleUpload.bind(this)
-    this.submit = this.submit.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.handleRowOptionClick = this.handleRowOptionClick.bind(this)
-  }
-
-  submit = () => {
-    console.log('We should submit the links here!')
-    this.closeModal()
   }
 
   closeModal = () => {
@@ -108,7 +102,7 @@ class ReportUploadModal extends React.PureComponent {
       if (checkedState) {
         this.setState({
           checkedOptionKey: rowContent.join(''),
-          linkData: `?${ReportUploadModal.getDataLink(rowContent)}`,
+          linkData: `&${ReportUploadModal.getDataLink(rowContent)}`,
         })
       } else {
         this.setState({
@@ -119,7 +113,7 @@ class ReportUploadModal extends React.PureComponent {
     } else {
       this.setState({
         checkedOptionKey: rowContent.join(''),
-        linkData: `?${ReportUploadModal.getDataLink(rowContent)}`,
+        linkData: `&${ReportUploadModal.getDataLink(rowContent)}`,
       })
     }
   }
@@ -148,8 +142,8 @@ class ReportUploadModal extends React.PureComponent {
       maxHeight: '180px',
       overflowY: 'auto',
     }
+    const displayGenerateButton = !this.state.fileOK || this.state.checkedOptionKey === null
     const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingHeadersMessage}`
-    console.log(this.state.linkData)
     return (
       <ModalComponent
         isOpen={this.state.modalOpen}
@@ -192,13 +186,7 @@ class ReportUploadModal extends React.PureComponent {
         </div>
         }
         <Divider />
-        <DispatchRequestButton
-          onSubmit={this.submit}
-          onSuccess={this.closeModal}
-          confirmDialog="Are you sure you want to generate a report using selected excel file entry?"
-        >
-          <Button content="Generate" primary disabled={!this.state.fileOK || this.state.checkedOptionKey === null} />
-        </DispatchRequestButton>
+        <a href={`${this.props.docUrl}${this.state.linkData}`} className="ui primary button" style={{ display: !displayGenerateButton ? 'inline-block' : 'none' }}>Generate</a>
       </ModalComponent>
     )
   }
