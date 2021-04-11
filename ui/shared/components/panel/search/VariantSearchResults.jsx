@@ -17,11 +17,13 @@ import { VARIANT_SORT_FIELD_NO_FAMILY_SORT, VARIANT_PAGINATION_FIELD } from '../
 import DataLoader from '../../DataLoader'
 import { QueryParamsEditor } from '../../QueryParamEditor'
 import { HorizontalSpacer } from '../../Spacers'
-import ExportTableButton from '../../buttons/ExportTableButton'
+import ExportTableButton, { updateRowsToIncludeInReport } from '../../buttons/ExportTableButton'
 import ReduxFormWrapper from '../../form/ReduxFormWrapper'
 import Variants from '../variants/Variants'
 import GeneBreakdown from './GeneBreakdown'
 import { UploadExcelFileModal } from '../reporting/ReportUploadModal'
+import { filteredPredictions } from '../../form/Inputs'
+import { PREDICTOR_FIELDS } from '../../panel/variants/Predictions'
 
 const LargeRow = styled(Grid.Row)`
   font-size: 1.15em;
@@ -49,6 +51,102 @@ DisplayVariants.propTypes = {
   displayVariants: PropTypes.array,
 }
 
+const getFilterPredictionOperator = (operator, predictionKey) => {
+  if (operator === undefined) {
+    throw new Error(`Error: Please specify operator for prediction ${predictionKey}`)
+  }
+
+  if (operator === 'LT') {
+    return '<'
+  } else if (operator === 'GT') {
+    return '>'
+  } else if (operator === 'LEQ') {
+    return '<='
+  } else if (operator === 'GEQ') {
+    return '>='
+  }
+
+  return '=='
+}
+
+const getCorrectVariantPredictionValue = (value) => {
+  /* eslint-disable-next-line no-restricted-globals */
+  const isFloat = value !== '' && !isNaN(value) && Math.round(value) !== value
+  if (isFloat) {
+    return parseFloat(value).toPrecision(2)
+  }
+
+  if (typeof (value) === 'string') {
+    return `"${value}"`
+  }
+
+  return value
+}
+
+const filterVariants = (variants) => {
+  const filteredVariants = []
+  const filteredPredictionKeys = Object.keys(filteredPredictions)
+
+  filteredPredictionKeys.forEach(filteredPrediction => PREDICTOR_FIELDS.push({ field: filteredPrediction }))
+
+  if (filteredPredictionKeys.length === 0) {
+    return variants
+  }
+
+  let filterVariantExpression = ''
+  for (let variantIdx = 0; variantIdx < variants.length; variantIdx++) {
+    const variant = variants[variantIdx]
+    let nonExistingKey = false
+    for (let predictionKeyIdx = 0; predictionKeyIdx < filteredPredictionKeys.length; predictionKeyIdx++) {
+      const predictionKey = filteredPredictionKeys[predictionKeyIdx]
+      const filteredPredictionValue = getCorrectVariantPredictionValue(filteredPredictions[predictionKey].value)
+      if (filteredPredictionValue === '' || filteredPredictionValue === undefined) {
+        throw new Error(`Error: Please specify value for ${predictionKey}`)
+      }
+
+      const filteredPredictionOperator = getFilterPredictionOperator(filteredPredictions[predictionKey].operator, predictionKey)
+      const variantPredictionValue = getCorrectVariantPredictionValue(variant.predictions[predictionKey])
+
+      if (filterVariantExpression !== '') {
+        filterVariantExpression += ' && '
+      }
+
+      if (variant.predictions[predictionKey] !== undefined) {
+        filterVariantExpression += `${variantPredictionValue} ${filteredPredictionOperator} ${filteredPredictionValue}`
+      } else {
+        nonExistingKey = true
+        break
+      }
+    }
+
+    if (!nonExistingKey) {
+      /* eslint-disable-next-line no-eval */
+      const result = eval(filterVariantExpression)
+      if (result === true) {
+        filteredVariants.push(variant)
+      }
+    }
+
+    filterVariantExpression = ''
+  }
+
+  return filteredVariants
+}
+
+const getRowsToIncludeInReport = (source, target) => {
+  const indicies = []
+  for (let targetIdx = 0; targetIdx < target.length; targetIdx++) {
+    for (let sourceIdx = 0; sourceIdx < source.length; sourceIdx++) {
+      if (source[sourceIdx].variantId === target[targetIdx].variantId) {
+        indicies.push(sourceIdx)
+        break
+      }
+    }
+  }
+
+  return indicies
+}
+
 const BaseVariantSearchResultsContent = React.memo((
   { match, variantSearchDisplay, searchedVariantExportConfig, onSubmit, totalVariantsCount, additionalDisplayEdit, displayVariants }) => {
   const { searchHash } = match.params
@@ -64,48 +162,62 @@ const BaseVariantSearchResultsContent = React.memo((
     })
   }
 
-  return [
-    <LargeRow key="resultsSummary">
-      <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} />
-      <Grid.Column width={5}>
-        {totalVariantsCount === displayVariants.length ? 'Found ' : `Showing ${variantDisplayPageOffset + 1}-${variantDisplayPageOffset + displayVariants.length} of `}
-        <b>{totalVariantsCount}</b> variants
-      </Grid.Column>
-      <Grid.Column width={11} floated="right" textAlign="right">
-        {additionalDisplayEdit}
-        <ReduxFormWrapper
-          onSubmit={onSubmit}
-          form="editSearchedVariantsDisplayTop"
-          initialValues={variantSearchDisplay}
-          closeOnSuccess={false}
-          submitOnChange
-          inline
-          fields={fields}
-        />
-        <HorizontalSpacer width={10} />
-        <ExportTableButton downloads={searchedVariantExportConfig} buttonText="Download" openModal={openModal} />
-        <HorizontalSpacer width={10} />
-        <GeneBreakdown searchHash={searchHash} />
-      </Grid.Column>
-    </LargeRow>,
-    <DisplayVariants key="variants" displayVariants={displayVariants} />,
-    <LargeRow key="bottomPagination">
-      <Grid.Column width={11} floated="right" textAlign="right">
-        <ReduxFormWrapper
-          onSubmit={onSubmit}
-          form="editSearchedVariantsDisplayBottom"
-          initialValues={variantSearchDisplay}
-          closeOnSuccess={false}
-          submitOnChange
-          inline
-          fields={paginationFields}
-        />
-        <HorizontalSpacer width={10} />
-        <Button onClick={scrollToTop}>Scroll To Top</Button>
-        <HorizontalSpacer width={10} />
-      </Grid.Column>
-    </LargeRow>,
-  ]
+  let filteredVariants = []
+  try {
+    filteredVariants = filterVariants(displayVariants)
+    updateRowsToIncludeInReport(getRowsToIncludeInReport(displayVariants, filteredVariants))
+
+    return [
+      <LargeRow key="resultsSummary">
+        <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} />
+        <Grid.Column width={5}>
+          {totalVariantsCount === displayVariants.length ? 'Found ' : `Showing ${variantDisplayPageOffset + 1}-${variantDisplayPageOffset + displayVariants.length} of `}
+          <b>{totalVariantsCount}</b> variants{filteredVariants.length < totalVariantsCount ? <span>, after filtering showing <b>{filteredVariants.length}</b> variants</span> : null}
+        </Grid.Column>
+        <Grid.Column width={11} floated="right" textAlign="right">
+          {additionalDisplayEdit}
+          <ReduxFormWrapper
+            onSubmit={onSubmit}
+            form="editSearchedVariantsDisplayTop"
+            initialValues={variantSearchDisplay}
+            closeOnSuccess={false}
+            submitOnChange
+            inline
+            fields={fields}
+          />
+          <HorizontalSpacer width={10} />
+          <ExportTableButton downloads={searchedVariantExportConfig} buttonText="Download" openModal={openModal} />
+          <HorizontalSpacer width={10} />
+          <GeneBreakdown searchHash={searchHash} />
+        </Grid.Column>
+      </LargeRow>,
+      <DisplayVariants key="variants" displayVariants={filteredVariants} />,
+      <LargeRow key="bottomPagination">
+        <Grid.Column width={11} floated="right" textAlign="right">
+          <ReduxFormWrapper
+            onSubmit={onSubmit}
+            form="editSearchedVariantsDisplayBottom"
+            initialValues={variantSearchDisplay}
+            closeOnSuccess={false}
+            submitOnChange
+            inline
+            fields={paginationFields}
+          />
+          <HorizontalSpacer width={10} />
+          <Button onClick={scrollToTop}>Scroll To Top</Button>
+          <HorizontalSpacer width={10} />
+        </Grid.Column>
+      </LargeRow>,
+    ]
+  } catch (error) {
+    return [
+      <Grid.Row>
+        <Grid.Column width={16}>
+          <Message error content={error.message} />
+        </Grid.Column>
+      </Grid.Row>,
+    ]
+  }
 })
 
 BaseVariantSearchResultsContent.propTypes = {
@@ -206,4 +318,3 @@ LoadedVariantSearchResults.propTypes = {
 }
 
 export default LoadedVariantSearchResults
-

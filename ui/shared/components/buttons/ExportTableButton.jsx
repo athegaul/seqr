@@ -39,6 +39,12 @@ const EXT_CONFIG = {
 const escapeExportItem = item => (item.replace ? item.replace(/"/g, '\'\'') : item)
 
 const acmgCriteria = {}
+let rowsToIncludeInReport = []
+
+export const updateRowsToIncludeInReport = (newRowsToIncludeInReport) => {
+  rowsToIncludeInReport = newRowsToIncludeInReport
+}
+
 export const updateAcmgCriteriaForFileDownload = (variantId, score, criteria) => {
   acmgCriteria[variantId] = { score, criteria }
 }
@@ -82,7 +88,8 @@ export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
   if (!url.endsWith('?')) {
     url += '&'
   }
-  return <a href={`${url}file_format=${ext}&acmg_criteria=${btoa(JSON.stringify(acmgCriteria))}`}>{linkContent}</a>
+
+  return <a href={`${url}file_format=${ext}&acmg_criteria=${btoa(JSON.stringify(acmgCriteria))}&filtered_indexes=${btoa(rowsToIncludeInReport.toString())}`}>{linkContent}</a>
 })
 
 FileLink.propTypes = {

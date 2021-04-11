@@ -271,6 +271,9 @@ def export_variants_handler(request, search_hash):
     acmg_criteria = request.GET.get('acmg_criteria')
     acmg_criteria_json = json.loads(base64.b64decode(acmg_criteria).decode('utf-8'))
 
+    filtered_indexes = base64.b64decode(request.GET.get('filtered_indexes')).decode('utf-8')
+    filtered_indexes_arr = [int(idx) for idx in filtered_indexes.split(",")]
+
     json_saved_variants, variants_to_saved_variants = _get_saved_variants(variants, families)
 
     max_families_per_variant = max([len(variant['familyGuids']) for variant in variants])
@@ -306,9 +309,14 @@ def export_variants_handler(request, search_hash):
         rows[idx].append(acmg_criteria_json[acmg_criteria_keys[idx]]["score"])
         rows[idx].append(', '.join(acmg_criteria_json[acmg_criteria_keys[idx]]["criteria"]))
 
+    filtered_rows = []
+    for rowIdx in range(len(rows)):
+        if rowIdx in filtered_indexes_arr:
+            filtered_rows.append(rows[rowIdx])
+
     file_format = request.GET.get('file_format', 'tsv')
 
-    return export_table('search_results_{}'.format(search_hash), header, rows, file_format, titlecase_header=False)
+    return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False)
 
 
 def _get_field_value(value, config):
