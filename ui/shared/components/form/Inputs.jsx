@@ -612,6 +612,57 @@ export const AlignedCheckboxGroup = styled(CheckboxGroup)`
 
 export const CheckboxTableGroup = React.memo((props) => {
   const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, ...baseProps } = props
+  const noDataTableStyle = {
+    textAlign: 'center',
+  }
+  const getTableContentData = (tableContentData) => {
+    if (tableContentData.length === 0) {
+      return (
+        <TableRow key="no-data-matched-row">
+          <TableCell colSpan={12} style={noDataTableStyle} >
+            No data matched!
+          </TableCell>
+        </TableRow>
+      )
+    }
+    return (tableContentData.map((content, contentIndex) => {
+      return (
+        <TableRow key={content}>
+          <TableCell key={`optionClickCell${content}`}>
+            <BaseSemanticInput
+              {...baseProps}
+              inputType="Checkbox"
+              checked={checkedOptionKey !== null && checkedOptionKey === content.join('')}
+              /* eslint-disable-next-line react/no-array-index-key */
+              key={`optionClick${content}${contentIndex}`}
+              onChange={({ checked }) => {
+                if (checked) {
+                  onRowOptionClick(content, true)
+                } else {
+                  onRowOptionClick(content, false)
+                }
+              }}
+            />
+          </TableCell>
+          {content.map((contentData, contentDataIndex) => {
+            const returnedDateFormat = /^([0-9]+-?)+T([0-9]+:)+([0-9]+\.?)+$/
+            const validDate = returnedDateFormat.test(contentData)
+            if (validDate) {
+              contentData = new Date(contentData).toLocaleDateString('en-US')
+            }
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <TableCell key={`${contentData}${contentIndex}${contentDataIndex}`}>
+                {contentData}
+              </TableCell>
+            ) },
+            )}
+        </TableRow>)
+    },
+    ))
+  }
+
+
   return (
     <Table >
       <Table.Header>
@@ -628,41 +679,7 @@ export const CheckboxTableGroup = React.memo((props) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {tableContent.map((content, contentIndex) => {
-          return (
-            <TableRow key={content}>
-              <TableCell key={`optionClickCell${content}`}>
-                <BaseSemanticInput
-                  {...baseProps}
-                  inputType="Checkbox"
-                  checked={checkedOptionKey !== null && checkedOptionKey === content.join('')}
-                  /* eslint-disable-next-line react/no-array-index-key */
-                  key={`optionClick${content}${contentIndex}`}
-                  onChange={({ checked }) => {
-                    if (checked) {
-                      onRowOptionClick(content, true)
-                    } else {
-                      onRowOptionClick(content, false)
-                    }
-                  }}
-                />
-              </TableCell>
-              {content.map((contentData, contentDataIndex) => {
-                const returnedDateFormat = /^([0-9]+-?)+T([0-9]+:)+([0-9]+\.?)+$/
-                const validDate = returnedDateFormat.test(contentData)
-                if (validDate) {
-                  contentData = new Date(contentData).toLocaleDateString('en-US')
-                }
-                return (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <TableCell key={`${contentData}${contentIndex}${contentDataIndex}`}>
-                    {contentData}
-                  </TableCell>
-                ) },
-              )}
-            </TableRow>)
-          },
-        )}
+        { getTableContentData(tableContent) }
       </Table.Body>
     </Table>)
 })

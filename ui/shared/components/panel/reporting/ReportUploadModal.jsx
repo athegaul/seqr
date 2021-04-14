@@ -8,7 +8,7 @@ import { ModalComponent } from '../../modal/Modal'
 import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReducer'
 import FileUploadField from '../../form/XHRUploaderField'
 import { WORD_REPORT_EXCEL_GENERATION_HEADERS, WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES } from '../../../utils/constants'
-import { CheckboxTableGroup } from '../../form/Inputs'
+import { BaseSemanticInput, CheckboxTableGroup } from '../../form/Inputs'
 import { VerticalSpacer } from '../../../components/Spacers'
 
 
@@ -26,7 +26,7 @@ class ReportUploadModal extends React.PureComponent {
     this.state = {
       linkData: null,
       fileDataHeaders: [],
-      fileDataContent: [],
+      filteredFileDataContent: [],
       modalToggle: props.modalToggle,
       modalOpen: false,
       modalClosing: false,
@@ -76,6 +76,7 @@ class ReportUploadModal extends React.PureComponent {
           fileOK: true,
           fileDataHeaders: parsedDataHeaders,
           fileDataContent: parsedDataContent,
+          filteredFileDataContent: parsedDataContent,
           missingHeadersMessage: null,
           checkedOptionKey: null,
         })
@@ -86,6 +87,7 @@ class ReportUploadModal extends React.PureComponent {
           fileOK: false,
           fileDataHeaders: [],
           fileDataContent: [],
+          filteredFileDataContent: [],
           checkedOptionKey: null,
         })
       }
@@ -118,6 +120,32 @@ class ReportUploadModal extends React.PureComponent {
     }
   }
 
+  static fileDataContainsSearchData = (fileDataContentArray, searchValue) => {
+
+    if (searchValue === undefined || searchValue === '') {
+      return true
+    }
+
+    const filteredData = Object.values(fileDataContentArray).filter((fileDataContent) => {
+      return fileDataContent.indexOf(searchValue) !== -1
+    })
+    return filteredData.length > 0
+  }
+
+  handleXLSSearch(searchValue) {
+    const fileDataContent = Object.values(this.state.fileDataContent).map((fileDataContentRow) => {
+      if (ReportUploadModal.fileDataContainsSearchData(fileDataContentRow, searchValue)) {
+        return fileDataContentRow
+      }
+      return []
+    })
+    this.setState({
+      filteredFileDataContent: Object.values(fileDataContent).filter((fileDataContentData) => {
+        return fileDataContentData.length > 0
+      }),
+    })
+  }
+
   static getDerivedStateFromProps(props, currentState) {
     if (currentState.modalToggle !== props.modalToggle) {
       return {
@@ -141,6 +169,9 @@ class ReportUploadModal extends React.PureComponent {
     const checkboxTableStyle = {
       maxHeight: '180px',
       overflowY: 'auto',
+    }
+    const tableDataSearchStyle = {
+      textAlign: 'center',
     }
     const displayGenerateButton = !this.state.fileOK || this.state.checkedOptionKey === null
     const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingHeadersMessage}`
@@ -173,11 +204,20 @@ class ReportUploadModal extends React.PureComponent {
         }
         {!this.state.initialTableDisplay && this.state.fileOK &&
         <div>
+          <VerticalSpacer height={45} />
+          <div style={tableDataSearchStyle}>
+            {/* eslint-disable-next-line jsx-a11y/label-has-for */}
+            <label> Search uploaded data: </label>
+            <BaseSemanticInput
+              inputType="Input"
+              onChange={(searchVal) => { this.handleXLSSearch(searchVal) }}
+            />
+          </div>
           <VerticalSpacer height={15} />
           <div style={checkboxTableStyle}>
             <CheckboxTableGroup
               tableHeaders={this.state.fileDataHeaders}
-              tableContent={this.state.fileDataContent}
+              tableContent={this.state.filteredFileDataContent}
               checkedOptionKey={this.state.checkedOptionKey}
               onRowOptionClick={this.handleRowOptionClick}
               tableKey="excelUploadCheckboxGroup"
