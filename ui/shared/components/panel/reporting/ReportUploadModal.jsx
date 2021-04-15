@@ -179,6 +179,8 @@ class ReportUploadModal extends React.PureComponent {
     const displayGenerateButton = !this.state.fileOK || this.state.checkedOptionKey === null
     const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingHeadersMessage}`
     const buttonClassName = !displayGenerateButton ? 'ui primary button' : 'ui primary button disabled'
+    const xlsButtonClassName = 'ui download button'
+    const xlsFileDownloadLink = ''
     return (
       <ModalComponent
         isOpen={this.state.modalOpen}
@@ -232,6 +234,7 @@ class ReportUploadModal extends React.PureComponent {
         }
         <Divider />
         <a href={`${this.props.docUrl}${this.state.linkData}`} className={buttonClassName} >Generate</a>
+        <a href={`${xlsFileDownloadLink}`} className={xlsButtonClassName} download>Download Excel File Template</a>
       </ModalComponent>
     )
   }
