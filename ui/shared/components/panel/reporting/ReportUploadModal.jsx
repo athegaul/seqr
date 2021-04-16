@@ -35,12 +35,14 @@ class ReportUploadModal extends React.PureComponent {
       initialTableDisplay: true,
       checkedOptionKey: null,
       missingHeadersMessage: null,
+      ascSortToggle: false,
     }
     this.modalName = props.modalName
 
     this.handleUpload = this.handleUpload.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.handleRowOptionClick = this.handleRowOptionClick.bind(this)
+    this.handleSort = this.handleSort.bind(this)
   }
 
   closeModal = () => {
@@ -162,6 +164,44 @@ class ReportUploadModal extends React.PureComponent {
     return null
   }
 
+  handleSort(header) {
+    const ascToggle = !this.state.ascSortToggle
+    const headerValueIndex = this.state.fileDataHeaders.indexOf(header)
+
+    if (headerValueIndex !== -1) {
+      const mappedContentArray = this.state.filteredFileDataContent.map((tableContentDataArray, index) => {
+        return {
+          arrayValue: tableContentDataArray[headerValueIndex],
+          arrayPositionIndex: index,
+        }
+      })
+      mappedContentArray.sort((a, b) => {
+        if (Number.isNaN(Number.parseInt(a.arrayValue, 10)) && Number.isNaN(Number.parseInt(b.arrayValue, 10))) {
+          if (ascToggle) {
+            return a.arrayValue.localeCompare(b.arrayValue)
+          }
+          return b.arrayValue.localeCompare(a.arrayValue)
+        }
+        else if (!Number.isNaN(Number.parseInt(a.arrayValue, 10)) && !Number.isNaN(Number.parseInt(b.arrayValue, 10))) {
+          if (ascToggle) {
+            return parseInt(a.arrayValue, 10) - parseInt(b.arrayValue, 10)
+          }
+          return parseInt(b.arrayValue, 10) - parseInt(a.arrayValue, 10)
+        }
+        return 0
+      })
+      const sortedContentArray = mappedContentArray.map((mappedContent) => {
+        return this.state.filteredFileDataContent[mappedContent.arrayPositionIndex]
+      })
+      console.log(sortedContentArray)
+      this.setState({
+        fileDataContent: sortedContentArray,
+        filteredFileDataContent: sortedContentArray,
+        ascSortToggle: ascToggle,
+      })
+    }
+  }
+
   render() {
     const errorMessageStyle = {
       paddingTop: '15px',
@@ -227,6 +267,7 @@ class ReportUploadModal extends React.PureComponent {
               checkedOptionKey={this.state.checkedOptionKey}
               onRowOptionClick={this.handleRowOptionClick}
               tableKey="excelUploadCheckboxGroup"
+              handleSort={this.handleSort}
             />
           </div>
           <VerticalSpacer height={5} />

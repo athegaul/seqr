@@ -611,10 +611,16 @@ export const AlignedCheckboxGroup = styled(CheckboxGroup)`
 `
 
 export const CheckboxTableGroup = React.memo((props) => {
-  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, ...baseProps } = props
+  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, ...baseProps } = props
   const noDataTableStyle = {
     textAlign: 'center',
   }
+  const sortArrowStyle = {
+    fontSize: '17px',
+    paddingLeft: '20px',
+    fontWeight: '100',
+  }
+
   const getTableContentData = (tableContentData) => {
     if (tableContentData.length === 0) {
       return (
@@ -671,8 +677,10 @@ export const CheckboxTableGroup = React.memo((props) => {
           </Table.HeaderCell>
           {tableHeaders.map((header) => {
             return (
-              <Table.HeaderCell key={header}>
+              <Table.HeaderCell key={header} onClick={() => { handleSort(header) }}>
                 {header}
+                {/* eslint-disable-next-line jsx-a11y/label-has-for */}
+                <label style={sortArrowStyle}>⇵</label>
               </Table.HeaderCell>
             )
           })}
@@ -690,6 +698,7 @@ CheckboxTableGroup.propTypes = {
   onRowOptionClick: PropTypes.func,
   tableKey: PropTypes.string,
   checkedOptionKey: PropTypes.string,
+  handleSort: PropTypes.func,
 }
 
 const BaseRadioGroup = React.memo((props) => {
