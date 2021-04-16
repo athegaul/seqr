@@ -175,6 +175,7 @@ class ReportUploadModal extends React.PureComponent {
           arrayPositionIndex: index,
         }
       })
+
       mappedContentArray.sort((a, b) => {
         if (Number.isNaN(Number.parseInt(a.arrayValue, 10)) && Number.isNaN(Number.parseInt(b.arrayValue, 10))) {
           if (ascToggle) {
@@ -193,7 +194,7 @@ class ReportUploadModal extends React.PureComponent {
       const sortedContentArray = mappedContentArray.map((mappedContent) => {
         return this.state.filteredFileDataContent[mappedContent.arrayPositionIndex]
       })
-      console.log(sortedContentArray)
+
       this.setState({
         fileDataContent: sortedContentArray,
         filteredFileDataContent: sortedContentArray,
