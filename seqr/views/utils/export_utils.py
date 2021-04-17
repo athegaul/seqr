@@ -7,6 +7,7 @@ from io import BytesIO
 from docxtpl import DocxTemplate
 import calendar
 from datetime import date
+from seqr.utils.gene_utils import get_genes
 
 from django.http.response import HttpResponse
 
@@ -24,7 +25,7 @@ def get_date():
     return f"{calendar.month_name[todays_date.month]}, {todays_date.day}, {todays_date.year}"
 
 def get_doc_template():
-    template = DocxTemplate("/Users/mladen.zeljic/Downloads/diagnostic_report.docx")
+    template = DocxTemplate("")
     return template
 
 def get_hgvspc(row):
@@ -49,7 +50,7 @@ def get_gene_type(row):
     result = GeneInfo.objects.raw(query)[0]
     return result.gencode_gene_type
 
-def get_doc_response(rows, header, families, doc_values):
+def get_doc_response(rows, header, families, doc_values, transcript_keys):
     document_template = get_doc_template()
 
     generated_file = BytesIO()
@@ -60,14 +61,19 @@ def get_doc_response(rows, header, families, doc_values):
             notes_indices.append(idx)
 
     records = []
+    row_idx = 0
     for row in rows:
         for idx in notes_indices:
             if row[idx] != "":
+                disease_name, disease_description = _parse_disease_information(transcript_keys[row_idx][0])
                 records.append({
                     "message": row[idx],
                     "acmg_criteria": row[len(row) - 2],
                     "variant": get_hgvspc(row),
+                    "disease_name": disease_name,
+                    "disease_description": disease_description
                 })
+        row_idx += 1
 
     filtered_records = []
     for record in records:
@@ -76,7 +82,9 @@ def get_doc_response(rows, header, families, doc_values):
             "message": split_note_message[0],
             "reference": split_note_message[1].split("(")[0],
             "classification": record["acmg_criteria"],
-            "variant": record["variant"]
+            "variant": record["variant"],
+            "disease_name": record["disease_name"],
+            "disease_description": record["disease_description"]
         })
 
     families = [str(family) for family in families]
@@ -102,7 +110,21 @@ def get_doc_response(rows, header, families, doc_values):
     response["Content-Length"] = content_length
     return response
 
-def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True, families=[], doc_values={}):
+def _parse_disease_information(gene_id):
+    response = get_genes([gene_id], add_dbnsfp=True, add_omim=True, add_constraints=True)
+    disease = response[gene_id]["diseaseDesc"]
+
+    if disease == "":
+        return "No disease associations", "No disease associations"
+
+    disease_split = disease.split("]:")
+  
+    disease_name = disease_split[0].replace("DISEASE:", "").replace("[MIM:", "OMIM #").strip()
+    disease_description = disease_split[1].replace(";", "").strip()
+  
+    return disease_name, disease_description
+
+def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True, families=[], doc_values={}, transcript_keys=[]):
     """Generates an HTTP response for a table with the given header and rows, exported into the given file_format.
 
     Args:
@@ -149,7 +171,7 @@ def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_hea
             response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(filename_prefix).encode('ascii', 'ignore')
             return response
     elif file_format == "doc":
-        return get_doc_response(rows, header, families, doc_values)
+        return get_doc_response(rows, header, families, doc_values, transcript_keys)
     else:
         raise ValueError("Invalid file_format: %s" % file_format)
 

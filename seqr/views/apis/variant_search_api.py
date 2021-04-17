@@ -303,6 +303,8 @@ def export_variants_handler(request, search_hash):
     max_families_per_variant = max([len(variant['familyGuids']) for variant in variants])
     max_samples_per_variant = max([len(variant['genotypes']) for variant in variants])
 
+    transcript_keys = [[*variant['transcripts']] for variant in variants]
+
     rows = []
     for variant in variants:
         row = [_get_field_value(variant, config) for config in VARIANT_EXPORT_DATA]
@@ -334,13 +336,15 @@ def export_variants_handler(request, search_hash):
         rows[idx].append(', '.join(acmg_criteria_json[acmg_criteria_keys[idx]]["criteria"]))
 
     filtered_rows = []
-    for rowIdx in range(len(rows)):
-        if rowIdx in filtered_indexes_arr:
-            filtered_rows.append(rows[rowIdx])
+    filtered_transcript_keys = []
+    for row_idx in range(len(rows)):
+        if row_idx in filtered_indexes_arr:
+            filtered_rows.append(rows[row_idx])
+            filtered_transcript_keys.append(transcript_keys[row_idx])
 
     file_format = request.GET.get('file_format', 'tsv')
 
-    return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False, families=family_names, doc_values=doc_template_export_criteria)
+    return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False, families=family_names, doc_values=doc_template_export_criteria, transcript_keys=filtered_transcript_keys)
 
 
 def _get_field_value(value, config):
