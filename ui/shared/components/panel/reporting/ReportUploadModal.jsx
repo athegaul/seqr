@@ -26,6 +26,7 @@ class ReportUploadModal extends React.PureComponent {
     this.state = {
       linkData: null,
       fileDataHeaders: [],
+      fileDataContent: [],
       filteredFileDataContent: [],
       modalToggle: props.modalToggle,
       modalOpen: false,
@@ -37,6 +38,9 @@ class ReportUploadModal extends React.PureComponent {
       missingHeadersMessage: null,
       ascSortToggle: false,
       selectedHeader: null,
+      rowsPerPage: 5,
+      selectedPage: 0,
+      numberOfPages: 0,
     }
     this.modalName = props.modalName
 
@@ -44,6 +48,7 @@ class ReportUploadModal extends React.PureComponent {
     this.closeModal = this.closeModal.bind(this)
     this.handleRowOptionClick = this.handleRowOptionClick.bind(this)
     this.handleSort = this.handleSort.bind(this)
+    this.handlePageSelect = this.handlePageSelect.bind(this)
   }
 
   closeModal = () => {
@@ -79,9 +84,13 @@ class ReportUploadModal extends React.PureComponent {
           fileOK: true,
           fileDataHeaders: parsedDataHeaders,
           fileDataContent: parsedDataContent,
-          filteredFileDataContent: parsedDataContent,
+          filteredFileDataContent: ReportUploadModal.paginateData(0, parsedDataContent, this.state.rowsPerPage).paginatedData,
           missingHeadersMessage: null,
           checkedOptionKey: null,
+          numberOfPages: ReportUploadModal.getNumberOfPages(parsedDataContent, this.state.rowsPerPage),
+          selectedHeader: null,
+          ascSortToggle: false,
+          selectedPage: 0,
         })
       } else {
         this.setState({
@@ -92,6 +101,10 @@ class ReportUploadModal extends React.PureComponent {
           fileDataContent: [],
           filteredFileDataContent: [],
           checkedOptionKey: null,
+          numberOfPages: 0,
+          selectedHeader: null,
+          ascSortToggle: false,
+          selectedPage: 0,
         })
       }
     }
@@ -135,6 +148,13 @@ class ReportUploadModal extends React.PureComponent {
     return filteredData.length > 0
   }
 
+  static getNumberOfPages(dataContent, rowsPerPage) {
+    if (dataContent.length === 0) {
+      return 0
+    }
+    return Math.ceil(dataContent.length / rowsPerPage)
+  }
+
   handleXLSSearch(searchValue) {
     const fileDataContent = Object.values(this.state.fileDataContent).map((fileDataContentRow) => {
       if (ReportUploadModal.fileDataContainsSearchData(fileDataContentRow, searchValue)) {
@@ -142,10 +162,14 @@ class ReportUploadModal extends React.PureComponent {
       }
       return []
     })
+    const filteredFileDataContent = Object.values(fileDataContent).filter((fileDataContentData) => {
+      return fileDataContentData.length > 0
+    })
+    const filteredAndSortedFileDataContent = ReportUploadModal.sortDataByHeader(this.state.selectedHeader, this.state.fileDataHeaders, filteredFileDataContent, this.state.ascSortToggle, false)
     this.setState({
-      filteredFileDataContent: Object.values(fileDataContent).filter((fileDataContentData) => {
-        return fileDataContentData.length > 0
-      }),
+      numberOfPages: ReportUploadModal.getNumberOfPages(filteredFileDataContent, this.state.rowsPerPage),
+      filteredFileDataContent: ReportUploadModal.paginateData(0, filteredAndSortedFileDataContent, this.state.rowsPerPage).paginatedData,
+      selectedPage: 1,
     })
   }
 
@@ -165,12 +189,17 @@ class ReportUploadModal extends React.PureComponent {
     return null
   }
 
-  handleSort(header) {
-    const ascToggle = !this.state.ascSortToggle
-    const headerValueIndex = this.state.fileDataHeaders.indexOf(header)
+  static sortDataByHeader(header, headers, dataContent, ascSortToggle, shouldChangeToggle = true) {
+
+    let ascToggle = ascSortToggle
+    if (shouldChangeToggle) {
+      ascToggle = !ascSortToggle
+    }
+
+    const headerValueIndex = headers.indexOf(header)
 
     if (headerValueIndex !== -1) {
-      const mappedContentArray = this.state.filteredFileDataContent.map((tableContentDataArray, index) => {
+      const mappedContentArray = dataContent.map((tableContentDataArray, index) => {
         return {
           arrayValue: tableContentDataArray[headerValueIndex],
           arrayPositionIndex: index,
@@ -192,16 +221,41 @@ class ReportUploadModal extends React.PureComponent {
         }
         return 0
       })
-      const sortedContentArray = mappedContentArray.map((mappedContent) => {
-        return this.state.filteredFileDataContent[mappedContent.arrayPositionIndex]
+      return mappedContentArray.map((mappedContent) => {
+        return dataContent[mappedContent.arrayPositionIndex]
       })
+    }
+    return dataContent
+  }
 
-      this.setState({
-        fileDataContent: sortedContentArray,
-        filteredFileDataContent: sortedContentArray,
-        ascSortToggle: ascToggle,
-        selectedHeader: header,
-      })
+  handleSort(header) {
+    const sortedContentArray = ReportUploadModal.sortDataByHeader(header, this.state.fileDataHeaders, this.state.fileDataContent, this.state.ascSortToggle)
+
+    this.setState({
+      fileDataContent: sortedContentArray,
+      filteredFileDataContent: ReportUploadModal.paginateData(this.state.selectedPage, sortedContentArray, this.state.rowsPerPage).paginatedData,
+      ascSortToggle: !this.state.ascSortToggle,
+      selectedHeader: header,
+    })
+  }
+
+  handlePageSelect(newPage) {
+    const { paginatedData } = ReportUploadModal.paginateData(newPage, this.state.fileDataContent, this.state.rowsPerPage)
+    this.setState({
+      filteredFileDataContent: paginatedData,
+      selectedPage: newPage,
+    })
+  }
+
+  static paginateData(newPage, dataToPaginate, rowsPerPage) {
+    const startIndex = (newPage * rowsPerPage)
+    let endIndex = (newPage * rowsPerPage) + (rowsPerPage - 1)
+
+    if (endIndex > dataToPaginate.length) {
+      endIndex = dataToPaginate.length - 1
+    }
+    return {
+      paginatedData: dataToPaginate.slice(startIndex, endIndex + 1),
     }
   }
 
@@ -272,6 +326,9 @@ class ReportUploadModal extends React.PureComponent {
               tableKey="excelUploadCheckboxGroup"
               handleSort={this.handleSort}
               selectedHeader={this.state.selectedHeader}
+              handlePageSelect={this.handlePageSelect}
+              numberOfPages={this.state.numberOfPages}
+              selectedPage={this.state.selectedPage}
             />
           </div>
           <VerticalSpacer height={5} />

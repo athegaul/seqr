@@ -3,7 +3,7 @@
 import React, { createElement } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Form, List, Button, Pagination as PaginationComponent, Search, Icon, Popup, Table, TableCell, TableRow } from 'semantic-ui-react'
+import { Form, List, Button, Pagination as PaginationComponent, Search, Icon, Popup, Table, TableCell, TableRow, TableFooter } from 'semantic-ui-react'
 import Slider from 'react-rangeslider'
 import { JsonEditor } from 'jsoneditor-react'
 import 'react-rangeslider/lib/index.css'
@@ -611,7 +611,7 @@ export const AlignedCheckboxGroup = styled(CheckboxGroup)`
 `
 
 export const CheckboxTableGroup = React.memo((props) => {
-  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, selectedHeader, ...baseProps } = props
+  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, ...baseProps } = props
   const noDataTableStyle = {
     textAlign: 'center',
   }
@@ -626,6 +626,10 @@ export const CheckboxTableGroup = React.memo((props) => {
     fontWeight: '100',
     color: '#D3D3D3',
   }
+  const tableFooterStyle = {
+    background: '#f9fafb',
+  }
+  const pages = [...Array(numberOfPages).keys()]
 
   const getTableContentData = (tableContentData) => {
     if (tableContentData.length === 0) {
@@ -701,6 +705,16 @@ export const CheckboxTableGroup = React.memo((props) => {
       <Table.Body>
         { getTableContentData(tableContent) }
       </Table.Body>
+      <TableFooter style={tableFooterStyle}>
+        <TableRow>
+          <TableCell colSpan={13} style={noDataTableStyle} key="pageCell">
+            {pages.map((page) => {
+              // eslint-disable-next-line react/no-array-index-key
+              return <button className="ui download button" key={`page${page}Link`} onClick={() => { handlePageSelect(page) }}>{page + 1}</button>
+            })}
+          </TableCell>
+        </TableRow>
+      </TableFooter>
     </Table>)
 })
 
@@ -712,6 +726,9 @@ CheckboxTableGroup.propTypes = {
   checkedOptionKey: PropTypes.string,
   handleSort: PropTypes.func,
   selectedHeader: PropTypes.string,
+  handlePageSelect: PropTypes.func,
+  numberOfPages: PropTypes.number,
+  selectedPage: PropTypes.number,
 }
 
 const BaseRadioGroup = React.memo((props) => {
