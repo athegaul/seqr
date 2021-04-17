@@ -611,14 +611,20 @@ export const AlignedCheckboxGroup = styled(CheckboxGroup)`
 `
 
 export const CheckboxTableGroup = React.memo((props) => {
-  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, ...baseProps } = props
+  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, selectedHeader, ...baseProps } = props
   const noDataTableStyle = {
     textAlign: 'center',
   }
-  const sortArrowStyle = {
+  const selectedSortArrowStyle = {
     fontSize: '17px',
     paddingLeft: '20px',
     fontWeight: '100',
+  }
+  const normalSortArrowStyle = {
+    fontSize: '17px',
+    paddingLeft: '20px',
+    fontWeight: '100',
+    color: '#D3D3D3',
   }
 
   const getTableContentData = (tableContentData) => {
@@ -679,8 +685,14 @@ export const CheckboxTableGroup = React.memo((props) => {
             return (
               <Table.HeaderCell key={header} onClick={() => { handleSort(header) }}>
                 {header}
-                {/* eslint-disable-next-line jsx-a11y/label-has-for */}
-                <label style={sortArrowStyle}>⇵</label>
+                {selectedHeader && selectedHeader === header &&
+                // eslint-disable-next-line jsx-a11y/label-has-for
+                <label style={selectedSortArrowStyle}>⇵</label>
+                }
+                {(!selectedHeader || selectedHeader !== header) &&
+                // eslint-disable-next-line jsx-a11y/label-has-for
+                <label style={normalSortArrowStyle}>⇵</label>
+                }
               </Table.HeaderCell>
             )
           })}
@@ -699,6 +711,7 @@ CheckboxTableGroup.propTypes = {
   tableKey: PropTypes.string,
   checkedOptionKey: PropTypes.string,
   handleSort: PropTypes.func,
+  selectedHeader: PropTypes.string,
 }
 
 const BaseRadioGroup = React.memo((props) => {

@@ -36,6 +36,7 @@ class ReportUploadModal extends React.PureComponent {
       checkedOptionKey: null,
       missingHeadersMessage: null,
       ascSortToggle: false,
+      selectedHeader: null,
     }
     this.modalName = props.modalName
 
@@ -199,6 +200,7 @@ class ReportUploadModal extends React.PureComponent {
         fileDataContent: sortedContentArray,
         filteredFileDataContent: sortedContentArray,
         ascSortToggle: ascToggle,
+        selectedHeader: header,
       })
     }
   }
@@ -269,6 +271,7 @@ class ReportUploadModal extends React.PureComponent {
               onRowOptionClick={this.handleRowOptionClick}
               tableKey="excelUploadCheckboxGroup"
               handleSort={this.handleSort}
+              selectedHeader={this.state.selectedHeader}
             />
           </div>
           <VerticalSpacer height={5} />
