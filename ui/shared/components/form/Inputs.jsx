@@ -679,6 +679,99 @@ export const CheckboxTableGroup = React.memo((props) => {
   }
 
 
+  const pageButton = (pageIndex, buttonText = null, buttonDisabled = false) => {
+
+    let text = `${pageIndex + 1}`
+    if (buttonText !== null) {
+      text = `${buttonText}`
+    }
+    const buttonClassName = buttonDisabled ? 'ui download button disabled' : 'ui download button'
+    return (
+      <button
+        className={buttonClassName}
+        key={`page${pageIndex + 1}Link`}
+        onClick={() => {
+          handlePageSelect(pageIndex)
+        }}
+      > {text}
+      </button>
+    )
+  }
+
+  const dataPages = () => {
+    const morePagesStyle = {
+      fontSize: 'x-large',
+      padding: '0px 10px',
+      marginRight: '5px',
+    }
+    if (pages.length > 5) {
+      const lastPage = pages.slice(-1)[0]
+      const secondToLastPage = pages.slice(-2)[0]
+      if (selectedPage === 0) {
+        return (
+          <div>
+            {pageButton(0)}
+            {pageButton(1)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(lastPage)}
+          </div>
+        )
+      }
+      if (selectedPage === 1) {
+        return (
+          <div>
+            {pageButton(0)}
+            {pageButton(1)}
+            {pageButton(2)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(lastPage)}
+          </div>
+        )
+      }
+      if (selectedPage === secondToLastPage) {
+        return (
+          <div>
+            {pageButton(0)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(selectedPage - 1)}
+            {pageButton(selectedPage)}
+            {pageButton(lastPage)}
+          </div>
+        )
+      }
+      if (selectedPage === lastPage) {
+        return (
+          <div>
+            {pageButton(0)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(selectedPage - 1)}
+            {pageButton(selectedPage)}
+          </div>
+        )
+      }
+      if (pages.includes(selectedPage)) {
+        return (
+          <div>
+            {pageButton(0)}
+            { selectedPage - 1 !== 1 && <span style={morePagesStyle}>...</span>}
+            {pageButton(selectedPage - 1)}
+            {pageButton(selectedPage)}
+            {pageButton(selectedPage + 1)}
+            { selectedPage + 1 !== secondToLastPage && <span style={morePagesStyle}>...</span>}
+            {pageButton(lastPage)}
+          </div>
+        )
+      }
+    }
+    return (
+      <div>
+        {pages.map((page) => {
+          return pageButton(page)
+        })}
+      </div>
+    )
+  }
+
   return (
     <Table >
       <Table.Header>
@@ -708,10 +801,7 @@ export const CheckboxTableGroup = React.memo((props) => {
       <TableFooter style={tableFooterStyle}>
         <TableRow>
           <TableCell colSpan={13} style={noDataTableStyle} key="pageCell">
-            {pages.map((page) => {
-              // eslint-disable-next-line react/no-array-index-key
-              return <button className="ui download button" key={`page${page}Link`} onClick={() => { handlePageSelect(page) }}>{page + 1}</button>
-            })}
+            {dataPages()}
           </TableCell>
         </TableRow>
       </TableFooter>
