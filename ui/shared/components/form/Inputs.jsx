@@ -777,8 +777,8 @@ export const CheckboxTableGroup = React.memo((props) => {
         )
       }
     }
-    const previousPageButtonDisabled = selectedPage === 0
-    const nextPageButtonDisabled = selectedPage === pages.slice(-1)[0]
+    const previousPageButtonDisabled = selectedPage === 0 || pages.length === 0
+    const nextPageButtonDisabled = selectedPage === pages.slice(-1)[0] || pages.length === 0
     const previousPage = (selectedPage - 1 < 0) ? 0 : selectedPage - 1
     const nextPage = (selectedPage === pages.slice(-1)[0]) ? pages.slice(-1)[0] : selectedPage + 1
     return (

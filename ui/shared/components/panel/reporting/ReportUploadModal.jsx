@@ -169,7 +169,7 @@ class ReportUploadModal extends React.PureComponent {
     this.setState({
       numberOfPages: ReportUploadModal.getNumberOfPages(filteredFileDataContent, this.state.rowsPerPage),
       filteredFileDataContent: ReportUploadModal.paginateData(0, filteredAndSortedFileDataContent, this.state.rowsPerPage).paginatedData,
-      selectedPage: 1,
+      selectedPage: 0,
     })
   }
 
