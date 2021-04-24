@@ -263,10 +263,8 @@ const getElasticSearchIndicies = async () => {
   // Clear searchOptions and get new data
   searchOptions = []
 
-  const url = 'http://localhost:8080/http://localhost:9200/'
-
   // Get all keys from Elasticsearch
-  let response = await fetch(`${url}/_mapping`)
+  let response = await fetch('/api/data_management/elasticsearch_mapping')
   let data = await response.json()
 
   // Include only index names that are not from ElasticSearch (the ones that start with dot)
@@ -276,7 +274,7 @@ const getElasticSearchIndicies = async () => {
   /* eslint-disable no-await-in-loop */
   for (let indexNameIdx = 0; indexNameIdx < indexNames.length; indexNameIdx++) {
     const indexName = indexNames[indexNameIdx]
-    response = await fetch(`${url}/${indexName}`)
+    response = await fetch(`/api/data_management/elasticsearch_index_data/${indexName}`)
     data = await response.json()
 
     /* eslint-disable no-loop-func */
