@@ -682,19 +682,23 @@ export const CheckboxTableGroup = React.memo((props) => {
   const pageButton = (pageIndex, buttonText = null, buttonDisabled = false) => {
 
     let text = `${pageIndex + 1}`
+    let key = `page${pageIndex + 1}Link`
     if (buttonText !== null) {
       text = `${buttonText}`
+      key = `page${pageIndex + 1}Link${buttonText}`
     }
     const buttonClassName = buttonDisabled ? 'ui download button disabled' : 'ui download button'
+    const buttonColor = (selectedPage === pageIndex && buttonText === null) ? 'blue' : null
     return (
-      <button
+      <Button
         className={buttonClassName}
-        key={`page${pageIndex + 1}Link`}
+        key={key}
         onClick={() => {
           handlePageSelect(pageIndex)
         }}
+        color={buttonColor}
       > {text}
-      </button>
+      </Button>
     )
   }
 
@@ -710,48 +714,57 @@ export const CheckboxTableGroup = React.memo((props) => {
       if (selectedPage === 0) {
         return (
           <div>
+            {pageButton(0, '<<', true)}
             {pageButton(0)}
             {pageButton(1)}
             <span style={morePagesStyle}>...</span>
             {pageButton(lastPage)}
+            {pageButton(1, '>>')}
           </div>
         )
       }
-      if (selectedPage === 1) {
+      else if (selectedPage === 1) {
         return (
           <div>
+            {pageButton(0, '<<')}
             {pageButton(0)}
             {pageButton(1)}
             {pageButton(2)}
             <span style={morePagesStyle}>...</span>
             {pageButton(lastPage)}
+            {pageButton(2, '>>')}
           </div>
         )
       }
-      if (selectedPage === secondToLastPage) {
+      else if (selectedPage === secondToLastPage) {
         return (
           <div>
+            {pageButton(selectedPage - 1, '<<')}
             {pageButton(0)}
             <span style={morePagesStyle}>...</span>
             {pageButton(selectedPage - 1)}
             {pageButton(selectedPage)}
             {pageButton(lastPage)}
+            {pageButton(lastPage, '>>')}
           </div>
         )
       }
-      if (selectedPage === lastPage) {
+      else if (selectedPage === lastPage) {
         return (
           <div>
+            {pageButton(selectedPage - 1, '<<')}
             {pageButton(0)}
             <span style={morePagesStyle}>...</span>
             {pageButton(selectedPage - 1)}
             {pageButton(selectedPage)}
+            {pageButton(selectedPage, '>>', true)}
           </div>
         )
       }
-      if (pages.includes(selectedPage)) {
+      else if (pages.includes(selectedPage)) {
         return (
           <div>
+            {pageButton(selectedPage - 1, '<<')}
             {pageButton(0)}
             { selectedPage - 1 !== 1 && <span style={morePagesStyle}>...</span>}
             {pageButton(selectedPage - 1)}
@@ -759,15 +772,26 @@ export const CheckboxTableGroup = React.memo((props) => {
             {pageButton(selectedPage + 1)}
             { selectedPage + 1 !== secondToLastPage && <span style={morePagesStyle}>...</span>}
             {pageButton(lastPage)}
+            {pageButton(selectedPage + 1, '>>')}
           </div>
         )
       }
     }
+    const previousPageButtonDisabled = selectedPage === 0
+    const nextPageButtonDisabled = selectedPage === pages.slice(-1)[0]
+    const previousPage = (selectedPage - 1 < 0) ? 0 : selectedPage - 1
+    const nextPage = (selectedPage === pages.slice(-1)[0]) ? pages.slice(-1)[0] : selectedPage + 1
     return (
       <div>
+        {pageButton(previousPage, '<<', previousPageButtonDisabled)}
         {pages.map((page) => {
-          return pageButton(page)
+          return (
+            <span key={`page${page + 1}LinkSpan`}>
+              {pageButton(page)}
+            </span>
+          )
         })}
+        {pageButton(nextPage, '>>', nextPageButtonDisabled)}
       </div>
     )
   }
