@@ -82,6 +82,12 @@ def elasticsearch_status(request):
         'errors': errors,
     })
 
+@data_manager_required
+def elasticsearch_mapping(request):
+    return create_json_response({
+        'data': 'Simple data'
+    })
+
 
 @data_manager_required
 def upload_qc_pipeline_output(request):
