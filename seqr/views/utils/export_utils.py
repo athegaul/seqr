@@ -39,10 +39,31 @@ def get_hgvspc(row):
 
     result = ""
     if hgvsc != "":
-        result += hgvsc
+        result += hgvsc.split(":")[1]
     if hgvsp != "":
-        result += f"({hgvsp})"
+        result += f"({hgvsp.split(':')[1]})"
     return result
+
+def get_transcript(row):
+    header_indices = {
+        "hgvsc": 19
+    }
+
+    hgvsc = row[header_indices["hgvsc"]]
+    result = ""
+    if hgvsc != "":
+        result += hgvsc.split(":")[0]
+
+    return result
+
+def get_coordinate(row):
+    header_indices = {
+        "pos": 1,
+        "ref": 2,
+        "alt": 3
+    }
+
+    return f"g.{row[header_indices['pos']]} {row[header_indices['ref']]} > {row[header_indices['alt']]}"
 
 def get_gene_type(row):
     gene_symbol = row[4]
@@ -71,7 +92,9 @@ def get_doc_response(rows, header, families, doc_values, transcript_keys):
                     "acmg_criteria": row[len(row) - 2],
                     "variant": get_hgvspc(row),
                     "disease_name": disease_name,
-                    "disease_description": disease_description
+                    "disease_description": disease_description,
+                    "gene_transcript": get_transcript(row),
+                    "genomic_coordinate": get_coordinate(row)
                 })
         row_idx += 1
 
@@ -84,7 +107,9 @@ def get_doc_response(rows, header, families, doc_values, transcript_keys):
             "classification": record["acmg_criteria"],
             "variant": record["variant"],
             "disease_name": record["disease_name"],
-            "disease_description": record["disease_description"]
+            "disease_description": record["disease_description"],
+            "gene_transcript": record["gene_transcript"],
+            "genomic_coordinate": record["genomic_coordinate"]
         })
 
     families = [str(family) for family in families]
