@@ -609,7 +609,7 @@ export const AlignedCheckboxGroup = styled(CheckboxGroup)`
 `
 
 export const CheckboxTableGroup = React.memo((props) => {
-  const { tableHeaders, tableContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, ...baseProps } = props
+  const { tableHeaders, tableDataContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, pageDataContent, ...baseProps } = props
   const noDataTableStyle = {
     textAlign: 'center',
   }
@@ -628,6 +628,7 @@ export const CheckboxTableGroup = React.memo((props) => {
     background: '#f9fafb',
   }
   const pages = [...Array(numberOfPages).keys()]
+  const tableContent = (pageDataContent.length === 0) ? tableDataContent : pageDataContent
 
   const getTableContentData = (tableContentData) => {
     if (tableContentData.length === 0) {
@@ -687,12 +688,15 @@ export const CheckboxTableGroup = React.memo((props) => {
     }
     const buttonClassName = buttonDisabled ? 'ui download button disabled' : 'ui download button'
     const buttonColor = (selectedPage === pageIndex && buttonText === null) ? 'blue' : null
+    const buttonClickable = (pageIndex !== selectedPage)
     return (
       <Button
         className={buttonClassName}
         key={key}
         onClick={() => {
-          handlePageSelect(pageIndex)
+          if (buttonClickable) {
+            handlePageSelect(pageIndex)
+          }
         }}
         color={buttonColor}
       > {text}
@@ -832,7 +836,7 @@ export const CheckboxTableGroup = React.memo((props) => {
 
 CheckboxTableGroup.propTypes = {
   tableHeaders: PropTypes.array,
-  tableContent: PropTypes.array,
+  tableDataContent: PropTypes.array,
   onRowOptionClick: PropTypes.func,
   tableKey: PropTypes.string,
   checkedOptionKey: PropTypes.string,
@@ -841,6 +845,7 @@ CheckboxTableGroup.propTypes = {
   handlePageSelect: PropTypes.func,
   numberOfPages: PropTypes.number,
   selectedPage: PropTypes.number,
+  pageDataContent: PropTypes.array,
 }
 
 const BaseRadioGroup = React.memo((props) => {
