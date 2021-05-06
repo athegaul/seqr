@@ -293,7 +293,7 @@ def _get_affected_patients(header, filtered_rows):
         individual_indices = []
 
         for idx in sample_indices:
-            if idx <= len(filtered_row) and filtered_row[idx] != None:
+            if idx < len(filtered_row) and filtered_row[idx] != None:
                 individual_indices.append(filtered_row[idx])
 
         row_affected_patients = []
