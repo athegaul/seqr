@@ -29,7 +29,7 @@ def get_date():
     return f"{calendar.month_name[todays_date.month]}, {todays_date.day}, {todays_date.year}"
 
 def get_doc_template():
-    template_location = '/opt/templates/diagnostic_report.docx'
+    template_location = '/home/ansible/diagnostic_report.docx'
     s3.download_file('diagnostic-report-templates', 'diagnostic_report.docx', template_location)
     template = DocxTemplate(template_location)
     return template
