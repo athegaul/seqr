@@ -15,17 +15,23 @@ from seqr.views.utils.json_utils import _to_title_case
 
 from reference_data.models import GeneInfo
 
+import boto3
+
 DELIMITERS = {
     'csv': ',',
     'tsv': '\t',
 }
+
+s3 = boto3.client('s3')
 
 def get_date():
     todays_date = date.today()
     return f"{calendar.month_name[todays_date.month]}, {todays_date.day}, {todays_date.year}"
 
 def get_doc_template():
-    template = DocxTemplate("")
+    template_location = '/opt/templates/diagnostic_report.docx'
+    s3.download_file('diagnostic-report-templates', 'diagnostic_report.docx', template_location)
+    template = DocxTemplate(template_location)
     return template
 
 def get_hgvspc(row):

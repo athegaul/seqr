@@ -24,3 +24,5 @@ whitenoise==5.2.0                # simplified static file handling. Behind a maj
 
 docx==0.2.4                      # creating word documents
 docxtpl==0.11.3                  # generating word documents based on jinja templates
+
+boto3==1.17.69                   # AWS
