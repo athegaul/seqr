@@ -7,9 +7,8 @@ import { connect } from 'react-redux'
 import { ModalComponent } from '../../modal/Modal'
 import { setModalConfirm, closeModal } from '../../../../redux/utils/modalReducer'
 import FileUploadField from '../../form/XHRUploaderField'
-import { WORD_REPORT_EXCEL_GENERATION_HEADERS, WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES } from '../../../utils/constants'
-import { BaseSemanticInput, CheckboxTableGroup } from '../../form/Inputs'
-import { VerticalSpacer } from '../../../components/Spacers'
+import { WORD_REPORT_EXCEL_GENERATION_HEADERS } from '../../../utils/constants'
+import SearchableTable from '../../page/SearchableTable'
 
 
 class ReportUploadModal extends React.PureComponent {
@@ -17,6 +16,7 @@ class ReportUploadModal extends React.PureComponent {
   static propTypes = {
     modalName: PropTypes.string,
     modalToggle: PropTypes.any,
+    affectedIndividuals: PropTypes.array,
     docUrl: PropTypes.string,
   }
 
@@ -25,32 +25,41 @@ class ReportUploadModal extends React.PureComponent {
 
     this.state = {
       linkData: null,
+      affectedIndividualsLink: '',
       fileDataHeaders: [],
       fileDataContent: [],
-      filteredFileDataContent: [],
-      pageDataContent: [],
+      affectedIndividualsDataHeaders: ['Index', 'Display Name', 'Family GUID', 'Individual ID', 'Individual GUID'],
       modalToggle: props.modalToggle,
       modalOpen: false,
       modalClosing: false,
       fileOK: false,
       initialUpload: true,
-      initialTableDisplay: true,
-      checkedOptionKey: null,
-      missingHeadersMessage: null,
-      ascSortToggle: false,
-      selectedHeader: null,
+      initialXLSTableDisplay: true,
+      missingXLSTableHeadersMessage: null,
       rowsPerPage: 5,
-      selectedPage: 0,
-      numberOfPages: 0,
-      searchValue: null,
     }
     this.modalName = props.modalName
 
     this.handleUpload = this.handleUpload.bind(this)
     this.closeModal = this.closeModal.bind(this)
-    this.handleRowOptionClick = this.handleRowOptionClick.bind(this)
-    this.handleSort = this.handleSort.bind(this)
-    this.handlePageSelect = this.handlePageSelect.bind(this)
+    this.getLinkValue = this.getLinkValue.bind(this)
+    this.getAffectedPatientsData = this.getAffectedPatientsData.bind(this)
+  }
+
+  getLinkValue = (value) => {
+    this.setState({
+      linkData: value,
+    })
+  }
+
+  getAffectedIndividualsLinkValue = (selectedAffectedIndividualIndexes) => {
+    const selectedAffectedIndividuals = []
+    Object.values(selectedAffectedIndividualIndexes).forEach((selectedAffectedIndividualIndex) => {
+      selectedAffectedIndividuals.push(this.props.affectedIndividuals[selectedAffectedIndividualIndex])
+    })
+    this.setState({
+      affectedIndividualsLink: `&patients=${btoa(JSON.stringify(selectedAffectedIndividuals))}`,
+    })
   }
 
   closeModal = () => {
@@ -59,8 +68,7 @@ class ReportUploadModal extends React.PureComponent {
       modalClosing: true,
       modalToggle: !this.state.modalToggle,
       initialUpload: true,
-      checkedOptionKey: null,
-      missingHeadersMessage: null,
+      missingXLSTableHeadersMessage: null,
     })
   }
 
@@ -73,7 +81,7 @@ class ReportUploadModal extends React.PureComponent {
         const headerDifference = WORD_REPORT_EXCEL_GENERATION_HEADERS.filter(x => !parsedDataHeaders.includes(x))
         if (headerDifference.length !== 0) {
           this.setState({
-            missingHeadersMessage: `Missing fields are: ${headerDifference.join(',')}`,
+            missingXLSTableHeadersMessage: `Missing fields are: ${headerDifference.join(',')}`,
           })
         }
         return headerDifference.length === 0
@@ -82,99 +90,38 @@ class ReportUploadModal extends React.PureComponent {
       if (headerIsComplete()) {
         this.setState({
           initialUpload: false,
-          initialTableDisplay: false,
+          initialXLSTableDisplay: false,
           fileOK: true,
           fileDataHeaders: parsedDataHeaders,
           fileDataContent: parsedDataContent,
-          filteredFileDataContent: ReportUploadModal.paginateData(0, parsedDataContent, this.state.rowsPerPage).paginatedData,
-          missingHeadersMessage: null,
-          checkedOptionKey: null,
-          numberOfPages: ReportUploadModal.getNumberOfPages(parsedDataContent, this.state.rowsPerPage),
-          selectedHeader: null,
-          ascSortToggle: false,
-          selectedPage: 0,
+          missingXLSTableHeadersMessage: null,
         })
       } else {
         this.setState({
           initialUpload: false,
-          initialTableDisplay: false,
+          initialXLSTableDisplay: false,
           fileOK: false,
           fileDataHeaders: [],
           fileDataContent: [],
-          filteredFileDataContent: [],
-          checkedOptionKey: null,
-          numberOfPages: 0,
-          selectedHeader: null,
-          ascSortToggle: false,
-          selectedPage: 0,
         })
       }
     }
   }
 
-  static getDataLink(rowContent) {
-    const linkData = WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES.map((k, i) => `${k}=${rowContent[i]}`)
-    return linkData.join('&').trim().replace(/\s/g, '%20')
-  }
-
-  handleRowOptionClick(rowContent, checkedState) {
-    if (this.state.checkedOptionKey == null) {
-      if (checkedState) {
-        this.setState({
-          checkedOptionKey: rowContent.join(''),
-          linkData: `&${ReportUploadModal.getDataLink(rowContent)}`,
-        })
-      } else {
-        this.setState({
-          checkedOptionKey: null,
-          linkData: null,
-        })
-      }
-    } else {
-      this.setState({
-        checkedOptionKey: rowContent.join(''),
-        linkData: `&${ReportUploadModal.getDataLink(rowContent)}`,
-      })
-    }
-  }
-
-  static fileDataContainsSearchData = (fileDataContentArray, searchValue) => {
-
-    if (searchValue === undefined || searchValue === '') {
-      return true
-    }
-
-    const filteredData = Object.values(fileDataContentArray).filter((fileDataContent) => {
-      return fileDataContent.indexOf(searchValue) !== -1
+  getAffectedPatientsData() {
+    const affectedPatientsDataContent = []
+    this.props.affectedIndividuals.map((affectedIndividualData) => {
+      const affectedMember = affectedIndividualData.affectedIndividual
+      affectedPatientsDataContent.push([
+        affectedIndividualData.rowIdx.toString(),
+        affectedMember.displayName,
+        affectedMember.familyGuid,
+        affectedMember.individualId,
+        affectedMember.individualGuid,
+      ])
+      return affectedIndividualData
     })
-    return filteredData.length > 0
-  }
-
-  static getNumberOfPages(dataContent, rowsPerPage) {
-    if (dataContent.length === 0) {
-      return 0
-    }
-    return Math.ceil(dataContent.length / rowsPerPage)
-  }
-
-  handleXLSSearch(searchValue) {
-    const fileDataContent = Object.values(this.state.fileDataContent).map((fileDataContentRow) => {
-      if (ReportUploadModal.fileDataContainsSearchData(fileDataContentRow, searchValue)) {
-        return fileDataContentRow
-      }
-      return []
-    })
-    const filteredFileDataContent = Object.values(fileDataContent).filter((fileDataContentData) => {
-      return fileDataContentData.length > 0
-    })
-    const filteredAndSortedFileDataContent = ReportUploadModal.sortDataByHeader(this.state.selectedHeader, this.state.fileDataHeaders, filteredFileDataContent, this.state.ascSortToggle, false)
-    this.setState({
-      numberOfPages: ReportUploadModal.getNumberOfPages(filteredFileDataContent, this.state.rowsPerPage),
-      filteredFileDataContent: filteredAndSortedFileDataContent,
-      pageDataContent: ReportUploadModal.paginateData(0, filteredAndSortedFileDataContent, this.state.rowsPerPage).paginatedData,
-      selectedPage: 0,
-      searchValue,
-    })
+    return affectedPatientsDataContent
   }
 
   static getDerivedStateFromProps(props, currentState) {
@@ -193,105 +140,16 @@ class ReportUploadModal extends React.PureComponent {
     return null
   }
 
-  static sortDataByHeader(header, headers, dataContent, ascSortToggle, shouldChangeToggle = true) {
-
-    let ascToggle = ascSortToggle
-    if (shouldChangeToggle) {
-      ascToggle = !ascSortToggle
-    }
-
-    const headerValueIndex = headers.indexOf(header)
-
-    if (headerValueIndex !== -1) {
-      const mappedContentArray = dataContent.map((tableContentDataArray, index) => {
-        return {
-          arrayValue: tableContentDataArray[headerValueIndex],
-          arrayPositionIndex: index,
-        }
-      })
-
-      mappedContentArray.sort((a, b) => {
-        if (Number.isNaN(Number.parseInt(a.arrayValue, 10)) && Number.isNaN(Number.parseInt(b.arrayValue, 10))) {
-          if (ascToggle) {
-            return a.arrayValue.localeCompare(b.arrayValue)
-          }
-          return b.arrayValue.localeCompare(a.arrayValue)
-        }
-        else if (!Number.isNaN(Number.parseInt(a.arrayValue, 10)) && !Number.isNaN(Number.parseInt(b.arrayValue, 10))) {
-          if (ascToggle) {
-            return parseInt(a.arrayValue, 10) - parseInt(b.arrayValue, 10)
-          }
-          return parseInt(b.arrayValue, 10) - parseInt(a.arrayValue, 10)
-        }
-        return 0
-      })
-      return mappedContentArray.map((mappedContent) => {
-        return dataContent[mappedContent.arrayPositionIndex]
-      })
-    }
-    return dataContent
-  }
-
-  handleSort(header) {
-    const sortedContentArray = ReportUploadModal.sortDataByHeader(header, this.state.fileDataHeaders, this.state.fileDataContent, this.state.ascSortToggle)
-    const sortedFilteredContentArray = ReportUploadModal.sortDataByHeader(header, this.state.fileDataHeaders, this.state.filteredFileDataContent, this.state.ascSortToggle)
-    let dataToPaginate = sortedContentArray
-    if (this.state.searchValue && this.state.searchValue.length > 0) {
-      dataToPaginate = sortedFilteredContentArray
-    }
-
-    this.setState({
-      fileDataContent: sortedContentArray,
-      filteredFileDataContent: sortedFilteredContentArray,
-      pageDataContent: ReportUploadModal.paginateData(this.state.selectedPage, dataToPaginate, this.state.rowsPerPage).paginatedData,
-      ascSortToggle: !this.state.ascSortToggle,
-      selectedHeader: header,
-    })
-  }
-
-  handlePageSelect(newPage) {
-    let dataToPaginate = this.state.fileDataContent
-    if (this.state.searchValue !== null && this.state.searchValue.length > 0) {
-      dataToPaginate = this.state.filteredFileDataContent
-    }
-    const { paginatedData } = ReportUploadModal.paginateData(newPage, dataToPaginate, this.state.rowsPerPage)
-    this.setState({
-      pageDataContent: paginatedData,
-      selectedPage: newPage,
-    })
-  }
-
-  static paginateData(newPage, dataToPaginate, rowsPerPage) {
-    const startIndex = (newPage * rowsPerPage)
-    let endIndex = (newPage * rowsPerPage) + (rowsPerPage - 1)
-
-    if (endIndex > dataToPaginate.length) {
-      endIndex = dataToPaginate.length - 1
-    }
-    return {
-      paginatedData: dataToPaginate.slice(startIndex, endIndex + 1),
-    }
-  }
-
   render() {
     const errorMessageStyle = {
       paddingTop: '15px',
     }
-    const checkboxTableStyle = {
-      maxHeight: '180px',
-      overflowY: 'auto',
-    }
-    const tableDataSearchStyle = {
-      textAlign: 'center',
-    }
-    const searchInputStyle = {
-      width: '250px',
-    }
-    const displayGenerateButton = !this.state.fileOK || this.state.checkedOptionKey === null
-    const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingHeadersMessage}`
+    const displayGenerateButton = !this.state.fileOK || this.state.linkData === null
+    const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingXLSTableHeadersMessage}`
     const buttonClassName = !displayGenerateButton ? 'ui primary button' : 'ui primary button disabled'
     const xlsButtonClassName = 'ui download button'
     const xlsFileDownloadLink = ''
+    const affectedMembers = this.getAffectedPatientsData()
     return (
       <ModalComponent
         isOpen={this.state.modalOpen}
@@ -302,6 +160,15 @@ class ReportUploadModal extends React.PureComponent {
         size="fullscreen"
         id="reportUploadModal"
       >
+        <SearchableTable
+          tableHeaders={this.state.affectedIndividualsDataHeaders}
+          tableContent={affectedMembers}
+          rowsPerPage={this.state.rowsPerPage}
+          getLinkData={this.getAffectedIndividualsLinkValue}
+          displaySearch
+          tableKey="affectedPatientsUploadCheckboxGroup"
+          multiSelectEnabled
+        />
         <FileUploadField
           clearTimeOut={0}
           dropzoneLabel="Click here to upload the excel file with additional fields, which will be used to generate word report"
@@ -318,39 +185,18 @@ class ReportUploadModal extends React.PureComponent {
           </Grid.Column>
         </Grid.Row>
         }
-        {!this.state.initialTableDisplay && this.state.fileOK &&
-        <div>
-          <VerticalSpacer height={45} />
-          <div style={tableDataSearchStyle}>
-            {/* eslint-disable-next-line jsx-a11y/label-has-for */}
-            <label> Search uploaded data: </label>
-            <BaseSemanticInput
-              inputType="Input"
-              onChange={(searchVal) => { this.handleXLSSearch(searchVal) }}
-              inputStyle={searchInputStyle}
-            />
-          </div>
-          <VerticalSpacer height={15} />
-          <div style={checkboxTableStyle}>
-            <CheckboxTableGroup
-              tableHeaders={this.state.fileDataHeaders}
-              tableDataContent={this.state.filteredFileDataContent}
-              checkedOptionKey={this.state.checkedOptionKey}
-              onRowOptionClick={this.handleRowOptionClick}
-              tableKey="excelUploadCheckboxGroup"
-              handleSort={this.handleSort}
-              selectedHeader={this.state.selectedHeader}
-              handlePageSelect={this.handlePageSelect}
-              numberOfPages={this.state.numberOfPages}
-              selectedPage={this.state.selectedPage}
-              pageDataContent={this.state.pageDataContent}
-            />
-          </div>
-          <VerticalSpacer height={5} />
-        </div>
+        {!this.state.initialXLSTableDisplay && this.state.fileOK &&
+        <SearchableTable
+          tableHeaders={this.state.fileDataHeaders}
+          tableContent={this.state.fileDataContent}
+          rowsPerPage={this.state.rowsPerPage}
+          getLinkData={this.getLinkValue}
+          displaySearch
+          tableKey="excelUploadCheckboxGroup"
+        />
         }
         <Divider />
-        <a href={`${this.props.docUrl}${this.state.linkData}`} className={buttonClassName} >Generate</a>
+        <a href={`${this.props.docUrl}${this.state.linkData}${this.state.affectedIndividualsLink}`} className={buttonClassName} >Generate</a>
         <a href={`${xlsFileDownloadLink}`} className={xlsButtonClassName} download>Download Excel File Template</a>
       </ModalComponent>
     )

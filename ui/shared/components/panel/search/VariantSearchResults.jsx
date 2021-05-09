@@ -39,16 +39,17 @@ const FIELDS = [
   VARIANT_SORT_FIELD_NO_FAMILY_SORT,
 ]
 
-export const DisplayVariants = React.memo(({ displayVariants }) =>
+export const DisplayVariants = React.memo(({ displayVariants, affectedIndividuals }) =>
   <Grid.Row>
     <Grid.Column width={16}>
-      <Variants variants={displayVariants} linkToSavedVariants />
+      <Variants variants={displayVariants} affectedIndividuals={affectedIndividuals} linkToSavedVariants />
     </Grid.Column>
   </Grid.Row>,
 )
 
 DisplayVariants.propTypes = {
   displayVariants: PropTypes.array,
+  affectedIndividuals: PropTypes.array,
 }
 
 const getFilterPredictionOperator = (operator, predictionKey) => {
@@ -156,6 +157,7 @@ const BaseVariantSearchResultsContent = React.memo((
   const fields = [...FIELDS, ...paginationFields]
   const [modalToggle, toggleModal] = useState(false)
   const [docUrl, setDocUrl] = useState(null)
+  const affectedIndividuals = []
 
   const openModal = (url) => {
     setDocUrl(url)
@@ -171,7 +173,7 @@ const BaseVariantSearchResultsContent = React.memo((
 
     return [
       <LargeRow key="resultsSummary">
-        <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} docUrl={docUrl} />
+        <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} affectedIndividuals={affectedIndividuals} docUrl={docUrl} />
         <Grid.Column width={5}>
           {totalVariantsCount === displayVariants.length ? 'Found ' : `Showing ${variantDisplayPageOffset + 1}-${variantDisplayPageOffset + displayVariants.length} of `}
           <b>{totalVariantsCount}</b> variants{filteredVariants.length < totalVariantsCount ? <span>, after filtering showing <b>{filteredVariants.length}</b> variants</span> : null}
@@ -193,7 +195,7 @@ const BaseVariantSearchResultsContent = React.memo((
           <GeneBreakdown searchHash={searchHash} />
         </Grid.Column>
       </LargeRow>,
-      <DisplayVariants key="variants" displayVariants={filteredVariants} />,
+      <DisplayVariants key="variants" displayVariants={filteredVariants} affectedIndividuals={affectedIndividuals} />,
       <LargeRow key="bottomPagination">
         <Grid.Column width={11} floated="right" textAlign="right">
           <ReduxFormWrapper

@@ -609,7 +609,7 @@ export const AlignedCheckboxGroup = styled(CheckboxGroup)`
 `
 
 export const CheckboxTableGroup = React.memo((props) => {
-  const { tableHeaders, tableDataContent, onRowOptionClick, tableKey, checkedOptionKey, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, pageDataContent, ...baseProps } = props
+  const { tableHeaders, tableDataContent, onRowOptionClick, tableKey, checkedOptionKeys, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, pageDataContent, dataRenderToggle, ...baseProps } = props
   const noDataTableStyle = {
     textAlign: 'center',
   }
@@ -630,6 +630,13 @@ export const CheckboxTableGroup = React.memo((props) => {
   const pages = [...Array(numberOfPages).keys()]
   const tableContent = (pageDataContent.length === 0) ? tableDataContent : pageDataContent
 
+  const isDataChecked = (content) => {
+    const filteredData = checkedOptionKeys.filter((checkedOptionKey) => {
+      return checkedOptionKey === content.join('')
+    })
+    return !((filteredData[0] === undefined || filteredData[0] === null))
+  }
+
   const getTableContentData = (tableContentData) => {
     if (tableContentData.length === 0) {
       return (
@@ -647,14 +654,14 @@ export const CheckboxTableGroup = React.memo((props) => {
             <BaseSemanticInput
               {...baseProps}
               inputType="Checkbox"
-              checked={checkedOptionKey !== null && checkedOptionKey === content.join('')}
+              checked={isDataChecked(content)}
               /* eslint-disable-next-line react/no-array-index-key */
               key={`optionClick${content}${contentIndex}`}
               onChange={({ checked }) => {
                 if (checked) {
-                  onRowOptionClick(content, true)
+                  onRowOptionClick(content, true, contentIndex)
                 } else {
-                  onRowOptionClick(content, false)
+                  onRowOptionClick(content, false, contentIndex)
                 }
               }}
             />
@@ -839,13 +846,14 @@ CheckboxTableGroup.propTypes = {
   tableDataContent: PropTypes.array,
   onRowOptionClick: PropTypes.func,
   tableKey: PropTypes.string,
-  checkedOptionKey: PropTypes.string,
+  checkedOptionKeys: PropTypes.array,
   handleSort: PropTypes.func,
   selectedHeader: PropTypes.string,
   handlePageSelect: PropTypes.func,
   numberOfPages: PropTypes.number,
   selectedPage: PropTypes.number,
   pageDataContent: PropTypes.array,
+  dataRenderToggle: PropTypes.bool,
 }
 
 const BaseRadioGroup = React.memo((props) => {

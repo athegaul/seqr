@@ -186,24 +186,32 @@ Genotype.propTypes = {
   isCompoundHet: PropTypes.bool,
 }
 
-
-const BaseVariantIndividuals = React.memo(({ variant, individuals, isCompoundHet }) => (
+const BaseVariantIndividuals = React.memo(({ variant, individuals, affectedIndividuals, index, isCompoundHet }) => (
   <IndividualsContainer>
-    {(individuals || []).map(individual =>
-      <IndividualCell key={individual.individualGuid} numIndividuals={individuals.length}>
-        <PedigreeIcon
-          sex={individual.sex}
-          affected={individual.affected}
-          label={<small>{individual.displayName}</small>}
-          popupHeader={individual.displayName}
-          popupContent={
-            individual.features ? <HpoPanel individual={individual} /> : null
-          }
-        />
-        <br />
-        <Genotype variant={variant} individual={individual} isCompoundHet={isCompoundHet} />
-      </IndividualCell>,
-    )}
+    {(individuals || []).map((individual) => {
+      if (individual.affected === 'A') {
+        affectedIndividuals.push({
+          rowIdx: index,
+          affectedIndividual: individual,
+        })
+      }
+      return (
+        <IndividualCell key={individual.individualGuid} numIndividuals={individuals.length}>
+          <PedigreeIcon
+            sex={individual.sex}
+            affected={individual.affected}
+            label={<small>{individual.displayName}</small>}
+            popupHeader={individual.displayName}
+            popupContent={
+              individual.features ? <HpoPanel individual={individual} /> : null
+            }
+          />
+          <br />
+          <Genotype variant={variant} individual={individual} isCompoundHet={isCompoundHet} />
+        </IndividualCell>
+      )
+    },
+  )}
   </IndividualsContainer>
 ))
 
@@ -211,6 +219,8 @@ BaseVariantIndividuals.propTypes = {
   variant: PropTypes.object,
   individuals: PropTypes.array,
   isCompoundHet: PropTypes.bool,
+  affectedIndividuals: PropTypes.array,
+  index: PropTypes.number,
 }
 
 const mapStateToProps = (state, ownProps) => ({
@@ -219,18 +229,23 @@ const mapStateToProps = (state, ownProps) => ({
 
 const FamilyVariantIndividuals = connect(mapStateToProps)(BaseVariantIndividuals)
 
-const VariantIndividuals = React.memo(({ variant, isCompoundHet }) =>
-  <span>
-    {variant.familyGuids.map(familyGuid =>
-      <FamilyVariantIndividuals key={familyGuid} familyGuid={familyGuid} variant={variant} isCompoundHet={isCompoundHet} />,
-    )}
-  </span>,
-)
+let idx = -1
+const VariantIndividuals = React.memo(({ variant, affectedIndividuals, isCompoundHet }) => {
+  idx += 1
+  return (
+    <span>
+      {variant.familyGuids.map(familyGuid =>
+        <FamilyVariantIndividuals key={familyGuid} familyGuid={familyGuid} variant={variant} isCompoundHet={isCompoundHet} index={idx} affectedIndividuals={affectedIndividuals} />,
+      )}
+    </span>
+  )
+})
 
 
 VariantIndividuals.propTypes = {
   variant: PropTypes.object,
   isCompoundHet: PropTypes.bool,
+  affectedIndividuals: PropTypes.array,
 }
 
 export default VariantIndividuals
