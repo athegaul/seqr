@@ -277,39 +277,6 @@ def _get_doc_template_data(request):
         "test_codes": request.GET.get('test_codes'),
     }
 
-def _get_affected_patients(header, filtered_rows):
-    response = {
-        'affected_patients': None
-    }
-
-    sample_indices = []
-    for idx in range(len(header)):
-        if 'sample_' in header[idx]:
-            sample_indices.append(idx)
-
-    affected_patients = []
-    for filtered_row_idx in range(len(filtered_rows)):
-        filtered_row = filtered_rows[filtered_row_idx]
-        individual_indices = []
-
-        for idx in sample_indices:
-            if idx < len(filtered_row) and filtered_row[idx] != None:
-                individual_indices.append(filtered_row[idx])
-
-        row_affected_patients = []
-        for individual_id in individual_indices:
-            individual = Individual.objects.filter(individual_id=individual_id)
-            individual_json = _get_json_for_individual(individual.first())
-            
-            if individual_json['affected'] == 'A':
-                individual_json['rowAffectedpatientIdx'] = filtered_row_idx
-                row_affected_patients.append(individual_json)
-
-        affected_patients.append(row_affected_patients)
-
-    response['affected_patients'] = affected_patients
-    return create_json_response(response)
-
 @login_required(login_url=API_LOGIN_REQUIRED_URL)
 def export_variants_handler(request, search_hash):
     results_model = VariantSearchResults.objects.get(search_hash=search_hash)
@@ -327,7 +294,11 @@ def export_variants_handler(request, search_hash):
     acmg_criteria = request.GET.get('acmg_criteria')
     acmg_criteria_json = json.loads(base64.b64decode(acmg_criteria).decode('utf-8'))
 
-    load_patients = request.GET.get('load_patients')
+    patients = request.GET.get('patients')
+
+    patients_json = []
+    if patients != None:
+        patients_json = json.loads(base64.b64decode(patients).decode('utf-8'))
 
     doc_template_export_criteria = _get_doc_template_data(request)
 
@@ -380,10 +351,7 @@ def export_variants_handler(request, search_hash):
 
     file_format = request.GET.get('file_format', 'tsv')
 
-    if load_patients == None:
-        return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False, families=family_names, doc_values=doc_template_export_criteria, transcript_keys=filtered_transcript_keys)
-    else:
-        return _get_affected_patients(header, filtered_rows)
+    return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False, families=family_names, doc_values=doc_template_export_criteria, transcript_keys=filtered_transcript_keys, patients=patients_json)
 
 def _get_field_value(value, config):
     field_value = jmespath.search(config.get('value_path', config['header']), value)

@@ -77,7 +77,7 @@ def get_gene_type(row):
     result = GeneInfo.objects.raw(query)[0]
     return result.gencode_gene_type
 
-def get_doc_response(rows, header, families, doc_values, transcript_keys):
+def get_doc_response(rows, header, families, doc_values, transcript_keys, patients):
     document_template = get_doc_template()
 
     generated_file = BytesIO()
@@ -88,13 +88,13 @@ def get_doc_response(rows, header, families, doc_values, transcript_keys):
             notes_indices.append(idx)
 
     records = []
-    row_idx = 0
-    for row in rows:
-        for idx in notes_indices:
-            if row[idx] != "":
-                disease_name, disease_description = _parse_disease_information(transcript_keys[row_idx][0])
+    for patient in patients:
+        for note_idx in notes_indices:
+            row = rows[patient["rowIdx"]]
+            if row[note_idx] != "":
+                disease_name, disease_description = _parse_disease_information(transcript_keys[patient["rowIdx"]][0])
                 records.append({
-                    "message": row[idx],
+                    "message": row[note_idx],
                     "acmg_criteria": row[len(row) - 2],
                     "variant": get_hgvspc(row),
                     "disease_name": disease_name,
@@ -102,7 +102,6 @@ def get_doc_response(rows, header, families, doc_values, transcript_keys):
                     "gene_transcript": get_transcript(row),
                     "genomic_coordinate": get_coordinate(row)
                 })
-        row_idx += 1
 
     filtered_records = []
     for record in records:
@@ -155,7 +154,7 @@ def _parse_disease_information(gene_id):
   
     return disease_name, disease_description
 
-def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True, families=[], doc_values={}, transcript_keys=[]):
+def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True, families=[], doc_values={}, transcript_keys=[], patients=[]):
     """Generates an HTTP response for a table with the given header and rows, exported into the given file_format.
 
     Args:
@@ -202,7 +201,7 @@ def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_hea
             response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(filename_prefix).encode('ascii', 'ignore')
             return response
     elif file_format == "doc":
-        return get_doc_response(rows, header, families, doc_values, transcript_keys)
+        return get_doc_response(rows, header, families, doc_values, transcript_keys, patients)
     else:
         raise ValueError("Invalid file_format: %s" % file_format)
 
