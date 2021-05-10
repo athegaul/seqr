@@ -104,9 +104,9 @@ class SearchableTable extends React.PureComponent {
       }
     } else if (checkedState) {
       const checkedOptionIndexes = this.state.checkedTableOptionIndexes
-      const arrayIndex = checkedOptionIndexes.indexOf(index)
+      const arrayIndex = checkedOptionIndexes.indexOf((this.state.selectedTablePage * this.props.rowsPerPage) + index)
       if (arrayIndex === -1) {
-        checkedOptionIndexes.push(index)
+        checkedOptionIndexes.push((this.state.selectedTablePage * this.props.rowsPerPage) + index)
       }
       const checkedOptionKeys = this.state.checkedTableOptionKeys
       const keysIndex = checkedOptionIndexes.indexOf(rowContent.join(''))
@@ -121,9 +121,9 @@ class SearchableTable extends React.PureComponent {
       this.props.getLinkData(checkedOptionIndexes)
     } else {
       const checkedOptionIndexes = this.state.checkedTableOptionIndexes
-      const arrayIndex = checkedOptionIndexes.indexOf(index)
+      const arrayIndex = checkedOptionIndexes.indexOf((this.state.selectedTablePage * this.props.rowsPerPage) + index)
       if (arrayIndex !== -1) {
-        checkedOptionIndexes.splice(index, 1)
+        checkedOptionIndexes.splice((this.state.selectedTablePage + this.props.rowsPerPage) + index, 1)
       }
       const checkedOptionKeys = this.state.checkedTableOptionKeys
       const keyIndex = checkedOptionKeys.indexOf(rowContent.join(''))
