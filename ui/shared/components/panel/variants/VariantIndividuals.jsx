@@ -231,7 +231,14 @@ const FamilyVariantIndividuals = connect(mapStateToProps)(BaseVariantIndividuals
 
 let idx = -1
 const VariantIndividuals = React.memo(({ variant, affectedIndividuals, isCompoundHet }) => {
-  idx += 1
+  const resetIndex = localStorage.getItem('resetIndex')
+  if (resetIndex === null || resetIndex === 'yes') {
+    idx = 0
+    localStorage.clear()
+    localStorage.setItem('resetIndex', 'no')
+  } else {
+    idx++
+  }
   return (
     <span>
       {variant.familyGuids.map(familyGuid =>

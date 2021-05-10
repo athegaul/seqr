@@ -126,12 +126,16 @@ class ReportUploadModal extends React.PureComponent {
 
   static getDerivedStateFromProps(props, currentState) {
     if (currentState.modalToggle !== props.modalToggle) {
+      localStorage.clear()
+      localStorage.setItem('resetIndex', 'yes')
       return {
         modalOpen: true,
         modalClosing: false,
       }
     }
     if (currentState.modalClosing) {
+      localStorage.clear()
+      localStorage.setItem('resetIndex', 'no')
       return {
         modalClosing: false,
       }
