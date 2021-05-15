@@ -1,5 +1,5 @@
 resource "aws_instance" "seqr" {
-    ami           = data.aws_ami.seqr.id
+    ami           = "ami-03d315ad33b9d49c4"
     instance_type = "m5.2xlarge"
 
     root_block_device {
@@ -41,7 +41,7 @@ data "aws_ami" "seqr" {
 
 resource "aws_security_group" "seqr-sg" {
     name        = "seqr security group"
-    description = "Allowing traffic to seqr instance"
+    description = "Allow SSH, HTTPS and HTTP traffic"
 
     ingress {
         description = "SSH"
@@ -63,14 +63,6 @@ resource "aws_security_group" "seqr-sg" {
         description = "HTTP"
         from_port   = 80
         to_port     = 80
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    ingress {
-        description = "Kibana"
-        from_port   = 5601
-        to_port     = 5601
         protocol    = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }

@@ -19,3 +19,7 @@ seqr_settings
 django_key
 
 .terraform*
+*.tfplan
+*.state
+*.tfstate
+*.backup
