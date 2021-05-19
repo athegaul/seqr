@@ -15,6 +15,7 @@ class SearchableTable extends React.PureComponent {
     displaySearch: PropTypes.bool,
     tableKey: PropTypes.string,
     multiSelectEnabled: PropTypes.bool,
+    clearData: PropTypes.bool,
   }
 
   constructor(props) {
@@ -23,10 +24,10 @@ class SearchableTable extends React.PureComponent {
     this.state = {
       tableDataHeaders: [],
       tableDataContent: [],
-      filteredTableDataContent: [],
+      filteredTableDataContent: props.clearData ? [] : SearchableTable.paginateData(0, props.tableContent, props.rowsPerPage).paginatedData,
       ascSortTableToggle: false,
       selectedTablePage: 0,
-      numberOfTablePages: 0,
+      numberOfTablePages: props.clearData ? 0 : SearchableTable.getNumberOfPages(props.tableContent, props.rowsPerPage),
       tableSearchValue: null,
       selectedTableHeader: null,
       checkedTableOptionKeys: [],
@@ -123,12 +124,12 @@ class SearchableTable extends React.PureComponent {
       const checkedOptionIndexes = this.state.checkedTableOptionIndexes
       const arrayIndex = checkedOptionIndexes.indexOf((this.state.selectedTablePage * this.props.rowsPerPage) + index)
       if (arrayIndex !== -1) {
-        checkedOptionIndexes.splice((this.state.selectedTablePage + this.props.rowsPerPage) + index, 1)
+        checkedOptionIndexes.slice((this.state.selectedTablePage + this.props.rowsPerPage) + index, 1)
       }
       const checkedOptionKeys = this.state.checkedTableOptionKeys
       const keyIndex = checkedOptionKeys.indexOf(rowContent.join(''))
       if (keyIndex !== -1) {
-        checkedOptionKeys.splice(keyIndex, 1)
+        checkedOptionKeys.slice(keyIndex, 1)
       }
       this.setState({
         checkedTableOptionIndexes: checkedOptionIndexes,

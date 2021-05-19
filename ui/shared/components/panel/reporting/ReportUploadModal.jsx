@@ -43,7 +43,6 @@ class ReportUploadModal extends React.PureComponent {
     this.handleUpload = this.handleUpload.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.getLinkValue = this.getLinkValue.bind(this)
-    this.getAffectedPatientsData = this.getAffectedPatientsData.bind(this)
   }
 
   getLinkValue = (value) => {
@@ -108,22 +107,6 @@ class ReportUploadModal extends React.PureComponent {
     }
   }
 
-  getAffectedPatientsData() {
-    const affectedPatientsDataContent = []
-    this.props.affectedIndividuals.map((affectedIndividualData) => {
-      const affectedMember = affectedIndividualData.affectedIndividual
-      affectedPatientsDataContent.push([
-        affectedIndividualData.rowIdx.toString(),
-        affectedMember.displayName,
-        affectedMember.familyGuid,
-        affectedMember.individualId,
-        affectedMember.individualGuid,
-      ])
-      return affectedIndividualData
-    })
-    return affectedPatientsDataContent
-  }
-
   static getDerivedStateFromProps(props, currentState) {
     if (currentState.modalToggle !== props.modalToggle) {
       localStorage.clear()
@@ -153,7 +136,6 @@ class ReportUploadModal extends React.PureComponent {
     const buttonClassName = !displayGenerateButton ? 'ui primary button' : 'ui primary button disabled'
     const xlsButtonClassName = 'ui download button'
     const xlsFileDownloadLink = ''
-    const affectedMembers = this.getAffectedPatientsData()
     return (
       <ModalComponent
         isOpen={this.state.modalOpen}
@@ -166,7 +148,7 @@ class ReportUploadModal extends React.PureComponent {
       >
         <SearchableTable
           tableHeaders={this.state.affectedIndividualsDataHeaders}
-          tableContent={affectedMembers}
+          tableContent={this.props.affectedIndividuals}
           rowsPerPage={this.state.rowsPerPage}
           getLinkData={this.getAffectedIndividualsLinkValue}
           displaySearch
@@ -197,6 +179,7 @@ class ReportUploadModal extends React.PureComponent {
           getLinkData={this.getLinkValue}
           displaySearch
           tableKey="excelUploadCheckboxGroup"
+          clearData
         />
         }
         <Divider />
