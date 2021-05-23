@@ -234,7 +234,6 @@ const VariantIndividuals = React.memo(({ variant, affectedIndividuals, isCompoun
   const resetIndex = localStorage.getItem('resetIndex')
   if (resetIndex === null || resetIndex === 'yes') {
     idx = 0
-    localStorage.clear()
     localStorage.setItem('resetIndex', 'no')
   } else {
     idx++

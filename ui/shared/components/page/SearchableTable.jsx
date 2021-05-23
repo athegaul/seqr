@@ -14,8 +14,8 @@ class SearchableTable extends React.PureComponent {
     getLinkData: PropTypes.func,
     displaySearch: PropTypes.bool,
     tableKey: PropTypes.string,
-    multiSelectEnabled: PropTypes.bool,
     clearData: PropTypes.bool,
+    setSelectedAffectedPatient: PropTypes.func,
   }
 
   constructor(props) {
@@ -24,16 +24,14 @@ class SearchableTable extends React.PureComponent {
     this.state = {
       tableDataHeaders: [],
       tableDataContent: [],
-      filteredTableDataContent: props.clearData ? [] : SearchableTable.paginateData(0, props.tableContent, props.rowsPerPage).paginatedData,
-      ascSortTableToggle: false,
-      selectedTablePage: 0,
-      numberOfTablePages: props.clearData ? 0 : SearchableTable.getNumberOfPages(props.tableContent, props.rowsPerPage),
-      tableSearchValue: null,
-      selectedTableHeader: null,
-      checkedTableOptionKeys: [],
-      checkedTableOptionIndexes: [],
-      pageDataContent: [],
-      multiSelectEnabled: (props.multiSelectEnabled === undefined) ? false : props.multiSelectEnabled,
+      filteredTableDataContent: props.clearData ? [] : this.getTableFilteredDataContent(),
+      ascSortTableToggle: props.clearData ? false : this.getTableAscSortTableToggleValue(),
+      selectedTablePage: props.clearData ? 0 : this.getTableSelectedDataPage(),
+      numberOfTablePages: props.clearData ? 0 : this.getTableNumberOfPages(),
+      tableSearchValue: props.clearData ? null : this.getTableDataSearchValue(),
+      selectedTableHeader: props.clearData ? null : this.getTableSelectedHeaderValue(),
+      checkedTableOptionKeys: props.clearData ? [] : this.getTableCheckedOptionKeys(),
+      pageDataContent: props.clearData ? [] : this.getTablePageDataContent(),
       dataRenderToggle: false,
     }
 
@@ -41,6 +39,20 @@ class SearchableTable extends React.PureComponent {
     this.handleSort = this.handleSort.bind(this)
     this.handlePageSelect = this.handlePageSelect.bind(this)
     this.handleSearch = this.handleSearch.bind(this)
+
+    this.removeTableLocalStorageData = this.removeTableLocalStorageData.bind(this)
+    this.getTableLocalStorageData = this.getTableLocalStorageData.bind(this)
+    this.setTableLocalStorageData = this.setTableLocalStorageData.bind(this)
+
+    this.getTableDataSearchValue = this.getTableDataSearchValue.bind(this)
+    this.getTablePageDataContent = this.getTablePageDataContent.bind(this)
+    this.getTableDataPagesLength = this.getTableDataPagesLength.bind(this)
+    this.getTableSelectedDataPage = this.getTableSelectedDataPage.bind(this)
+    this.getTableNumberOfPages = this.getTableNumberOfPages.bind(this)
+    this.getTableFilteredDataContent = this.getTableFilteredDataContent.bind(this)
+    this.getTableAscSortTableToggleValue = this.getTableAscSortTableToggleValue.bind(this)
+    this.getTableSelectedHeaderValue = this.getTableSelectedHeaderValue.bind(this)
+    this.getTableCheckedOptionKeys = this.getTableCheckedOptionKeys.bind(this)
   }
 
   static getDerivedStateFromProps(props, currentState) {
@@ -83,60 +95,99 @@ class SearchableTable extends React.PureComponent {
     return Math.ceil(dataContent.length / rowsPerPage)
   }
 
-  handleRowOptionClick(rowContent, checkedState, index) {
-    if (this.state.multiSelectEnabled !== true) {
-      if (this.state.checkedTableOptionKeys.length === 0) {
-        if (checkedState) {
-          this.setState({
-            checkedTableOptionKeys: [rowContent.join('')],
-          })
-          this.props.getLinkData(`&${SearchableTable.getDataLink(rowContent)}`)
-        } else {
-          this.setState({
-            checkedTableOptionKeys: [],
-          })
-          this.props.getLinkData(null)
-        }
-      } else {
+  getTableCheckedOptionKeys() {
+    return this.getTableLocalStorageData('checkedTableOptionKeys', [])
+  }
+
+  getTableDataSearchValue() {
+    return this.getTableLocalStorageData('searchValue', null)
+  }
+
+  getTableAscSortTableToggleValue() {
+    const ascToggleValueString = this.getTableLocalStorageData('ascSortTableToggle', '0')
+    return ascToggleValueString === 'true'
+  }
+
+  getTableSelectedHeaderValue() {
+    return this.getTableLocalStorageData('selectedTableHeader', null)
+  }
+
+  getTableFilteredDataContent() {
+    const tableSearchValue = this.getTableDataSearchValue()
+    const selectedTableHeader = this.getTableSelectedHeaderValue()
+    const selectedAscSortTableToggle = this.getTableAscSortTableToggleValue()
+
+    let dataToPaginate = this.props.tableContent
+    if (tableSearchValue !== null) {
+      dataToPaginate = SearchableTable.doSearch(tableSearchValue, this.props.tableContent, this.props.tableHeaders, selectedTableHeader, selectedAscSortTableToggle).filteredAndSortedTableDataContent
+    }
+    return dataToPaginate
+  }
+
+  getTablePageDataContent() {
+    const tableDataContent = this.getTableFilteredDataContent()
+    const selectedTableDataPage = this.getTableSelectedDataPage()
+    return SearchableTable.paginateData(selectedTableDataPage, tableDataContent, this.props.rowsPerPage).paginatedData
+  }
+
+  getTableDataPagesLength(dataContent) {
+    const dataToPaginate = this.getTablePageDataContent(dataContent, this.props.rowsPerPage)
+    return SearchableTable.getNumberOfPages(dataToPaginate, this.props.rowsPerPage)
+  }
+
+  getTableNumberOfPages() {
+    return SearchableTable.getNumberOfPages(this.getTableFilteredDataContent(), this.props.rowsPerPage)
+  }
+
+  getTableSelectedDataPage() {
+    return Number.parseInt(this.getTableLocalStorageData('selectedTablePage', 0), 10)
+  }
+
+  getTableLocalStorageData(dataKey, substituteValue) {
+    const tableLocalStorageData = JSON.parse(localStorage.getItem(`${this.props.tableKey}_${dataKey}`))
+    if (tableLocalStorageData === null) {
+      return substituteValue
+    }
+    return tableLocalStorageData.storageData
+  }
+
+  removeTableLocalStorageData(key) {
+    localStorage.removeItem(`${this.props.tableKey}_${key}`)
+  }
+
+  setTableLocalStorageData(dataKey, value) {
+    const data = {
+      storageData: value,
+    }
+    localStorage.setItem(`${this.props.tableKey}_${dataKey}`, JSON.stringify(data))
+
+  }
+
+  handleRowOptionClick(rowContent, checkedState) {
+    const displayNameIndex = this.props.tableHeaders.indexOf('Display Name')
+    if (this.props.setSelectedAffectedPatient !== undefined) {
+      this.props.setSelectedAffectedPatient(rowContent[displayNameIndex])
+    }
+    if (this.state.checkedTableOptionKeys.length === 0) {
+      if (checkedState) {
+        this.setTableLocalStorageData('checkedTableOptionKeys', [rowContent.join('')])
         this.setState({
           checkedTableOptionKeys: [rowContent.join('')],
         })
         this.props.getLinkData(`&${SearchableTable.getDataLink(rowContent)}`)
+      } else {
+        this.setTableLocalStorageData('checkedTableOptionKeys', [])
+        this.setState({
+          checkedTableOptionKeys: [],
+        })
+        this.props.getLinkData(null)
       }
-    } else if (checkedState) {
-      const checkedOptionIndexes = this.state.checkedTableOptionIndexes
-      const arrayIndex = checkedOptionIndexes.indexOf((this.state.selectedTablePage * this.props.rowsPerPage) + index)
-      if (arrayIndex === -1) {
-        checkedOptionIndexes.push((this.state.selectedTablePage * this.props.rowsPerPage) + index)
-      }
-      const checkedOptionKeys = this.state.checkedTableOptionKeys
-      const keysIndex = checkedOptionIndexes.indexOf(rowContent.join(''))
-      if (keysIndex === -1) {
-        checkedOptionKeys.push(rowContent.join(''))
-      }
-      this.setState({
-        checkedTableOptionIndexes: checkedOptionIndexes,
-        checkedTableOptionKeys: checkedOptionKeys,
-        dataRenderToggle: !this.state.dataRenderToggle,
-      })
-      this.props.getLinkData(checkedOptionIndexes)
     } else {
-      const checkedOptionIndexes = this.state.checkedTableOptionIndexes
-      const arrayIndex = checkedOptionIndexes.indexOf((this.state.selectedTablePage * this.props.rowsPerPage) + index)
-      if (arrayIndex !== -1) {
-        checkedOptionIndexes.slice((this.state.selectedTablePage + this.props.rowsPerPage) + index, 1)
-      }
-      const checkedOptionKeys = this.state.checkedTableOptionKeys
-      const keyIndex = checkedOptionKeys.indexOf(rowContent.join(''))
-      if (keyIndex !== -1) {
-        checkedOptionKeys.slice(keyIndex, 1)
-      }
+      this.setTableLocalStorageData('checkedTableOptionKeys', [rowContent.join('')])
       this.setState({
-        checkedTableOptionIndexes: checkedOptionIndexes,
-        checkedTableOptionKeys: checkedOptionKeys,
-        dataRenderToggle: !this.state.dataRenderToggle,
+        checkedTableOptionKeys: [rowContent.join('')],
       })
-      this.props.getLinkData(checkedOptionIndexes)
+      this.props.getLinkData(`&${SearchableTable.getDataLink(rowContent)}`)
     }
   }
 
@@ -199,6 +250,8 @@ class SearchableTable extends React.PureComponent {
       dataToPaginate = sortedFilteredContentArray
     }
 
+    this.setTableLocalStorageData('selectedTableHeader', header)
+    this.setTableLocalStorageData('ascSortTableToggle', !this.state.ascSortTableToggle)
     this.setState({
       tableDataContent: sortedContentArray,
       filteredTableDataContent: sortedFilteredContentArray,
@@ -214,6 +267,7 @@ class SearchableTable extends React.PureComponent {
       dataToPaginate = this.state.filteredTableDataContent
     }
     const { paginatedData } = SearchableTable.paginateData(newPage, dataToPaginate, this.props.rowsPerPage)
+    this.setTableLocalStorageData('selectedTablePage', newPage)
     this.setState({
       pageDataContent: paginatedData,
       selectedTablePage: newPage,
@@ -251,9 +305,11 @@ class SearchableTable extends React.PureComponent {
 
   handleSearch(searchValue) {
     const searchResult = SearchableTable.doSearch(searchValue, this.state.tableDataContent, this.state.tableDataHeaders, this.state.selectedTableHeader, this.state.ascSortTableToggle)
+    const numberOfPages = SearchableTable.getNumberOfPages(searchResult.filteredTableDataContent, this.props.rowsPerPage)
 
+    this.setTableLocalStorageData('searchValue', searchValue)
     this.setState({
-      numberOfTablePages: SearchableTable.getNumberOfPages(searchResult.filteredTableDataContent, this.props.rowsPerPage),
+      numberOfTablePages: numberOfPages,
       filteredTableDataContent: searchResult.filteredAndSortedTableDataContent,
       pageDataContent: SearchableTable.paginateData(0, searchResult.filteredAndSortedTableDataContent, this.props.rowsPerPage).paginatedData,
       selectedTablePage: 0,
@@ -272,6 +328,7 @@ class SearchableTable extends React.PureComponent {
     const searchInputStyle = {
       width: '250px',
     }
+
     return (
       <div>
         <VerticalSpacer height={45} />
@@ -285,6 +342,7 @@ class SearchableTable extends React.PureComponent {
               this.handleSearch(searchVal)
             }}
             inputStyle={searchInputStyle}
+            value={this.state.tableSearchValue === null ? '' : this.state.tableSearchValue}
           />
         </div>
         }

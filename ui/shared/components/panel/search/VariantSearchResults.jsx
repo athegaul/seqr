@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Grid, Message, Button } from 'semantic-ui-react'
@@ -159,6 +159,18 @@ const BaseVariantSearchResultsContent = React.memo((
   const [docUrl, setDocUrl] = useState(null)
   const [currentAffectedIndividuals, setCurrentAffectedIndividuals] = useState([])
   const affectedIndividuals = []
+
+  useEffect(() => {
+    const onbeforeunloadFn = () => {
+      localStorage.clear()
+    }
+
+    window.addEventListener('beforeunload', onbeforeunloadFn)
+
+    return () => {
+      window.removeEventListener('beforeunload', onbeforeunloadFn)
+    }
+  }, [])
 
   const getAffectedPatientsData = (affectedIndividualsData) => {
     const affectedPatientsDataContent = []
