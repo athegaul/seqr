@@ -16,6 +16,7 @@ class SearchableTable extends React.PureComponent {
     tableKey: PropTypes.string,
     clearData: PropTypes.bool,
     setSelectedAffectedPatient: PropTypes.func,
+    handleAffectedPatientSelect: PropTypes.func,
   }
 
   constructor(props) {
@@ -32,7 +33,6 @@ class SearchableTable extends React.PureComponent {
       selectedTableHeader: props.clearData ? null : this.getTableSelectedHeaderValue(),
       checkedTableOptionKeys: props.clearData ? [] : this.getTableCheckedOptionKeys(),
       pageDataContent: props.clearData ? [] : this.getTablePageDataContent(),
-      dataRenderToggle: false,
     }
 
     this.handleRowOptionClick = this.handleRowOptionClick.bind(this)
@@ -167,6 +167,7 @@ class SearchableTable extends React.PureComponent {
     const displayNameIndex = this.props.tableHeaders.indexOf('Display Name')
     if (this.props.setSelectedAffectedPatient !== undefined) {
       this.props.setSelectedAffectedPatient(rowContent[displayNameIndex])
+      this.props.handleAffectedPatientSelect(rowContent[displayNameIndex])
     }
     if (this.state.checkedTableOptionKeys.length === 0) {
       if (checkedState) {
@@ -360,7 +361,6 @@ class SearchableTable extends React.PureComponent {
             numberOfPages={this.state.numberOfTablePages}
             selectedPage={this.state.selectedTablePage}
             pageDataContent={this.state.pageDataContent}
-            dataRenderToggle={this.state.dataRenderToggle}
           />
         </div>
         <VerticalSpacer height={5} />
