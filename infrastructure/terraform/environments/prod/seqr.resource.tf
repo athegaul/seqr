@@ -1,5 +1,5 @@
 resource "aws_instance" "seqr" {
-    ami           = "ami-03d315ad33b9d49c4"
+    ami           = data.aws_ami.seqr.id
     instance_type = "m5.2xlarge"
 
     root_block_device {
