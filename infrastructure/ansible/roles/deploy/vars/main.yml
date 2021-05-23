@@ -7,3 +7,7 @@ cors_anywhere_port: 8080
 
 postgres_username: seqr
 postgres_password: 
+
+aws_access_key: 
+aws_secret_access: 
+aws_default_region: us-east-1
