@@ -17,6 +17,8 @@ class SearchableTable extends React.PureComponent {
     clearData: PropTypes.bool,
     setSelectedAffectedPatient: PropTypes.func,
     handleAffectedPatientSelect: PropTypes.func,
+    getAffectedPatientLink: PropTypes.func,
+    resetSelectedOptionKeysToggle: PropTypes.bool,
   }
 
   constructor(props) {
@@ -96,6 +98,9 @@ class SearchableTable extends React.PureComponent {
   }
 
   getTableCheckedOptionKeys() {
+    if (this.props.resetSelectedOptionKeysToggle !== undefined) {
+      return []
+    }
     return this.getTableLocalStorageData('checkedTableOptionKeys', [])
   }
 
@@ -165,9 +170,13 @@ class SearchableTable extends React.PureComponent {
 
   handleRowOptionClick(rowContent, checkedState) {
     const displayNameIndex = this.props.tableHeaders.indexOf('Display Name')
+    const patientIndex = this.props.tableHeaders.indexOf('Index')
     if (this.props.setSelectedAffectedPatient !== undefined) {
       this.props.setSelectedAffectedPatient(rowContent[displayNameIndex])
       this.props.handleAffectedPatientSelect(rowContent[displayNameIndex])
+    }
+    if (this.props.getAffectedPatientLink !== undefined) {
+      this.props.getAffectedPatientLink(rowContent[patientIndex])
     }
     if (this.state.checkedTableOptionKeys.length === 0) {
       if (checkedState) {
@@ -175,20 +184,26 @@ class SearchableTable extends React.PureComponent {
         this.setState({
           checkedTableOptionKeys: [rowContent.join('')],
         })
-        this.props.getLinkData(`&${SearchableTable.getDataLink(rowContent)}`)
+        if (this.props.getLinkData !== undefined) {
+          this.props.getLinkData(`&${SearchableTable.getDataLink(rowContent)}`)
+        }
       } else {
         this.setTableLocalStorageData('checkedTableOptionKeys', [])
         this.setState({
           checkedTableOptionKeys: [],
         })
-        this.props.getLinkData(null)
+        if (this.props.getLinkData !== undefined) {
+          this.props.getLinkData(null)
+        }
       }
     } else {
       this.setTableLocalStorageData('checkedTableOptionKeys', [rowContent.join('')])
       this.setState({
         checkedTableOptionKeys: [rowContent.join('')],
       })
-      this.props.getLinkData(`&${SearchableTable.getDataLink(rowContent)}`)
+      if (this.props.getLinkData !== undefined) {
+        this.props.getLinkData(`&${SearchableTable.getDataLink(rowContent)}`)
+      }
     }
   }
 

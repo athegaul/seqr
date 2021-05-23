@@ -17,6 +17,7 @@ class ReportUploadModal extends React.PureComponent {
     modalName: PropTypes.string,
     modalToggle: PropTypes.any,
     affectedIndividuals: PropTypes.array,
+    allAffectedIndividuals: PropTypes.array,
     docUrl: PropTypes.string,
   }
 
@@ -39,6 +40,7 @@ class ReportUploadModal extends React.PureComponent {
       missingXLSTableHeadersMessage: null,
       rowsPerPage: 5,
       selectedAffectedIndividual: null,
+      resetSelectedOptionKeysToggle: false,
     }
     this.modalName = props.modalName
 
@@ -49,6 +51,7 @@ class ReportUploadModal extends React.PureComponent {
     this.getUploadExcelFileTab = this.getUploadExcelFileTab.bind(this)
     this.setSelectedAffectedIndividual = this.setSelectedAffectedIndividual.bind(this)
     this.handleAffectedPatientSelect = this.handleAffectedPatientSelect.bind(this)
+    this.getAffectedPatientLink = this.getAffectedPatientLink.bind(this)
   }
 
   getLinkValue = (value) => {
@@ -57,10 +60,9 @@ class ReportUploadModal extends React.PureComponent {
     })
   }
 
-  getAffectedIndividualsLinkValue = (selectedAffectedIndividualIndexes) => {
-    const selectedAffectedIndividuals = []
-    Object.values(selectedAffectedIndividualIndexes).forEach((selectedAffectedIndividualIndex) => {
-      selectedAffectedIndividuals.push(this.props.affectedIndividuals[selectedAffectedIndividualIndex])
+  getAffectedPatientLink(selectedAffectedIndividualIndex) {
+    const selectedAffectedIndividuals = this.props.allAffectedIndividuals.filter((affectedIndividual) => {
+      return affectedIndividual.rowIdx === selectedAffectedIndividualIndex
     })
     this.setState({
       affectedIndividualsLink: `&patients=${btoa(JSON.stringify(selectedAffectedIndividuals))}`,
@@ -148,9 +150,10 @@ class ReportUploadModal extends React.PureComponent {
     const filteredFileDataContent = this.state.fileDataContent.filter((fileData) => {
       return fileData[fileDataDisplayNameIndex] === affectedPatient
     })
-    this.setState({
+    this.setState(prevState => ({
       filteredFileDataContent,
-    })
+      resetSelectedOptionKeysToggle: !prevState.resetSelectedOptionKeysToggle,
+    }))
   }
 
   getAffectedPatientsTab = () => {
@@ -160,11 +163,11 @@ class ReportUploadModal extends React.PureComponent {
           tableHeaders={this.state.affectedIndividualsDataHeaders}
           tableContent={this.props.affectedIndividuals}
           rowsPerPage={this.state.rowsPerPage}
-          getLinkData={this.getAffectedIndividualsLinkValue}
           setSelectedAffectedPatient={this.setSelectedAffectedIndividual}
           displaySearch
           tableKey="affectedPatientsUploadCheckboxGroup"
           handleAffectedPatientSelect={this.handleAffectedPatientSelect}
+          getAffectedPatientLink={this.getAffectedPatientLink}
         />
       </Tab.Pane>)
   }
@@ -196,6 +199,7 @@ class ReportUploadModal extends React.PureComponent {
           getLinkData={this.getLinkValue}
           displaySearch
           tableKey="excelUploadCheckboxGroup"
+          resetSelectedOptionKeysToggle={this.state.resetSelectedOptionKeysToggle}
         />
         }
       </Tab.Pane>
