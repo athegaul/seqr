@@ -57,4 +57,4 @@ After setting up Terraform state it is time to create infrastructure for seqr.
 
 ![output 6](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/88cbd739-c30a-4a70-ab65-94043a31dd38/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210523%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210523T092124Z&X-Amz-Expires=86400&X-Amz-Signature=d38b00aa717939381d63ed88a0ab8179a0f20891db3fe8803069e5142523524e&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
 
-After apply gets to the prompt it should show only 3 resources that are going to be created
+As before, type yes and wait until resources are provisioned on AWS.
