@@ -60,8 +60,7 @@ const tagFamily = tag =>
     target="_blank"
   />
 
-
-const Variant = React.memo(({ variant, isCompoundHet, mainGeneId, affectedIndividuals, linkToSavedVariants, reads, showReads }) => {
+const Variant = React.memo(({ variant, isCompoundHet, mainGeneId, affectedIndividuals, linkToSavedVariants, reads, showReads, rowIndividualIdx }) => {
   if (!mainGeneId) {
     mainGeneId = getVariantMainGeneId(variant)
   }
@@ -105,7 +104,7 @@ const Variant = React.memo(({ variant, isCompoundHet, mainGeneId, affectedIndivi
       <Grid.Column><Frequencies variant={variant} /></Grid.Column>
       {!isCompoundHet &&
         <Grid.Column width={16}>
-          <VariantIndividuals variant={variant} affectedIndividuals={affectedIndividuals} />
+          <VariantIndividuals variant={variant} affectedIndividuals={affectedIndividuals} rowIndividualIdx={rowIndividualIdx} />
           {showReads}
         </Grid.Column>}
       <Grid.Column width={16}>
@@ -123,6 +122,7 @@ Variant.propTypes = {
   linkToSavedVariants: PropTypes.bool,
   reads: PropTypes.object,
   showReads: PropTypes.object,
+  rowIndividualIdx: PropTypes.number,
 }
 
 const VariantWithReads = props => <FamilyReads layout={Variant} {...props} />
@@ -170,9 +170,9 @@ CompoundHets.propTypes = {
 
 const Variants = React.memo(({ variants, affectedIndividuals, ...props }) => (
   <Grid stackable divided="vertically" columns="equal">
-    {variants.map(variant => (Array.isArray(variant) ?
-      <CompoundHets variants={variant} key={`${variant.map(v => v.variantId).join()}-${variant[0].familyGuids.join('-')}`} affectedIndividuals={affectedIndividuals} {...props} /> :
-      <VariantWithReads variant={variant} key={`${variant.variantId}-${variant.familyGuids.join('-')}`} affectedIndividuals={affectedIndividuals} {...props} />
+    {variants.map((variant, rowIndividualIdx) => (Array.isArray(variant) ?
+      <CompoundHets variants={variant} key={`${variant.map(v => v.variantId).join()}-${variant[0].familyGuids.join('-')}`} affectedIndividuals={affectedIndividuals} rowIndividualIdx={rowIndividualIdx} {...props} /> :
+      <VariantWithReads variant={variant} key={`${variant.variantId}-${variant.familyGuids.join('-')}`} affectedIndividuals={affectedIndividuals} rowIndividualIdx={rowIndividualIdx} {...props} />
     ))}
   </Grid>
 ))

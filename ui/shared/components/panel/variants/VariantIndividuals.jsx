@@ -186,12 +186,12 @@ Genotype.propTypes = {
   isCompoundHet: PropTypes.bool,
 }
 
-const BaseVariantIndividuals = React.memo(({ variant, individuals, affectedIndividuals, index, isCompoundHet }) => (
+const BaseVariantIndividuals = React.memo(({ variant, individuals, affectedIndividuals, rowIndividualIdx, isCompoundHet }) => (
   <IndividualsContainer>
     {(individuals || []).map((individual) => {
       if (individual.affected === 'A') {
         affectedIndividuals.push({
-          rowIdx: index,
+          rowIdx: rowIndividualIdx,
           affectedIndividual: individual,
         })
       }
@@ -220,7 +220,7 @@ BaseVariantIndividuals.propTypes = {
   individuals: PropTypes.array,
   isCompoundHet: PropTypes.bool,
   affectedIndividuals: PropTypes.array,
-  index: PropTypes.number,
+  rowIndividualIdx: PropTypes.number,
 }
 
 const mapStateToProps = (state, ownProps) => ({
@@ -229,20 +229,11 @@ const mapStateToProps = (state, ownProps) => ({
 
 const FamilyVariantIndividuals = connect(mapStateToProps)(BaseVariantIndividuals)
 
-let idx = -1
-const VariantIndividuals = React.memo(({ variant, affectedIndividuals, isCompoundHet }) => {
-  const resetIndex = localStorage.getItem('resetIndex')
-  if (resetIndex === null || resetIndex === 'yes') {
-    idx = 0
-    localStorage.clear()
-    localStorage.setItem('resetIndex', 'no')
-  } else {
-    idx++
-  }
+const VariantIndividuals = React.memo(({ variant, affectedIndividuals, isCompoundHet, rowIndividualIdx }) => {
   return (
     <span>
       {variant.familyGuids.map(familyGuid =>
-        <FamilyVariantIndividuals key={familyGuid} familyGuid={familyGuid} variant={variant} isCompoundHet={isCompoundHet} index={idx} affectedIndividuals={affectedIndividuals} />,
+        <FamilyVariantIndividuals key={familyGuid} familyGuid={familyGuid} variant={variant} isCompoundHet={isCompoundHet} rowIndividualIdx={rowIndividualIdx} affectedIndividuals={affectedIndividuals} />,
       )}
     </span>
   )
@@ -253,6 +244,7 @@ VariantIndividuals.propTypes = {
   variant: PropTypes.object,
   isCompoundHet: PropTypes.bool,
   affectedIndividuals: PropTypes.array,
+  rowIndividualIdx: PropTypes.number,
 }
 
 export default VariantIndividuals
