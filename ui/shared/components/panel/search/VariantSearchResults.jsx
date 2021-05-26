@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Grid, Message, Button } from 'semantic-ui-react'
@@ -160,6 +160,18 @@ const BaseVariantSearchResultsContent = React.memo((
   const [currentAffectedIndividuals, setCurrentAffectedIndividuals] = useState([])
   const affectedIndividuals = []
 
+  useEffect(() => {
+    const onbeforeunloadFn = () => {
+      localStorage.clear()
+    }
+
+    window.addEventListener('beforeunload', onbeforeunloadFn)
+
+    return () => {
+      window.removeEventListener('beforeunload', onbeforeunloadFn)
+    }
+  }, [])
+
   const getAffectedPatientsData = (affectedIndividualsData) => {
     const affectedPatientsDataContent = []
     affectedIndividualsData.map((affectedIndividualData) => {
@@ -191,7 +203,7 @@ const BaseVariantSearchResultsContent = React.memo((
 
     return [
       <LargeRow key="resultsSummary">
-        <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} affectedIndividuals={currentAffectedIndividuals} docUrl={docUrl} />
+        <UploadExcelFileModal modalName="upload-excel-file" modalToggle={modalToggle} affectedIndividuals={currentAffectedIndividuals} allAffectedIndividuals={affectedIndividuals} docUrl={docUrl} />
         <Grid.Column width={5}>
           {totalVariantsCount === displayVariants.length ? 'Found ' : `Showing ${variantDisplayPageOffset + 1}-${variantDisplayPageOffset + displayVariants.length} of `}
           <b>{totalVariantsCount}</b> variants{filteredVariants.length < totalVariantsCount ? <span>, after filtering showing <b>{filteredVariants.length}</b> variants</span> : null}

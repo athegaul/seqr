@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Divider, Grid, Message } from 'semantic-ui-react'
+import { Divider, Grid, Message, Tab } from 'semantic-ui-react'
 import { reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
 
@@ -17,6 +17,7 @@ class ReportUploadModal extends React.PureComponent {
     modalName: PropTypes.string,
     modalToggle: PropTypes.any,
     affectedIndividuals: PropTypes.array,
+    allAffectedIndividuals: PropTypes.array,
     docUrl: PropTypes.string,
   }
 
@@ -28,6 +29,7 @@ class ReportUploadModal extends React.PureComponent {
       affectedIndividualsLink: '',
       fileDataHeaders: [],
       fileDataContent: [],
+      filteredFileDataContent: [],
       affectedIndividualsDataHeaders: ['Index', 'Display Name', 'Family GUID', 'Individual ID', 'Individual GUID'],
       modalToggle: props.modalToggle,
       modalOpen: false,
@@ -37,12 +39,19 @@ class ReportUploadModal extends React.PureComponent {
       initialXLSTableDisplay: true,
       missingXLSTableHeadersMessage: null,
       rowsPerPage: 5,
+      selectedAffectedIndividual: null,
+      resetSelectedOptionKeysToggle: false,
     }
     this.modalName = props.modalName
 
     this.handleUpload = this.handleUpload.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.getLinkValue = this.getLinkValue.bind(this)
+    this.getAffectedPatientsTab = this.getAffectedPatientsTab.bind(this)
+    this.getUploadExcelFileTab = this.getUploadExcelFileTab.bind(this)
+    this.setSelectedAffectedIndividual = this.setSelectedAffectedIndividual.bind(this)
+    this.handleAffectedPatientSelect = this.handleAffectedPatientSelect.bind(this)
+    this.getAffectedPatientLink = this.getAffectedPatientLink.bind(this)
   }
 
   getLinkValue = (value) => {
@@ -51,10 +60,9 @@ class ReportUploadModal extends React.PureComponent {
     })
   }
 
-  getAffectedIndividualsLinkValue = (selectedAffectedIndividualIndexes) => {
-    const selectedAffectedIndividuals = []
-    Object.values(selectedAffectedIndividualIndexes).forEach((selectedAffectedIndividualIndex) => {
-      selectedAffectedIndividuals.push(this.props.affectedIndividuals[selectedAffectedIndividualIndex])
+  getAffectedPatientLink(selectedAffectedIndividualIndex) {
+    const selectedAffectedIndividuals = this.props.allAffectedIndividuals.filter((affectedIndividual) => {
+      return affectedIndividual.rowIdx === selectedAffectedIndividualIndex
     })
     this.setState({
       affectedIndividualsLink: `&patients=${btoa(JSON.stringify(selectedAffectedIndividuals))}`,
@@ -68,6 +76,12 @@ class ReportUploadModal extends React.PureComponent {
       modalToggle: !this.state.modalToggle,
       initialUpload: true,
       missingXLSTableHeadersMessage: null,
+    })
+  }
+
+  setSelectedAffectedIndividual(selectedAffectedIndividual) {
+    this.setState({
+      selectedAffectedIndividual,
     })
   }
 
@@ -87,12 +101,17 @@ class ReportUploadModal extends React.PureComponent {
       }
 
       if (headerIsComplete()) {
+        const displayNameIndex = parsedDataHeaders.indexOf('Display Name')
+        const filteredParsedDataContent = parsedDataContent.filter((parsedContentData) => {
+          return parsedContentData[displayNameIndex] === this.state.selectedAffectedIndividual
+        })
         this.setState({
           initialUpload: false,
           initialXLSTableDisplay: false,
           fileOK: true,
           fileDataHeaders: parsedDataHeaders,
           fileDataContent: parsedDataContent,
+          filteredFileDataContent: this.state.selectedAffectedIndividual !== null ? filteredParsedDataContent : parsedDataContent,
           missingXLSTableHeadersMessage: null,
         })
       } else {
@@ -102,6 +121,7 @@ class ReportUploadModal extends React.PureComponent {
           fileOK: false,
           fileDataHeaders: [],
           fileDataContent: [],
+          filteredFileDataContent: [],
         })
       }
     }
@@ -109,7 +129,6 @@ class ReportUploadModal extends React.PureComponent {
 
   static getDerivedStateFromProps(props, currentState) {
     if (currentState.modalToggle !== props.modalToggle) {
-      localStorage.clear()
       localStorage.setItem('resetIndex', 'yes')
       return {
         modalOpen: true,
@@ -117,7 +136,6 @@ class ReportUploadModal extends React.PureComponent {
       }
     }
     if (currentState.modalClosing) {
-      localStorage.clear()
       localStorage.setItem('resetIndex', 'no')
       return {
         modalClosing: false,
@@ -127,34 +145,36 @@ class ReportUploadModal extends React.PureComponent {
     return null
   }
 
-  render() {
-    const errorMessageStyle = {
-      paddingTop: '15px',
-    }
-    const displayGenerateButton = !this.state.fileOK || this.state.linkData === null
-    const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingXLSTableHeadersMessage}`
-    const buttonClassName = !displayGenerateButton ? 'ui primary button' : 'ui primary button disabled'
-    const xlsButtonClassName = 'ui download button'
-    const xlsFileDownloadLink = ''
+  handleAffectedPatientSelect(affectedPatient) {
+    const fileDataDisplayNameIndex = this.state.fileDataHeaders.indexOf('Display Name')
+    const filteredFileDataContent = this.state.fileDataContent.filter((fileData) => {
+      return fileData[fileDataDisplayNameIndex] === affectedPatient
+    })
+    this.setState(prevState => ({
+      filteredFileDataContent,
+      resetSelectedOptionKeysToggle: !prevState.resetSelectedOptionKeysToggle,
+    }))
+  }
+
+  getAffectedPatientsTab = () => {
     return (
-      <ModalComponent
-        isOpen={this.state.modalOpen}
-        open={this.openModal}
-        close={this.closeModal}
-        title="Upload Excel File With Additional Fields"
-        modalName={this.modalName}
-        size="fullscreen"
-        id="reportUploadModal"
-      >
+      <Tab.Pane>
         <SearchableTable
           tableHeaders={this.state.affectedIndividualsDataHeaders}
           tableContent={this.props.affectedIndividuals}
           rowsPerPage={this.state.rowsPerPage}
-          getLinkData={this.getAffectedIndividualsLinkValue}
+          setSelectedAffectedPatient={this.setSelectedAffectedIndividual}
           displaySearch
           tableKey="affectedPatientsUploadCheckboxGroup"
-          multiSelectEnabled
+          handleAffectedPatientSelect={this.handleAffectedPatientSelect}
+          getAffectedPatientLink={this.getAffectedPatientLink}
         />
+      </Tab.Pane>)
+  }
+
+  getUploadExcelFileTab = (errorMessageStyle, errorMessageContent) => {
+    return (
+      <Tab.Pane>
         <FileUploadField
           clearTimeOut={0}
           dropzoneLabel="Click here to upload the excel file with additional fields, which will be used to generate word report"
@@ -174,14 +194,42 @@ class ReportUploadModal extends React.PureComponent {
         {!this.state.initialXLSTableDisplay && this.state.fileOK &&
         <SearchableTable
           tableHeaders={this.state.fileDataHeaders}
-          tableContent={this.state.fileDataContent}
+          tableContent={this.state.filteredFileDataContent}
           rowsPerPage={this.state.rowsPerPage}
           getLinkData={this.getLinkValue}
           displaySearch
           tableKey="excelUploadCheckboxGroup"
-          clearData
+          resetSelectedOptionKeysToggle={this.state.resetSelectedOptionKeysToggle}
         />
         }
+      </Tab.Pane>
+    )
+  }
+
+  render() {
+    const errorMessageStyle = {
+      paddingTop: '15px',
+    }
+    const displayGenerateButton = !this.state.fileOK || this.state.linkData === null
+    const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingXLSTableHeadersMessage}`
+    const buttonClassName = !displayGenerateButton ? 'ui primary button' : 'ui primary button disabled'
+    const xlsButtonClassName = 'ui download button'
+    const xlsFileDownloadLink = ''
+    const modalPanes = [
+      { menuItem: 'Affected Patients', render: () => this.getAffectedPatientsTab() },
+      { menuItem: 'Upload Excel File', render: () => this.getUploadExcelFileTab(errorMessageStyle, errorMessageContent) },
+    ]
+    return (
+      <ModalComponent
+        isOpen={this.state.modalOpen}
+        open={this.openModal}
+        close={this.closeModal}
+        title="Upload Excel File With Additional Fields"
+        modalName={this.modalName}
+        size="fullscreen"
+        id="reportUploadModal"
+      >
+        <Tab panes={modalPanes} />
         <Divider />
         <a href={`${this.props.docUrl}${this.state.linkData}${this.state.affectedIndividualsLink}`} className={buttonClassName} >Generate</a>
         <a href={`${xlsFileDownloadLink}`} className={xlsButtonClassName} download>Download Excel File Template</a>

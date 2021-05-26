@@ -84,6 +84,7 @@ export const SAMPLE_TYPE_LOOKUP = SAMPLE_TYPE_OPTIONS.reduce(
 )
 
 export const WORD_REPORT_EXCEL_GENERATION_HEADERS = [
+  'Display Name',
   'Fam ID',
   'Sample ID',
   'Age',
