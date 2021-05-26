@@ -127,7 +127,7 @@ Variant.propTypes = {
 
 const VariantWithReads = props => <FamilyReads layout={Variant} {...props} />
 
-const CompoundHets = React.memo(({ variants, affectedIndividuals, ...props }) => {
+const CompoundHets = React.memo(({ variants, affectedIndividuals, rowIndividualIdx, ...props }) => {
   const sharedGeneIds = Object.keys(variants[0].transcripts).filter(geneId => geneId in variants[1].transcripts)
   let mainGeneId = sharedGeneIds[0]
   if (sharedGeneIds.length > 1) {
@@ -155,7 +155,7 @@ const CompoundHets = React.memo(({ variants, affectedIndividuals, ...props }) =>
       </Grid.Column>
       <StyledCompoundHetRows stackable columns="equal">
         {variants.map(compoundHet =>
-          <VariantWithReads variant={compoundHet} key={compoundHet.variantId} affectedIndividuals={affectedIndividuals} mainGeneId={mainGeneId} isCompoundHet {...props} />,
+          <VariantWithReads variant={compoundHet} key={compoundHet.variantId} affectedIndividuals={affectedIndividuals} rowIndividualIdx={rowIndividualIdx} mainGeneId={mainGeneId} isCompoundHet {...props} />,
         )}
       </StyledCompoundHetRows>
     </StyledVariantRow>
@@ -166,6 +166,7 @@ const CompoundHets = React.memo(({ variants, affectedIndividuals, ...props }) =>
 CompoundHets.propTypes = {
   variants: PropTypes.array,
   affectedIndividuals: PropTypes.array,
+  rowIndividualIdx: PropTypes.number,
 }
 
 const Variants = React.memo(({ variants, affectedIndividuals, ...props }) => (
