@@ -171,12 +171,13 @@ class SearchableTable extends React.PureComponent {
   handleRowOptionClick(rowContent, checkedState) {
     const displayNameIndex = this.props.tableHeaders.indexOf('Display Name')
     const patientIndex = this.props.tableHeaders.indexOf('Index')
+    const individualIdIndex = this.props.tableHeaders.indexOf('Individual ID')
     if (this.props.setSelectedAffectedPatient !== undefined) {
       this.props.setSelectedAffectedPatient(rowContent[displayNameIndex])
       this.props.handleAffectedPatientSelect(rowContent[displayNameIndex])
     }
     if (this.props.getAffectedPatientLink !== undefined) {
-      this.props.getAffectedPatientLink(rowContent[patientIndex])
+      this.props.getAffectedPatientLink(rowContent[patientIndex], rowContent[individualIdIndex])
     }
     if (this.state.checkedTableOptionKeys.length === 0) {
       if (checkedState) {

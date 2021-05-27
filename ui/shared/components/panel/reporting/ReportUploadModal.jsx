@@ -60,9 +60,9 @@ class ReportUploadModal extends React.PureComponent {
     })
   }
 
-  getAffectedPatientLink(selectedAffectedIndividualIndex) {
+  getAffectedPatientLink(selectedAffectedIndividualRowIndex, selectedAffectedIndividualId) {
     const selectedAffectedIndividuals = this.props.allAffectedIndividuals.filter((affectedIndividual) => {
-      return affectedIndividual.rowIdx === Number.parseInt(selectedAffectedIndividualIndex, 10)
+      return affectedIndividual.rowIdx === Number.parseInt(selectedAffectedIndividualRowIndex, 10) && affectedIndividual.affectedIndividual.individualId === selectedAffectedIndividualId
     })
     this.setState({
       affectedIndividualsLink: `&patients=${btoa(JSON.stringify(selectedAffectedIndividuals))}`,
