@@ -26,6 +26,7 @@ from seqr.views.utils.orm_to_json_utils import \
     get_json_for_projects, \
     _get_json_for_families, \
     _get_json_for_individuals, \
+    _get_json_for_individual, \
     get_json_for_analysis_groups, \
     get_json_for_samples, \
     get_json_for_locus_lists, \
@@ -256,6 +257,26 @@ def get_variant_gene_breakdown(request, search_hash):
     })
 
 
+def _get_doc_template_data(request):
+    fam_id = request.GET.get('fam_id')
+    if fam_id is None:
+        return {}
+
+    return {
+        "fam_id": fam_id,
+        "sample_id": request.GET.get('sample_id'),
+        "age": request.GET.get('age'),
+        "sex": request.GET.get('sex'),
+        "test_performed": request.GET.get('test_performed'),
+        "phen": request.GET.get('phen'),
+        "mrn": request.GET.get('mrn'),
+        "referring_facility": request.GET.get('referring_facility'),
+        "crgd_accession_id": request.GET.get('crgd_accession_id'),
+        "specimen": request.GET.get('specimen'),
+        "received_date": request.GET.get('received_date'),
+        "test_codes": request.GET.get('test_codes'),
+    }
+
 @login_required(login_url=API_LOGIN_REQUIRED_URL)
 def export_variants_handler(request, search_hash):
     results_model = VariantSearchResults.objects.get(search_hash=search_hash)
@@ -263,6 +284,8 @@ def export_variants_handler(request, search_hash):
     _check_results_permission(results_model, request.user)
 
     families = results_model.families.all()
+    family_names = [family for family in families]
+
     family_ids_by_guid = {family.guid: family.family_id for family in families}
 
     variants, _ = get_es_variants(results_model, page=1, load_all=True)
@@ -271,10 +294,23 @@ def export_variants_handler(request, search_hash):
     acmg_criteria = request.GET.get('acmg_criteria')
     acmg_criteria_json = json.loads(base64.b64decode(acmg_criteria).decode('utf-8'))
 
+    patients = request.GET.get('patients')
+
+    patients_json = []
+    if patients != None:
+        patients_json = json.loads(base64.b64decode(patients).decode('utf-8'))
+
+    doc_template_export_criteria = _get_doc_template_data(request)
+
+    filtered_indexes = base64.b64decode(request.GET.get('filtered_indexes')).decode('utf-8')
+    filtered_indexes_arr = [int(idx) for idx in filtered_indexes.split(",")]
+
     json_saved_variants, variants_to_saved_variants = _get_saved_variants(variants, families)
 
     max_families_per_variant = max([len(variant['familyGuids']) for variant in variants])
     max_samples_per_variant = max([len(variant['genotypes']) for variant in variants])
+
+    transcript_keys = [[*variant['transcripts']] for variant in variants]
 
     rows = []
     for variant in variants:
@@ -306,10 +342,16 @@ def export_variants_handler(request, search_hash):
         rows[idx].append(acmg_criteria_json[acmg_criteria_keys[idx]]["score"])
         rows[idx].append(', '.join(acmg_criteria_json[acmg_criteria_keys[idx]]["criteria"]))
 
+    filtered_rows = []
+    filtered_transcript_keys = []
+    for row_idx in range(len(rows)):
+        if row_idx in filtered_indexes_arr:
+            filtered_rows.append(rows[row_idx])
+            filtered_transcript_keys.append(transcript_keys[row_idx])
+
     file_format = request.GET.get('file_format', 'tsv')
 
-    return export_table('search_results_{}'.format(search_hash), header, rows, file_format, titlecase_header=False)
-
+    return export_table('search_results_{}'.format(search_hash), header, filtered_rows, file_format, titlecase_header=False, families=family_names, doc_values=doc_template_export_criteria, transcript_keys=filtered_transcript_keys, patients=patients_json)
 
 def _get_field_value(value, config):
     field_value = jmespath.search(config.get('value_path', config['header']), value)

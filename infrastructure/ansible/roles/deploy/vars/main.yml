@@ -3,6 +3,8 @@ seqr_ui_port: 3000
 seqr_port: 8000
 key_file: /home/ansible/.ssh/ansible
 
+cors_anywhere_port: 8080
+
 postgres_username: seqr
 postgres_password: 
 

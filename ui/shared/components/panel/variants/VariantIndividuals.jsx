@@ -186,24 +186,32 @@ Genotype.propTypes = {
   isCompoundHet: PropTypes.bool,
 }
 
-
-const BaseVariantIndividuals = React.memo(({ variant, individuals, isCompoundHet }) => (
+const BaseVariantIndividuals = React.memo(({ variant, individuals, affectedIndividuals, rowIndividualIdx, isCompoundHet }) => (
   <IndividualsContainer>
-    {(individuals || []).map(individual =>
-      <IndividualCell key={individual.individualGuid} numIndividuals={individuals.length}>
-        <PedigreeIcon
-          sex={individual.sex}
-          affected={individual.affected}
-          label={<small>{individual.displayName}</small>}
-          popupHeader={individual.displayName}
-          popupContent={
-            individual.features ? <HpoPanel individual={individual} /> : null
-          }
-        />
-        <br />
-        <Genotype variant={variant} individual={individual} isCompoundHet={isCompoundHet} />
-      </IndividualCell>,
-    )}
+    {(individuals || []).map((individual) => {
+      if (individual.affected === 'A') {
+        affectedIndividuals.push({
+          rowIdx: rowIndividualIdx,
+          affectedIndividual: individual,
+        })
+      }
+      return (
+        <IndividualCell key={individual.individualGuid} numIndividuals={individuals.length}>
+          <PedigreeIcon
+            sex={individual.sex}
+            affected={individual.affected}
+            label={<small>{individual.displayName}</small>}
+            popupHeader={individual.displayName}
+            popupContent={
+              individual.features ? <HpoPanel individual={individual} /> : null
+            }
+          />
+          <br />
+          <Genotype variant={variant} individual={individual} isCompoundHet={isCompoundHet} />
+        </IndividualCell>
+      )
+    },
+  )}
   </IndividualsContainer>
 ))
 
@@ -211,6 +219,8 @@ BaseVariantIndividuals.propTypes = {
   variant: PropTypes.object,
   individuals: PropTypes.array,
   isCompoundHet: PropTypes.bool,
+  affectedIndividuals: PropTypes.array,
+  rowIndividualIdx: PropTypes.number,
 }
 
 const mapStateToProps = (state, ownProps) => ({
@@ -219,18 +229,22 @@ const mapStateToProps = (state, ownProps) => ({
 
 const FamilyVariantIndividuals = connect(mapStateToProps)(BaseVariantIndividuals)
 
-const VariantIndividuals = React.memo(({ variant, isCompoundHet }) =>
-  <span>
-    {variant.familyGuids.map(familyGuid =>
-      <FamilyVariantIndividuals key={familyGuid} familyGuid={familyGuid} variant={variant} isCompoundHet={isCompoundHet} />,
-    )}
-  </span>,
-)
+const VariantIndividuals = React.memo(({ variant, affectedIndividuals, isCompoundHet, rowIndividualIdx }) => {
+  return (
+    <span>
+      {variant.familyGuids.map(familyGuid =>
+        <FamilyVariantIndividuals key={familyGuid} familyGuid={familyGuid} variant={variant} isCompoundHet={isCompoundHet} rowIndividualIdx={rowIndividualIdx} affectedIndividuals={affectedIndividuals} />,
+      )}
+    </span>
+  )
+})
 
 
 VariantIndividuals.propTypes = {
   variant: PropTypes.object,
   isCompoundHet: PropTypes.bool,
+  affectedIndividuals: PropTypes.array,
+  rowIndividualIdx: PropTypes.number,
 }
 
 export default VariantIndividuals

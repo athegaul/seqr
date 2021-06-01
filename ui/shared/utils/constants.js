@@ -83,6 +83,37 @@ export const SAMPLE_TYPE_LOOKUP = SAMPLE_TYPE_OPTIONS.reduce(
   }), {},
 )
 
+export const WORD_REPORT_EXCEL_GENERATION_HEADERS = [
+  'Display Name',
+  'Fam ID',
+  'Sample ID',
+  'Age',
+  'Sex',
+  'Phen',
+  'Test Performed',
+  'MRN',
+  'Referring Facility',
+  'CRGD Accession ID',
+  'Specimen',
+  'Date (Received)',
+  'Test Codes',
+]
+
+export const WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES = [
+  'fam_id',
+  'sample_id',
+  'age',
+  'sex',
+  'phen',
+  'test_performed',
+  'mrn',
+  'referring_facility',
+  'crgd_accession_id',
+  'specimen',
+  'received_date',
+  'test_codes',
+]
+
 // ANALYSIS STATUS
 
 export const FAMILY_STATUS_SOLVED = 'S'

@@ -3,18 +3,158 @@ import json
 import openpyxl as xl
 from tempfile import NamedTemporaryFile
 import zipfile
+from io import BytesIO
+from docxtpl import DocxTemplate
+import calendar
+from datetime import date
+from seqr.utils.gene_utils import get_genes
 
 from django.http.response import HttpResponse
 
 from seqr.views.utils.json_utils import _to_title_case
+
+from reference_data.models import GeneInfo
+
+import boto3
 
 DELIMITERS = {
     'csv': ',',
     'tsv': '\t',
 }
 
+s3 = boto3.client('s3')
 
-def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True):
+def get_date():
+    todays_date = date.today()
+    return f"{calendar.month_name[todays_date.month]}, {todays_date.day}, {todays_date.year}"
+
+def get_doc_template():
+    template_location = '/home/ansible/diagnostic_report.docx'
+    s3.download_file('diagnostic-report-templates', 'diagnostic_report.docx', template_location)
+    template = DocxTemplate(template_location)
+    return template
+
+def get_hgvspc(row):
+    header_indices = {
+        "hgvsc": 19,
+        "hgvsp": 20,
+    }
+
+    hgvsc = row[header_indices["hgvsc"]]
+    hgvsp = row[header_indices["hgvsp"]]
+
+    result = ""
+    if hgvsc != "":
+        result += hgvsc.split(":")[1]
+    if hgvsp != "":
+        result += f"({hgvsp.split(':')[1]})"
+    return result
+
+def get_transcript(row):
+    header_indices = {
+        "hgvsc": 19
+    }
+
+    hgvsc = row[header_indices["hgvsc"]]
+    result = ""
+    if hgvsc != "":
+        result += hgvsc.split(":")[0]
+
+    return result
+
+def get_coordinate(row):
+    header_indices = {
+        "pos": 1,
+        "ref": 2,
+        "alt": 3
+    }
+
+    return f"g.{row[header_indices['pos']]} {row[header_indices['ref']]} > {row[header_indices['alt']]}"
+
+def get_gene_type(row):
+    gene_symbol = row[4]
+    query = f"SELECT id, gencode_gene_type FROM reference_data_geneinfo rdg WHERe gene_symbol = '{gene_symbol}'"
+    result = GeneInfo.objects.raw(query)[0]
+    return result.gencode_gene_type
+
+def get_doc_response(rows, header, families, doc_values, transcript_keys, patients):
+    document_template = get_doc_template()
+
+    generated_file = BytesIO()
+
+    notes_indices = []
+    for idx in range(len(header)):
+        if "notes" in header[idx]:
+            notes_indices.append(idx)
+
+    records = []
+    for patient in patients:
+        for note_idx in notes_indices:
+            row = rows[patient["rowIdx"]]
+            if row[note_idx] != "":
+                disease_name, disease_description = _parse_disease_information(transcript_keys[patient["rowIdx"]][0])
+                records.append({
+                    "message": row[note_idx],
+                    "acmg_criteria": row[len(row) - 2],
+                    "variant": get_hgvspc(row),
+                    "disease_name": disease_name,
+                    "disease_description": disease_description,
+                    "gene_transcript": get_transcript(row),
+                    "genomic_coordinate": get_coordinate(row)
+                })
+
+    filtered_records = []
+    for record in records:
+        split_note_message = record["message"].rsplit("  ", 1)
+        filtered_records.append({
+            "message": split_note_message[0],
+            "reference": split_note_message[1].split("(")[0],
+            "classification": record["acmg_criteria"],
+            "variant": record["variant"],
+            "disease_name": record["disease_name"],
+            "disease_description": record["disease_description"],
+            "gene_transcript": record["gene_transcript"],
+            "genomic_coordinate": record["genomic_coordinate"]
+        })
+
+    families = [str(family) for family in families]
+
+    data = {
+        "date": get_date(),
+        "family_id": ",".join(families),
+        "records": {
+            "based_analysis": filtered_records
+        }
+    }
+
+    document_template.render({**data, **doc_values})
+    document_template.save(generated_file)
+    content_length = generated_file.tell()
+    generated_file.seek(0)
+
+    response = HttpResponse(
+        generated_file.getvalue(),
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+    response["Content-Disposition"] = "attachment; filename=" + "diagnostic_report.docx"
+    response["Content-Length"] = content_length
+    return response
+
+def _parse_disease_information(gene_id):
+    response = get_genes([gene_id], add_dbnsfp=True, add_omim=True, add_constraints=True)
+    disease = response[gene_id]["diseaseDesc"]
+
+    if disease == "":
+        return "No disease associations", "No disease associations"
+
+    disease_split = disease.split("]:")
+  
+    disease_name = disease_split[0].replace("DISEASE:", "").replace("[MIM:", "OMIM #").strip()
+    disease_description = disease_split[1].replace(";", "").strip()
+  
+    return disease_name, disease_description
+
+def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_header=True, families=[], doc_values={}, transcript_keys=[], patients=[]):
     """Generates an HTTP response for a table with the given header and rows, exported into the given file_format.
 
     Args:
@@ -60,6 +200,8 @@ def export_table(filename_prefix, header, rows, file_format='tsv', titlecase_hea
             response = HttpResponse(temporary_file.read(), content_type="application/ms-excel")
             response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(filename_prefix).encode('ascii', 'ignore')
             return response
+    elif file_format == "doc":
+        return get_doc_response(rows, header, families, doc_values, transcript_keys, patients)
     else:
         raise ValueError("Invalid file_format: %s" % file_format)
 

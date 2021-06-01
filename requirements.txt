@@ -22,3 +22,7 @@ slugify==0.0.1                   # used for encoding names for guids
 tqdm==4.40.2                     # convenient way to create progress bar for long-running command-line operations
 whitenoise==5.2.0                # simplified static file handling. Behind a major version due to missing Python 2 support
 
+docx==0.2.4                      # creating word documents
+docxtpl==0.11.3                  # generating word documents based on jinja templates
+
+boto3==1.17.69                   # AWS

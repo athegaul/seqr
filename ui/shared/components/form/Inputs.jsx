@@ -3,16 +3,18 @@
 import React, { createElement } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Form, List, Button, Pagination as PaginationComponent, Search } from 'semantic-ui-react'
+import { Form, List, Button, Pagination as PaginationComponent, Search, Icon, Popup, Table, TableCell, TableRow, TableFooter } from 'semantic-ui-react'
 import Slider from 'react-rangeslider'
 import { JsonEditor } from 'jsoneditor-react'
 import 'react-rangeslider/lib/index.css'
 
 import { helpLabel } from './ReduxFormWrapper'
+import { VerticalSpacer } from '../Spacers'
 
 export class BaseSemanticInput extends React.Component {
 
   static propTypes = {
+    inputStyle: PropTypes.any,
     onChange: PropTypes.func,
     inputType: PropTypes.string.isRequired,
     options: PropTypes.array,
@@ -23,8 +25,8 @@ export class BaseSemanticInput extends React.Component {
   }
 
   render() {
-    const { inputType, ...props } = this.props
-    return createElement(Form[inputType], { ...props, onChange: this.handleChange, onBlur: null })
+    const { inputStyle, inputType, ...props } = this.props
+    return createElement(Form[inputType], { ...props, onChange: this.handleChange, onBlur: null, style: inputStyle !== undefined ? inputStyle : null })
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -118,6 +120,208 @@ Dropdown.propTypes = {
   includeCategories: PropTypes.bool,
 }
 
+export const filteredPredictions = {}
+
+const updateFilterPredictionValue = (prediction, value) => {
+  if (!(prediction in filteredPredictions)) {
+    filteredPredictions[prediction] = { value, ...filteredPredictions[prediction] }
+  } else {
+    filteredPredictions[prediction].value = value
+  }
+}
+
+const updateFilterPredictionOperator = (prediction, operator) => {
+  if (!(prediction in filteredPredictions)) {
+    filteredPredictions[prediction] = { operator, ...filteredPredictions[prediction] }
+  } else {
+    filteredPredictions[prediction].operator = operator
+  }
+}
+
+export const InputGroup = React.memo((props) => {
+  const { inputGroupId, isDefaultGroup, options, handleOptionDelete, handleOptionValueUpdate, handleOptionOperatorUpdate, compareOptions } = props
+  const inputGroupStyle = {
+    padding: '10px',
+  }
+
+  const dropdownGroupStyle = {
+    paddingTop: '35px',
+  }
+
+  const iconStyle = {
+    zIndex: '2',
+    position: 'absolute',
+    right: '0',
+    top: '0',
+  }
+
+  return (
+    <div key={`inputGroup-${inputGroupId}`}>
+      {options.map(option =>
+        <div style={{ float: 'left', width: '33%' }} key={option.label}>
+          <div style={{ gridTemplateColumns: '20% 80%', gridGap: '5px', display: 'grid' }}>
+            <BaseSemanticInput
+              inputType="Dropdown"
+              inputStyle={dropdownGroupStyle}
+              options={compareOptions}
+              noResultsMessage={null}
+              value={!isDefaultGroup ? option.operator : undefined}
+              tabIndex="0"
+              onClick={() => { }}
+              onFocus={() => { }}
+              onChange={(operator) => {
+                updateFilterPredictionOperator(option.name, operator)
+                if (!isDefaultGroup) {
+                  handleOptionOperatorUpdate(option, operator)
+                }
+              }}
+            />
+            <div>
+              {/* eslint-disable-next-line jsx-a11y/label-has-for */}
+              <label style={{ fontWeight: 'bold', whiteSpace: 'noWrap' }}>{helpLabel(option.label, option.labelHelp)}</label>
+              <div style={{ position: 'relative' }}>
+                <BaseSemanticInput
+                  id={option.name}
+                  inputType="Input"
+                  inputStyle={inputGroupStyle}
+                  key={option.name}
+                  value={!isDefaultGroup ? option.value : undefined}
+                  onChange={(value) => {
+                    updateFilterPredictionValue(option.name, value)
+                    if (!isDefaultGroup) {
+                      handleOptionValueUpdate(option.name)
+                    }
+                  }}
+                  onFocus={() => { }}
+                />
+                {(option.isDefault !== undefined || false) &&
+                  <Icon name="times circle outline" style={iconStyle}
+                    onClick={() => {
+                      handleOptionDelete(option.name)
+                    }}
+                  />
+                }
+              </div>
+            </div>
+          </div>
+        </div>,
+      )}
+    </div>
+  )
+})
+
+InputGroup.propTypes = {
+  options: PropTypes.array,
+  inputGroupId: PropTypes.string,
+  compareOptions: PropTypes.array,
+  handleOptionDelete: PropTypes.func,
+  handleOptionValueUpdate: PropTypes.func,
+  handleOptionOperatorUpdate: PropTypes.func,
+  isDefaultGroup: PropTypes.bool,
+}
+
+export const GridInputGroup = React.memo((props) => {
+  const { options, gridGroupName, isDefaultGroup, compareOptions, topSpacing, handleOptionDelete, handleOptionValueUpdate, handleOptionOperatorUpdate, ...baseProps } = props
+  const inputOptions = options[0] !== undefined ? options[0].options : []
+  const optionChunks = []
+  const optionChunkCount = 5
+  const inputOptionsCopy = [...inputOptions]
+  for (let i = optionChunkCount; i > 0; i--) {
+    const optionChunk = inputOptionsCopy.splice(0, Math.ceil(inputOptionsCopy.length / i))
+    optionChunks.push({ id: `${gridGroupName}-${i}`, key: `${gridGroupName}-chunk${i}`, chunk: optionChunk })
+  }
+  const floatStyle = {
+    clear: 'both',
+  }
+  return (
+    <div>
+      {(inputOptions.length > 0 && topSpacing === true) &&
+        <VerticalSpacer height={30} />
+      }
+      {optionChunks.map((chunk) => {
+        return <InputGroup inputGroupId={chunk.id} key={chunk.key} options={chunk.chunk} isDefaultGroup={isDefaultGroup} handleOptionDelete={handleOptionDelete} handleOptionValueUpdate={handleOptionValueUpdate} handleOptionOperatorUpdate={handleOptionOperatorUpdate} compareOptions={compareOptions} {...baseProps} />
+      })}
+      <div style={floatStyle} />
+      <VerticalSpacer height={40} />
+    </div>
+  )
+})
+
+GridInputGroup.propTypes = {
+  options: PropTypes.array,
+  gridGroupName: PropTypes.string,
+  topSpacing: PropTypes.bool,
+  handleOptionDelete: PropTypes.func,
+  compareOptions: PropTypes.array,
+  handleOptionValueUpdate: PropTypes.func,
+  handleOptionOperatorUpdate: PropTypes.func,
+  isDefaultGroup: PropTypes.bool,
+}
+
+let searchOptions = []
+const getElasticSearchIndicies = async () => {
+  // Clear searchOptions and get new data
+  searchOptions = []
+
+  // Get all keys from Elasticsearch
+  let response = await fetch('/api/data_management/elasticsearch_mapping')
+  let data = await response.json()
+
+  // Include only index names that are not from ElasticSearch (the ones that start with dot)
+  const indexNames = Object.keys(data).filter(key => key[0] !== '.')
+
+  // For each index name get properties
+  /* eslint-disable no-await-in-loop */
+  for (let indexNameIdx = 0; indexNameIdx < indexNames.length; indexNameIdx++) {
+    const indexName = indexNames[indexNameIdx]
+    response = await fetch(`/api/data_management/elasticsearch_index_data/${indexName}`)
+    data = await response.json()
+
+    /* eslint-disable no-loop-func */
+    Object.keys(data[indexName].mappings.properties).forEach((property) => {
+      searchOptions.push({ title: property })
+    })
+  }
+}
+
+export const InlineInputGroup = React.memo((props) => {
+  const { options, compareOptions, searchHelpText, ...baseProps } = props
+
+  getElasticSearchIndicies()
+
+  return (
+    <div>
+      <VerticalSpacer height={50} />
+      <GridInputGroup
+        {...baseProps}
+        options={options}
+        gridGroupName="baseAnnotationsGridGroup"
+        isDefaultGroup
+        compareOptions={compareOptions}
+        handleOptionDelete={() => { }}
+        handleOptionValueUpdate={() => { }}
+        handleOptionOperatorUpdate={() => { }}
+      />
+      <VerticalSpacer height={50} />
+      <SearchAnnotations
+        {...baseProps}
+        onChange={() => { }}
+        searchOptions={searchOptions}
+        onResultSelect={() => { }}
+        compareOptions={compareOptions}
+        searchHelpText={searchHelpText}
+        gridGroupName="customAnnotationsGridGroup"
+      />
+    </div>
+  )
+})
+
+InlineInputGroup.propTypes = {
+  options: PropTypes.array,
+  compareOptions: PropTypes.array,
+  searchHelpText: PropTypes.string,
+}
+
 export const Select = props =>
   <Dropdown selection fluid {...props} />
 
@@ -125,6 +329,117 @@ export const Select = props =>
 Select.propTypes = {
   options: PropTypes.array,
 }
+
+export class SearchAnnotations extends React.PureComponent {
+  static propTypes = {
+    onChange: PropTypes.func,
+    searchOptions: PropTypes.array,
+    onResultSelect: PropTypes.func,
+    compareOptions: PropTypes.array,
+    searchHelpText: PropTypes.string,
+    gridGroupName: PropTypes.string,
+  }
+
+  state = {
+    searchResults: this.props.searchOptions,
+    options: [{ options: [] }],
+    compareOptions: this.props.compareOptions,
+  }
+
+  handleResultSelect = (e, { result }) => {
+    this.props.onResultSelect(e, result.title)
+    this.setState((prevState) => {
+      const previousOptions = prevState.options[0].options
+      const newOptions = [...previousOptions]
+      const optionResult = newOptions.filter((option) => { return option.name === result.title })
+      if (optionResult.length === 0) {
+        const hello = {
+          name: result.title.toLowerCase(),
+          label: result.title,
+          isDefault: false,
+          value: '',
+          operator: '',
+        }
+        newOptions.push(hello)
+      }
+      return { options: [{ options: newOptions }] }
+    })
+  }
+
+  handleOptionOperatorUpdate = (option, operator) => {
+    this.setState((prevState) => {
+      const inputOptions = prevState.options[0] !== undefined ? prevState.options[0].options : []
+      const index = inputOptions.findIndex(opt => opt.name === option.name)
+      if (index > -1) {
+        inputOptions[index].operator = operator
+      }
+      return { options: [{ options: inputOptions }] }
+    })
+  }
+
+  handleOptionValueUpdate = (optionName) => {
+    const optionValue = filteredPredictions[optionName].value
+    this.setState((prevState) => {
+      const inputOptions = prevState.options[0] !== undefined ? prevState.options[0].options : []
+      const index = inputOptions.findIndex(opt => opt.name === optionName)
+      if (index > -1) {
+        inputOptions[index].value = optionValue
+      }
+      return { options: [{ options: inputOptions }] }
+    })
+  }
+
+  handleSearchChange = (e, data) => {
+    this.setState({
+      searchResults: this.props.searchOptions.filter(({ title }) => title.toLowerCase().includes(data.value.toLowerCase())),
+    })
+    this.props.onChange(e, data)
+  }
+  handleOptionDelete = (optionName) => {
+    this.setState((prevState) => {
+      const inputOptions = prevState.options[0] !== undefined ? prevState.options[0].options : []
+      const index = inputOptions.findIndex(option => option.name === optionName)
+      if (index > -1) {
+        inputOptions.splice(index, 1)
+      }
+      delete filteredPredictions[optionName]
+      return { options: [{ options: inputOptions }] }
+    })
+  }
+
+  render() {
+    // eslint-disable-next-line no-shadow
+    const { onChange, searchOptions, onResultSelect, compareOptions, searchHelpText, ...props } = this.props
+    return (
+      <div>
+        {/* eslint-disable-next-line jsx-a11y/label-has-for */}
+        <label> Search for additional annotations <Popup trigger={<Icon name="question circle outline" />} content={searchHelpText} size="small" position="top center" /></label>
+        <CustomAnnotationSearch
+          results={this.state.searchResults}
+          onResultSelect={this.handleResultSelect}
+          onSearchChange={this.handleSearchChange}
+        />
+        <GridInputGroup
+          {...props}
+          options={this.state.options}
+          compareOptions={this.state.compareOptions}
+          gridGroupName={this.props.gridGroupName}
+          topSpacing
+          handleOptionDelete={this.handleOptionDelete}
+          handleOptionValueUpdate={this.handleOptionValueUpdate}
+          handleOptionOperatorUpdate={this.handleOptionOperatorUpdate}
+        />
+      </div>
+    )
+  }
+}
+
+export const CustomAnnotationSearch = styled(Search)`
+  .input + .results {
+    max-height: 210px;
+    overflow-y: scroll;
+  }
+`
 
 export class Multiselect extends React.PureComponent {
   static propTypes = {
@@ -292,6 +607,254 @@ CheckboxGroup.propTypes = {
 export const AlignedCheckboxGroup = styled(CheckboxGroup)`
   text-align: left;
 `
+
+export const CheckboxTableGroup = React.memo((props) => {
+  const { tableHeaders, tableDataContent, onRowOptionClick, tableKey, checkedOptionKeys, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, pageDataContent, dataRenderToggle, ...baseProps } = props
+  const noDataTableStyle = {
+    textAlign: 'center',
+  }
+  const selectedSortArrowStyle = {
+    fontSize: '17px',
+    paddingLeft: '20px',
+    fontWeight: '100',
+  }
+  const normalSortArrowStyle = {
+    fontSize: '17px',
+    paddingLeft: '20px',
+    fontWeight: '100',
+    color: '#D3D3D3',
+  }
+  const tableFooterStyle = {
+    background: '#f9fafb',
+  }
+  const pages = [...Array(numberOfPages).keys()]
+  const tableContent = (pageDataContent.length === 0) ? tableDataContent : pageDataContent
+
+  const isDataChecked = (content) => {
+    const filteredData = checkedOptionKeys.filter((checkedOptionKey) => {
+      return checkedOptionKey === content.join('')
+    })
+    return !((filteredData[0] === undefined || filteredData[0] === null))
+  }
+
+  const getTableContentData = (tableContentData) => {
+    if (tableContentData.length === 0) {
+      return (
+        <TableRow key="no-data-matched-row">
+          <TableCell colSpan={12} style={noDataTableStyle} >
+            No data matched!
+          </TableCell>
+        </TableRow>
+      )
+    }
+    return (tableContentData.map((content, contentIndex) => {
+      return (
+        <TableRow key={content}>
+          <TableCell key={`optionClickCell${content}`}>
+            <BaseSemanticInput
+              {...baseProps}
+              inputType="Checkbox"
+              checked={isDataChecked(content)}
+              /* eslint-disable-next-line react/no-array-index-key */
+              key={`optionClick${content}${contentIndex}`}
+              onChange={({ checked }) => {
+                if (checked) {
+                  onRowOptionClick(content, true, contentIndex)
+                } else {
+                  onRowOptionClick(content, false, contentIndex)
+                }
+              }}
+            />
+          </TableCell>
+          {content.map((contentData, contentDataIndex) => {
+            const returnedDateFormat = /^([0-9]+-?)+T([0-9]+:)+([0-9]+\.?)+$/
+            const validDate = returnedDateFormat.test(contentData)
+            if (validDate) {
+              contentData = new Date(contentData).toLocaleDateString('en-US')
+            }
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <TableCell key={`${contentData}${contentIndex}${contentDataIndex}`}>
+                {contentData}
+              </TableCell>
+            ) },
+            )}
+        </TableRow>)
+    },
+    ))
+  }
+
+
+  const pageButton = (pageIndex, buttonText = null, buttonDisabled = false) => {
+
+    let text = `${pageIndex + 1}`
+    let key = `page${pageIndex + 1}Link`
+    if (buttonText !== null) {
+      text = `${buttonText}`
+      key = `page${pageIndex + 1}Link${buttonText}`
+    }
+    const buttonClassName = buttonDisabled ? 'ui download button disabled' : 'ui download button'
+    const buttonColor = (selectedPage === pageIndex && buttonText === null) ? 'blue' : null
+    const buttonClickable = (pageIndex !== selectedPage)
+    return (
+      <Button
+        className={buttonClassName}
+        key={key}
+        onClick={() => {
+          if (buttonClickable) {
+            handlePageSelect(pageIndex)
+          }
+        }}
+        color={buttonColor}
+      > {text}
+      </Button>
+    )
+  }
+
+  const dataPages = () => {
+    const morePagesStyle = {
+      fontSize: 'x-large',
+      padding: '0px 10px',
+      marginRight: '5px',
+    }
+    if (pages.length > 5) {
+      const lastPage = pages.slice(-1)[0]
+      const secondToLastPage = pages.slice(-2)[0]
+      if (selectedPage === 0) {
+        return (
+          <div>
+            {pageButton(0, '<<', true)}
+            {pageButton(0)}
+            {pageButton(1)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(lastPage)}
+            {pageButton(1, '>>')}
+          </div>
+        )
+      }
+      else if (selectedPage === 1) {
+        return (
+          <div>
+            {pageButton(0, '<<')}
+            {pageButton(0)}
+            {pageButton(1)}
+            {pageButton(2)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(lastPage)}
+            {pageButton(2, '>>')}
+          </div>
+        )
+      }
+      else if (selectedPage === secondToLastPage) {
+        return (
+          <div>
+            {pageButton(selectedPage - 1, '<<')}
+            {pageButton(0)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(selectedPage - 1)}
+            {pageButton(selectedPage)}
+            {pageButton(lastPage)}
+            {pageButton(lastPage, '>>')}
+          </div>
+        )
+      }
+      else if (selectedPage === lastPage) {
+        return (
+          <div>
+            {pageButton(selectedPage - 1, '<<')}
+            {pageButton(0)}
+            <span style={morePagesStyle}>...</span>
+            {pageButton(selectedPage - 1)}
+            {pageButton(selectedPage)}
+            {pageButton(selectedPage, '>>', true)}
+          </div>
+        )
+      }
+      else if (pages.includes(selectedPage)) {
+        return (
+          <div>
+            {pageButton(selectedPage - 1, '<<')}
+            {pageButton(0)}
+            { selectedPage - 1 !== 1 && <span style={morePagesStyle}>...</span>}
+            {pageButton(selectedPage - 1)}
+            {pageButton(selectedPage)}
+            {pageButton(selectedPage + 1)}
+            { selectedPage + 1 !== secondToLastPage && <span style={morePagesStyle}>...</span>}
+            {pageButton(lastPage)}
+            {pageButton(selectedPage + 1, '>>')}
+          </div>
+        )
+      }
+    }
+    const previousPageButtonDisabled = selectedPage === 0 || pages.length === 0
+    const nextPageButtonDisabled = selectedPage === pages.slice(-1)[0] || pages.length === 0
+    const previousPage = (selectedPage - 1 < 0) ? 0 : selectedPage - 1
+    const nextPage = (selectedPage === pages.slice(-1)[0]) ? pages.slice(-1)[0] : selectedPage + 1
+    return (
+      <div>
+        {pageButton(previousPage, '<<', previousPageButtonDisabled)}
+        {pages.map((page) => {
+          return (
+            <span key={`page${page + 1}LinkSpan`}>
+              {pageButton(page)}
+            </span>
+          )
+        })}
+        {pageButton(nextPage, '>>', nextPageButtonDisabled)}
+      </div>
+    )
+  }
+
+  return (
+    <Table >
+      <Table.Header>
+        <Table.Row key={tableKey}>
+          <Table.HeaderCell key="clickOption">
+          </Table.HeaderCell>
+          {tableHeaders.map((header) => {
+            return (
+              <Table.HeaderCell key={header} onClick={() => { handleSort(header) }}>
+                {header}
+                {selectedHeader && selectedHeader === header &&
+                // eslint-disable-next-line jsx-a11y/label-has-for
+                <label style={selectedSortArrowStyle}>⇵</label>
+                }
+                {(!selectedHeader || selectedHeader !== header) &&
+                // eslint-disable-next-line jsx-a11y/label-has-for
+                <label style={normalSortArrowStyle}>⇵</label>
+                }
+              </Table.HeaderCell>
+            )
+          })}
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        { getTableContentData(tableContent) }
+      </Table.Body>
+      <TableFooter style={tableFooterStyle}>
+        <TableRow>
+          <TableCell colSpan={13} style={noDataTableStyle} key="pageCell">
+            {dataPages()}
+          </TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>)
+})
+
+CheckboxTableGroup.propTypes = {
+  tableHeaders: PropTypes.array,
+  tableDataContent: PropTypes.array,
+  onRowOptionClick: PropTypes.func,
+  tableKey: PropTypes.string,
+  checkedOptionKeys: PropTypes.array,
+  handleSort: PropTypes.func,
+  selectedHeader: PropTypes.string,
+  handlePageSelect: PropTypes.func,
+  numberOfPages: PropTypes.number,
+  selectedPage: PropTypes.number,
+  pageDataContent: PropTypes.array,
+  dataRenderToggle: PropTypes.bool,
+}
 
 const BaseRadioGroup = React.memo((props) => {
   const { value, options, label, onChange, margin, widths, getOptionProps, formGroupAs, ...baseProps } = props
@@ -482,4 +1045,3 @@ JsonInput.propTypes = {
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   onChange: PropTypes.func,
 }
-

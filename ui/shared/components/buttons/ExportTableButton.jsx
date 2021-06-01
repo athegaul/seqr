@@ -30,13 +30,48 @@ const EXT_CONFIG = {
     delimiter: ',',
     dataExt: 'csv',
   },
+  doc: {
+    dataType: 'doc',
+    dataExt: 'doc',
+  },
 }
 
 const escapeExportItem = item => (item.replace ? item.replace(/"/g, '\'\'') : item)
 
 const acmgCriteria = {}
+let rowsToIncludeInReport = []
+
+export const updateRowsToIncludeInReport = (newRowsToIncludeInReport) => {
+  rowsToIncludeInReport = newRowsToIncludeInReport
+}
+
 export const updateAcmgCriteriaForFileDownload = (variantId, score, criteria) => {
   acmgCriteria[variantId] = { score, criteria }
+}
+
+const docFileLinkStyle = {
+  cursor: 'pointer',
+  outline: 'none',
+}
+
+export const DocFileLink = React.memo(({ openModal, url }) => {
+  const extConfig = EXT_CONFIG.doc
+
+  if (!url.includes('?')) {
+    url += '?'
+  }
+  if (!url.endsWith('?')) {
+    url += '&'
+  }
+
+  const newUrl = `${url}file_format=doc&acmg_criteria=${btoa(JSON.stringify(acmgCriteria))}&filtered_indexes=${btoa(rowsToIncludeInReport.toString())}`
+
+  return (<a style={docFileLinkStyle} role="button" tabIndex={0} onClick={() => { openModal(newUrl) }}><span><img alt="doc" src={`/static/images/table_${extConfig.imageName || 'doc'}.png`} /> .doc</span></a>)
+})
+
+DocFileLink.propTypes = {
+  openModal: PropTypes.func,
+  url: PropTypes.string,
 }
 
 export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
@@ -64,7 +99,8 @@ export const FileLink = React.memo(({ url, data, ext, linkContent }) => {
   if (!url.endsWith('?')) {
     url += '&'
   }
-  return <a href={`${url}file_format=${ext}&acmg_criteria=${btoa(JSON.stringify(acmgCriteria))}`}>{linkContent}</a>
+
+  return <a href={`${url}file_format=${ext}&acmg_criteria=${btoa(JSON.stringify(acmgCriteria))}&filtered_indexes=${btoa(rowsToIncludeInReport.toString())}`}>{linkContent}</a>
 })
 
 FileLink.propTypes = {
@@ -74,11 +110,14 @@ FileLink.propTypes = {
   linkContent: PropTypes.node,
 }
 
-const ExportTableButton = React.memo(({ downloads, buttonText, ...buttonProps }) =>
+const style = { zIndex: '2' }
+
+const ExportTableButton = React.memo(({ downloads, buttonText, openModal, ...buttonProps }) =>
   <Popup
     trigger={
       <ButtonLink icon="download" content={buttonText || 'Download Table'} {...buttonProps} />
     }
+    style={style}
     content={
       <NoBorderTable>
         <Table.Body>
@@ -91,6 +130,9 @@ const ExportTableButton = React.memo(({ downloads, buttonText, ...buttonProps })
                   </NameCell>
                 </Table.Row>,
                 <Table.Row key={2}>
+                  <LinkCell>
+                    <DocFileLink openModal={openModal} url={url} />
+                  </LinkCell>
                   <LinkCell>
                     <FileLink url={url} data={data} ext="xls" />
                   </LinkCell>
@@ -117,6 +159,7 @@ ExportTableButton.propTypes = {
    */
   downloads: PropTypes.array.isRequired,
   buttonText: PropTypes.string,
+  openModal: PropTypes.func,
 }
 
 export default ExportTableButton

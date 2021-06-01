@@ -1,4 +1,4 @@
-import { RadioGroup, BooleanCheckbox, BaseSemanticInput } from 'shared/components/form/Inputs'
+import { RadioGroup, BooleanCheckbox, BaseSemanticInput, InlineInputGroup } from 'shared/components/form/Inputs'
 import { snakecaseToTitlecase } from 'shared/utils/stringUtils'
 import {
   VEP_GROUP_NONSENSE,
@@ -364,6 +364,165 @@ export const LOCATION_FIELDS = [
     labelHelp: 'Search for variants not in the specified genes/ intervals',
     width: 3,
   },
+]
+
+export const SEARCH_HELP_CONTENT = 'Using this search, you can find additional annotations that are relevant to you and filter the data by them'
+
+export const ANNOTATION_FILTER_OPTIONS_LIST = [
+  {
+    name: 'cadd',
+    label: 'CADD',
+    labelHelp: 'Cadd value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'revel',
+    label: 'Revel',
+    labelHelp: 'Revel value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'primate_ai',
+    label: 'Primate AI',
+    labelHelp: 'Primate AI value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'mpc',
+    label: 'MPC',
+    labelHelp: 'MPC value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'splice_ai',
+    label: 'Splice AI',
+    labelHelp: 'Splice AI value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'eigen',
+    label: 'Eigen',
+    labelHelp: 'Eigen value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'dann',
+    label: 'Dann',
+    labelHelp: 'Dann value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'strvctvre',
+    label: 'STRVCTVRE',
+    labelHelp: 'STRVCTVRE value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'polyphen',
+    label: 'Polyphen',
+    labelHelp: 'Polyphen value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'sift',
+    label: 'Sift',
+    labelHelp: 'Sift value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'mut_taster',
+    label: 'Mut Taster',
+    labelHelp: 'Mut Taster value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'fathmm',
+    label: 'FATHMM',
+    labelHelp: 'FATHMM value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'metasvm',
+    label: 'METASVM',
+    labelHelp: 'METASVM value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'gerp_rs',
+    label: 'GERP RS',
+    labelHelp: 'GERP RS value',
+    value: '',
+    operator: '',
+  },
+  {
+    name: 'phastcons_100_vert',
+    label: 'Phastcons 100 Vert',
+    labelHelp: 'Phastcons 100 Vert value',
+    value: '',
+    operator: '',
+  },
+]
+
+
+export const COMPARE_OPTIONS = [
+  {
+    key: 'Option_Less',
+    text: '<',
+    value: 'LT',
+  },
+  {
+    key: 'Option_Greater',
+    text: '>',
+    value: 'GT',
+  },
+  {
+    key: 'Option_LessEqual',
+    text: '<=',
+    value: 'LEQ',
+  },
+  {
+    key: 'Option_GreaterEqual',
+    text: '>=',
+    value: 'GEQ',
+  },
+  {
+    key: 'Option_Equal',
+    text: '=',
+    value: 'EQ',
+  },
+]
+
+
+export const ANNOTATION_FILTER_OPTION_LIST = [
+  {
+    control: InlineInputGroup,
+    options: ANNOTATION_FILTER_OPTIONS_LIST,
+  },
+]
+
+const ANNOTATION_FILTER_FIELD = {
+  name: 'annotationFilterField',
+  options: ANNOTATION_FILTER_OPTION_LIST,
+  compareOptions: COMPARE_OPTIONS,
+  searchHelpText: SEARCH_HELP_CONTENT,
+  width: 9,
+}
+
+export const ANNOTATION_FILTER_FIELDS = [
+  ANNOTATION_FILTER_FIELD,
 ]
 
 export const QUALITY_FILTER_FIELDS = [

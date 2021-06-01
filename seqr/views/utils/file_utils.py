@@ -1,3 +1,4 @@
+import datetime
 from io import TextIOWrapper
 
 import csv
@@ -63,6 +64,10 @@ def parse_file(filename, stream):
 
 def _parse_excel_string_cell(cell):
     cell_value = cell.value
+
+    if isinstance(cell_value, datetime.datetime):
+        cell_value = cell_value.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+
     if cell_value is not None and cell.data_type == 'n' and int(cell_value) == cell_value:
         cell_value = '{:.0f}'.format(cell_value)
     return cell_value or ''
