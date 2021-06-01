@@ -20,7 +20,6 @@
     clone: yes
     key_file: "{{ key_file }}"
     accept_hostkey: yes
-    version: feature/generate-reporting-word
 
 - name: Install node modules for seqr ui
   shell: >
