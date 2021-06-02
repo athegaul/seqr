@@ -1,5 +1,9 @@
 # Creating Infrastructure - AWS
 
+## Tutorial
+
+If you are not familiar with the Terraform, you can go over [Terraform Course](https://www.youtube.com/watch?v=SLB_c_ayRMo) from [https://www.freecodecamp.org/](FCC) as introduction.
+
 Prerequisites:
 
 1. Install Terraform https://www.terraform.io/downloads.html 
