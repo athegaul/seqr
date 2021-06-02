@@ -2,7 +2,7 @@
 
 ## Tutorial
 
-If you are not familiar with the Terraform, you can go over [Terraform Course](https://www.youtube.com/watch?v=SLB_c_ayRMo) from [https://www.freecodecamp.org/](FCC) as introduction.
+If you are not familiar with the Terraform, you can go over [Terraform Course](https://www.youtube.com/watch?v=SLB_c_ayRMo) from [FCC](https://www.freecodecamp.org/) as introduction.
 
 Prerequisites:
 
