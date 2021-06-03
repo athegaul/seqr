@@ -23,7 +23,7 @@ regions = us-east-1
 
 **Note:** dev and prod will have same credentials
 
-If you dont't know where to create AWS credentials follow [AWS Guide](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-your-credentials.html)
+If you dont't know how to create AWS credentials follow [AWS Guide](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-your-credentials.html)
 
 After installing Terraform and creating credentials file it is time to create infrastructure on AWS. 
 
