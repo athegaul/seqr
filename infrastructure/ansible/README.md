@@ -46,4 +46,9 @@ ansible-playbook node-startup.yml
 ansible-playbook seqr-startup.yml
 ```
 
+Once seqr-startup is completed you will have to create admin user. Connect to the server, navigate to seqr repository and run the following command:
+```
+python manage.py createsuperuser
+```
+
 From here you can follow [local install](https://github.com/broadinstitute/seqr/blob/master/deploy/LOCAL_INSTALL.md) guide for pipeline-runner.
