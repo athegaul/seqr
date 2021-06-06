@@ -2,16 +2,19 @@
   shell: fuser -k {{ seqr_ui_port }}/tcp
   ignore_errors: yes
   become: true
+  tags: deploy
 
 - name: Stop seqr if running
   shell: fuser -k {{ seqr_port }}/tcp
   ignore_errors: yes
   become: true
+  tags: deploy
 
 - name: Remove repository athegaul/seqr
   file:
     path: "{{ repo_dest }}/seqr"
     state: absent
+  tags: deploy
 
 - name: Clone repository athegaul/seqr
   git:
@@ -20,6 +23,7 @@
     clone: yes
     key_file: "{{ key_file }}"
     accept_hostkey: yes
+  tags: deploy
 
 - name: Install node modules for seqr ui
   shell: >
@@ -29,6 +33,7 @@
     chdir: "{{ repo_dest }}/seqr/ui"
   ignore_errors: yes
   become: true
+  tags: deploy
 
 - name: Build seqr ui
   shell: >
@@ -38,24 +43,28 @@
     chdir: "{{ repo_dest }}/seqr/ui"
   ignore_errors: yes
   become: true
+  tags: deploy
 
 - name: Install psycopg2 for Python3
   apt:
     name: python3-psycopg2
     state: latest
     update_cache: yes
+  tags: deploy
 
 - name: Install requirements.txt
   command:
     chdir: "{{ repo_dest }}/seqr"
     cmd: pip3 install -r requirements.txt
   become: false
+  tags: deploy
 
 - name: Install requirements-dev.txt
   command:
     chdir: "{{ repo_dest }}/seqr"
     cmd: pip3 install -r requirements-dev.txt
   become: false
+  tags: deploy
 
 - name: Add POSTGRES_USERNAME variable
   lineinfile:
@@ -63,6 +72,7 @@
     line: "export POSTGRES_USERNAME={{ postgres_username }}"
     insertafter: "EOF"
     state: present
+  tags: deploy
 
 - name: Add POSTGRES_PASSWORD variable
   lineinfile:
@@ -70,6 +80,7 @@
     line: "export POSTGRES_PASSWORD={{ postgres_password }}"
     insertafter: "EOF"
     state: present
+  tags: deploy
 
 - name: Add AWS_ACCESS_KEY_ID variable
   lineinfile:
@@ -77,6 +88,7 @@
     line: "export AWS_ACCESS_KEY_ID={{ aws_access_key }}"
     insertafter: "EOF"
     state: present
+  tags: deploy
 
 - name: Add AWS_SECRET_ACCESS_KEY variable
   lineinfile:
@@ -84,6 +96,7 @@
     line: "export AWS_SECRET_ACCESS_KEY={{ aws_secret_access }}"
     insertafter: "EOF"
     state: present
+  tags: deploy
 
 - name: Add AWS_DEFAULT_REGION variable
   lineinfile:
@@ -91,6 +104,7 @@
     line: "export AWS_DEFAULT_REGION={{ aws_default_region }}"
     insertafter: "EOF"
     state: present
+  tags: deploy
 
 - name: Set environment variables into temp file
   shell: env > /opt/.ansible_env_file
@@ -101,6 +115,7 @@
    - AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access }}"
    - AWS_DEFAULT_REGION: "{{ aws_default_region }}"
   become: true
+  tags: deploy
 
 - name: "Start seqr-ui at port {{ seqr_ui_port }}"
   shell: >
@@ -111,6 +126,7 @@
   async: 10
   poll: 0
   become: true
+  tags: deploy
 
 - name: "Start seqr server at port {{ seqr_port }}"
   shell: nohup python3 -m manage runserver 0.0.0.0:8000 &
@@ -123,3 +139,26 @@
    - AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access }}"
    - AWS_DEFAULT_REGION: "{{ aws_default_region }}"
   become: false
+  tags: deploy
+
+- name: "Update gene-level reference datasets"
+  become: true
+  shell: |
+    docker container exec postgres2 psql -U seqr seqrdb -c "create database reference_data_db"
+    docker container exec postgres2 wget -N https://storage.googleapis.com/seqr-reference-data/gene_reference_data_backup.gz -O gene_reference_data_backup.gz
+    docker container exec postgres2 bash -c "gunzip -c gene_reference_data_backup.gz | psql -U seqr reference_data_db"
+  tags: migration
+
+- name: "Run migrations"
+  args:
+    chdir: "{{ repo_dest }}/seqr"
+  environment:
+   - POSTGRES_USERNAME: "{{ postgres_username }}"
+   - POSTGRES_PASSWORD: "{{ postgres_password }}"
+  shell: |
+    python3 -m manage migrate 
+    python3 -m manage loaddata variant_tag_types
+    python3 -m manage loaddata variant_searches
+    python3 -m manage reload_saved_variant_json
+  tags: migration
+  
