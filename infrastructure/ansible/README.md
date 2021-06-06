@@ -41,8 +41,8 @@ Before you run postgres-container, make sure you have set the postgres username,
 ansible-playbook postgres-container.yml
 ansible-playbook startup-script.yml
 ansible-playbook node.yml
-ansible-playbook deploy.yml --tags "migration"
-ansible-playbook deploy.yml --tags "deploy"
+ansible-playbook deploy.yml --tags migration
+ansible-playbook deploy.yml --tags deploy
 ansible-playbook node-startup.yml
 ansible-playbook seqr-startup.yml
 ```
