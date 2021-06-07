@@ -33,12 +33,23 @@ ansible-playbook docker.yml
 ansible-playbook elasticsearch-container.yml
 ansible-playbook kibana-container.yml
 ansible-playbook pipeline-runner.yml
+```
+
+Before you run postgres-container, make sure you have set the postgres username, password, aws secret and access key in the [/roles/deploy/vars/main.yml](https://github.com/athegaul/seqr/blob/master/infrastructure/ansible/roles/deploy/vars/main.yml) file
+
+```
 ansible-playbook postgres-container.yml
 ansible-playbook startup-script.yml
 ansible-playbook node.yml
-ansible-playbook deploy.yml
+ansible-playbook deploy.yml --tags migration
+ansible-playbook deploy.yml --tags deploy
 ansible-playbook node-startup.yml
 ansible-playbook seqr-startup.yml
+```
+
+Once seqr-startup is completed you will have to create admin user. Connect to the server, navigate to seqr repository and run the following command:
+```
+python manage.py createsuperuser
 ```
 
 From here you can follow [local install](https://github.com/broadinstitute/seqr/blob/master/deploy/LOCAL_INSTALL.md) guide for pipeline-runner.
