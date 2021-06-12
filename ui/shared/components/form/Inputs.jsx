@@ -128,6 +128,10 @@ const updateFilterPredictionValue = (prediction, value) => {
   } else {
     filteredPredictions[prediction].value = value
   }
+
+  if (value === '' && (filteredPredictions[prediction].operator === undefined || filteredPredictions[prediction].operator === null)) {
+    delete filteredPredictions[prediction]
+  }
 }
 
 const updateFilterPredictionOperator = (prediction, operator) => {
@@ -136,6 +140,11 @@ const updateFilterPredictionOperator = (prediction, operator) => {
   } else {
     filteredPredictions[prediction].operator = operator
   }
+
+  if (operator === null) {
+    delete filteredPredictions[prediction]
+  }
+
 }
 
 export const InputGroup = React.memo((props) => {
@@ -353,14 +362,14 @@ export class SearchAnnotations extends React.PureComponent {
       const newOptions = [...previousOptions]
       const optionResult = newOptions.filter((option) => { return option.name === result.title })
       if (optionResult.length === 0) {
-        const hello = {
+        const newOption = {
           name: result.title.toLowerCase(),
           label: result.title,
           isDefault: false,
           value: '',
           operator: '',
         }
-        newOptions.push(hello)
+        newOptions.push(newOption)
       }
       return { options: [{ options: newOptions }] }
     })
@@ -609,7 +618,7 @@ export const AlignedCheckboxGroup = styled(CheckboxGroup)`
 `
 
 export const CheckboxTableGroup = React.memo((props) => {
-  const { tableHeaders, tableDataContent, onRowOptionClick, tableKey, checkedOptionKeys, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, pageDataContent, dataRenderToggle, ...baseProps } = props
+  const { tableHeaders, tableDataContent, tableEmptyMessage, onRowOptionClick, tableKey, checkedOptionKeys, handleSort, selectedHeader, handlePageSelect, numberOfPages, selectedPage, pageDataContent, dataRenderToggle, ...baseProps } = props
   const noDataTableStyle = {
     textAlign: 'center',
   }
@@ -642,7 +651,7 @@ export const CheckboxTableGroup = React.memo((props) => {
       return (
         <TableRow key="no-data-matched-row">
           <TableCell colSpan={12} style={noDataTableStyle} >
-            No data matched!
+            {(tableEmptyMessage !== undefined) ? tableEmptyMessage : 'No data!' }
           </TableCell>
         </TableRow>
       )
@@ -844,6 +853,7 @@ export const CheckboxTableGroup = React.memo((props) => {
 CheckboxTableGroup.propTypes = {
   tableHeaders: PropTypes.array,
   tableDataContent: PropTypes.array,
+  tableEmptyMessage: PropTypes.string,
   onRowOptionClick: PropTypes.func,
   tableKey: PropTypes.string,
   checkedOptionKeys: PropTypes.array,

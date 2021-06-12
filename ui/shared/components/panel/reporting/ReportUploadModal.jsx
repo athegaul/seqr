@@ -162,6 +162,9 @@ class ReportUploadModal extends React.PureComponent {
         <SearchableTable
           tableHeaders={this.state.affectedIndividualsDataHeaders}
           tableContent={this.props.affectedIndividuals}
+          tableEmptyMessage="There are no affected individuals for the current search"
+          searchFieldLabel="Search affected individuals data"
+          searchFieldHelpText="By using the search field bellow you can search for desired affected patients by their attributes"
           rowsPerPage={this.state.rowsPerPage}
           setSelectedAffectedPatient={this.setSelectedAffectedIndividual}
           displaySearch
@@ -195,6 +198,8 @@ class ReportUploadModal extends React.PureComponent {
         <SearchableTable
           tableHeaders={this.state.fileDataHeaders}
           tableContent={this.state.filteredFileDataContent}
+          searchFieldLabel="Search uploaded data"
+          searchFieldHelpText="By using the search field bellow you can search for desired rows from uploaded file by their attributes"
           rowsPerPage={this.state.rowsPerPage}
           getLinkData={this.getLinkValue}
           displaySearch
@@ -214,7 +219,7 @@ class ReportUploadModal extends React.PureComponent {
     const errorMessageContent = `It seems that the uploaded file is missing some required headers. Please review the file and upload it again. ${this.state.missingXLSTableHeadersMessage}`
     const buttonClassName = !displayGenerateButton ? 'ui primary button' : 'ui primary button disabled'
     const xlsButtonClassName = 'ui download button'
-    const xlsFileDownloadLink = ''
+    const xlsFileDownloadLink = 'http://diagnostic-report-templates.s3.amazonaws.com/XLSX_file_template.xlsx'
     const modalPanes = [
       { menuItem: 'Affected Patients', render: () => this.getAffectedPatientsTab() },
       { menuItem: 'Upload Excel File', render: () => this.getUploadExcelFileTab(errorMessageStyle, errorMessageContent) },

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { BaseSemanticInput, CheckboxTableGroup } from '../form/Inputs'
 import { WORD_REPORT_EXCEL_GENERATION_QUERY_VARIABLES } from '../../utils/constants'
 import { VerticalSpacer } from '../Spacers'
+import { helpLabel } from '../form/ReduxFormWrapper'
 
 class SearchableTable extends React.PureComponent {
   static propTypes = {
@@ -11,6 +12,9 @@ class SearchableTable extends React.PureComponent {
     // eslint-disable-next-line react/no-unused-prop-types
     tableContent: PropTypes.array,
     rowsPerPage: PropTypes.number,
+    tableEmptyMessage: PropTypes.string,
+    searchFieldLabel: PropTypes.string,
+    searchFieldHelpText: PropTypes.string,
     getLinkData: PropTypes.func,
     displaySearch: PropTypes.bool,
     tableKey: PropTypes.string,
@@ -126,6 +130,9 @@ class SearchableTable extends React.PureComponent {
     if (tableSearchValue !== null) {
       dataToPaginate = SearchableTable.doSearch(tableSearchValue, this.props.tableContent, this.props.tableHeaders, selectedTableHeader, selectedAscSortTableToggle).filteredAndSortedTableDataContent
     }
+    if (selectedTableHeader !== null && tableSearchValue === null) {
+      dataToPaginate = SearchableTable.sortDataByHeader(selectedTableHeader, this.props.tableHeaders, this.props.tableContent, selectedAscSortTableToggle, false)
+    }
     return dataToPaginate
   }
 
@@ -172,6 +179,7 @@ class SearchableTable extends React.PureComponent {
     const displayNameIndex = this.props.tableHeaders.indexOf('Display Name')
     const patientIndex = this.props.tableHeaders.indexOf('Index')
     const individualIdIndex = this.props.tableHeaders.indexOf('Individual ID')
+
     if (this.props.setSelectedAffectedPatient !== undefined) {
       this.props.setSelectedAffectedPatient(rowContent[displayNameIndex])
       this.props.handleAffectedPatientSelect(rowContent[displayNameIndex])
@@ -352,7 +360,7 @@ class SearchableTable extends React.PureComponent {
         {this.props.displaySearch &&
         <div style={tableDataSearchStyle}>
           {/* eslint-disable-next-line jsx-a11y/label-has-for */}
-          <label> Search uploaded data: </label>
+          <label> {helpLabel(`${this.props.searchFieldLabel}:`, this.props.searchFieldHelpText)} </label>
           <BaseSemanticInput
             inputType="Input"
             onChange={(searchVal) => {
@@ -368,6 +376,7 @@ class SearchableTable extends React.PureComponent {
           <CheckboxTableGroup
             tableHeaders={this.props.tableHeaders}
             tableDataContent={this.state.filteredTableDataContent}
+            tableEmptyMessage={this.props.tableEmptyMessage}
             checkedOptionKeys={this.state.checkedTableOptionKeys}
             onRowOptionClick={this.handleRowOptionClick}
             tableKey={this.props.tableKey}
