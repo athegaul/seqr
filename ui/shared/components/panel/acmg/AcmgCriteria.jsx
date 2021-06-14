@@ -113,26 +113,7 @@ const AcmgCriteria = (props) => {
               </Table>
             </Table.Cell>
             <Table.Cell></Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="green">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>PM2_P</Table.Cell>
-                    <Table.Cell width={2}>Low AF in pop db</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.PM2_Supporting ? 'Y' : ''}
-                        key="dropdown1"
-                        placeholder="N"
-                        options={dropDownOptions[1]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.PM2_Supporting ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
+            <Table.Cell></Table.Cell>
             <Table.Cell>
               <Table size="small" color="orange">
                 <Table.Body>
@@ -142,9 +123,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM2 ? 'Y' : ''}
-                        key="dropdown2"
+                        key="dropdown1"
                         placeholder="N"
-                        options={dropDownOptions[2]}
+                        options={dropDownOptions[1]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM2 ? 'Y' : ''}
                       />
@@ -163,13 +144,13 @@ const AcmgCriteria = (props) => {
                 <Table.Body>
                   <Table.Row textAlign="center">
                     <Table.Cell width={1}>BS1</Table.Cell>
-                    <Table.Cell width={2}>MAF too high<br />(Stand Alone)</Table.Cell>
+                    <Table.Cell width={2}>MAF too high</Table.Cell>
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BS1 ? 'Y' : ''}
-                        key="dropdown3"
+                        key="dropdown2"
                         placeholder="N"
-                        options={dropDownOptions[3]}
+                        options={dropDownOptions[2]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BS1 ? 'Y' : ''}
                       />
@@ -178,26 +159,7 @@ const AcmgCriteria = (props) => {
                 </Table.Body>
               </Table>
             </Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="blue">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>BS1_P</Table.Cell>
-                    <Table.Cell width={2}>MAF too high<br />(Supporting)</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.BS1_Supporting ? 'Y' : ''}
-                        key="dropdown4"
-                        placeholder="N"
-                        options={dropDownOptions[4]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.BS1_Supporting ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
+            <Table.Cell></Table.Cell>
             <Table.Cell>
               <Table size="small" color="green">
                 <Table.Body>
@@ -207,9 +169,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS4_Supporting ? 'Y' : ''}
-                        key="dropdown5"
+                        key="dropdown3"
                         placeholder="N"
-                        options={dropDownOptions[5]}
+                        options={dropDownOptions[3]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS4_Supporting ? 'Y' : ''}
                       />
@@ -227,9 +189,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS4_Moderate ? 'Y' : ''}
-                        key="dropdown6"
+                        key="dropdown4"
                         placeholder="N"
-                        options={dropDownOptions[6]}
+                        options={dropDownOptions[4]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS4_Moderate ? 'Y' : ''}
                       />
@@ -247,9 +209,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS4 ? 'Y' : ''}
-                        key="dropdown7"
+                        key="dropdown5"
                         placeholder="N"
-                        options={dropDownOptions[7]}
+                        options={dropDownOptions[5]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS4 ? 'Y' : ''}
                       />
@@ -267,13 +229,13 @@ const AcmgCriteria = (props) => {
                 <Table.Body>
                   <Table.Row textAlign="center">
                     <Table.Cell width={1}>BS2</Table.Cell>
-                    <Table.Cell width={2}>MAF too high<br />(Stand Alone)</Table.Cell>
+                    <Table.Cell width={2}>Observ in unaffected</Table.Cell>
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BS2 ? 'Y' : ''}
-                        key="dropdown8"
+                        key="dropdown6"
                         placeholder="N"
-                        options={dropDownOptions[8]}
+                        options={dropDownOptions[6]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BS2 ? 'Y' : ''}
                       />
@@ -301,9 +263,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BP1 ? 'Y' : ''}
-                        key="dropdown9"
+                        key="dropdown7"
                         placeholder="N"
-                        options={dropDownOptions[9]}
+                        options={dropDownOptions[7]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BP1 ? 'Y' : ''}
                       />
@@ -323,9 +285,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS1 ? 'Y' : ''}
-                        key="dropdown10"
+                        key="dropdown8"
                         placeholder="N"
-                        options={dropDownOptions[10]}
+                        options={dropDownOptions[8]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS1 ? 'Y' : ''}
                       />
@@ -348,9 +310,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BP3 ? 'Y' : ''}
-                        key="dropdown11"
+                        key="dropdown9"
                         placeholder="N"
-                        options={dropDownOptions[11]}
+                        options={dropDownOptions[9]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BP3 ? 'Y' : ''}
                       />
@@ -369,9 +331,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM5 ? 'Y' : ''}
-                        key="dropdown12"
+                        key="dropdown10"
                         placeholder="N"
-                        options={dropDownOptions[12]}
+                        options={dropDownOptions[10]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM5 ? 'Y' : ''}
                       />
@@ -389,9 +351,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM5_Strong ? 'Y' : ''}
-                        key="dropdown13"
+                        key="dropdown11"
                         placeholder="N"
-                        options={dropDownOptions[13]}
+                        options={dropDownOptions[11]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM5_Strong ? 'Y' : ''}
                       />
@@ -404,26 +366,7 @@ const AcmgCriteria = (props) => {
           </Table.Row>
 
           <Table.Row>
-            <Table.Cell>
-              <Table size="small" color="pink">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>BP4_S</Table.Cell>
-                    <Table.Cell width={2}>Variant AA found<br />{'in >=3 mammals'}</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.BP4_Strong ? 'Y' : ''}
-                        key="dropdown14"
-                        placeholder="N"
-                        options={dropDownOptions[14]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.BP4_Strong ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
+            <Table.Cell></Table.Cell>
             <Table.Cell>
               <Table size="small" color="blue">
                 <Table.Body>
@@ -433,9 +376,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BP4 ? 'Y' : ''}
-                        key="dropdown15"
+                        key="dropdown12"
                         placeholder="N"
-                        options={dropDownOptions[15]}
+                        options={dropDownOptions[12]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BP4 ? 'Y' : ''}
                       />
@@ -453,9 +396,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PP3 ? 'Y' : ''}
-                        key="dropdown16"
+                        key="dropdown13"
                         placeholder="N"
-                        options={dropDownOptions[16]}
+                        options={dropDownOptions[13]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PP3 ? 'Y' : ''}
                       />
@@ -473,9 +416,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PVS1_Moderate ? 'Y' : ''}
-                        key="dropdown17"
+                        key="dropdown14"
                         placeholder="N"
-                        options={dropDownOptions[17]}
+                        options={dropDownOptions[14]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PVS1_Moderate ? 'Y' : ''}
                       />
@@ -493,9 +436,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PVS1_Strong ? 'Y' : ''}
-                        key="dropdown18"
+                        key="dropdown15"
                         placeholder="N"
-                        options={dropDownOptions[18]}
+                        options={dropDownOptions[15]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PVS1_Strong ? 'Y' : ''}
                       />
@@ -513,9 +456,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PVS1 ? 'Y' : ''}
-                        key="dropdown19"
+                        key="dropdown16"
                         placeholder="N"
-                        options={dropDownOptions[19]}
+                        options={dropDownOptions[16]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PVS1 ? 'Y' : ''}
                       />
@@ -537,9 +480,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BP7 ? 'Y' : ''}
-                        key="dropdown20"
+                        key="dropdown17"
                         placeholder="N"
-                        options={dropDownOptions[20]}
+                        options={dropDownOptions[17]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BP7 ? 'Y' : ''}
                       />
@@ -548,26 +491,7 @@ const AcmgCriteria = (props) => {
                 </Table.Body>
               </Table>
             </Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="green">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>PM4_S</Table.Cell>
-                    <Table.Cell width={2}>In-frame indel of 1-2<br />AA</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.PM4_Supporting ? 'Y' : ''}
-                        key="dropdown21"
-                        placeholder="N"
-                        options={dropDownOptions[21]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.PM4_Supporting ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
+            <Table.Cell></Table.Cell>
             <Table.Cell>
               <Table size="small" color="orange">
                 <Table.Body>
@@ -577,9 +501,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM4 ? 'Y' : ''}
-                        key="dropdown22"
+                        key="dropdown18"
                         placeholder="N"
-                        options={dropDownOptions[22]}
+                        options={dropDownOptions[18]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM4 ? 'Y' : ''}
                       />
@@ -605,9 +529,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PP2 ? 'Y' : ''}
-                        key="dropdown23"
+                        key="dropdown19"
                         placeholder="N"
-                        options={dropDownOptions[23]}
+                        options={dropDownOptions[19]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PP2 ? 'Y' : ''}
                       />
@@ -625,9 +549,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM1 ? 'Y' : ''}
-                        key="dropdown24"
+                        key="dropdown20"
                         placeholder="N"
-                        options={dropDownOptions[24]}
+                        options={dropDownOptions[20]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM1 ? 'Y' : ''}
                       />
@@ -649,9 +573,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BS3 ? 'Y' : ''}
-                        key="dropdown25"
+                        key="dropdown21"
                         placeholder="N"
-                        options={dropDownOptions[25]}
+                        options={dropDownOptions[21]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BS3 ? 'Y' : ''}
                       />
@@ -670,9 +594,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS3_Supporting ? 'Y' : ''}
-                        key="dropdown26"
+                        key="dropdown22"
                         placeholder="N"
-                        options={dropDownOptions[26]}
+                        options={dropDownOptions[22]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS3_Supporting ? 'Y' : ''}
                       />
@@ -690,9 +614,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS3_Moderate ? 'Y' : ''}
-                        key="dropdown27"
+                        key="dropdown23"
                         placeholder="N"
-                        options={dropDownOptions[27]}
+                        options={dropDownOptions[23]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS3_Moderate ? 'Y' : ''}
                       />
@@ -710,9 +634,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS3 ? 'Y' : ''}
-                        key="dropdown28"
+                        key="dropdown24"
                         placeholder="N"
-                        options={dropDownOptions[28]}
+                        options={dropDownOptions[24]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS3 ? 'Y' : ''}
                       />
@@ -735,9 +659,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BS4 ? 'Y' : ''}
-                        key="dropdown29"
+                        key="dropdown25"
                         placeholder="N"
-                        options={dropDownOptions[29]}
+                        options={dropDownOptions[25]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BS4 ? 'Y' : ''}
                       />
@@ -756,9 +680,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PP1 ? 'Y' : ''}
-                        key="dropdown30"
+                        key="dropdown26"
                         placeholder="N"
-                        options={dropDownOptions[30]}
+                        options={dropDownOptions[26]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PP1 ? 'Y' : ''}
                       />
@@ -776,9 +700,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PP1_Moderate ? 'Y' : ''}
-                        key="dropdown31"
+                        key="dropdown27"
                         placeholder="N"
-                        options={dropDownOptions[31]}
+                        options={dropDownOptions[27]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PP1_Moderate ? 'Y' : ''}
                       />
@@ -796,9 +720,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PP1_Strong ? 'Y' : ''}
-                        key="dropdown32"
+                        key="dropdown28"
                         placeholder="N"
-                        options={dropDownOptions[32]}
+                        options={dropDownOptions[28]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PP1_Strong ? 'Y' : ''}
                       />
@@ -824,9 +748,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM6 ? 'Y' : ''}
-                        key="dropdown33"
+                        key="dropdown29"
                         placeholder="N"
-                        options={dropDownOptions[33]}
+                        options={dropDownOptions[29]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM6 ? 'Y' : ''}
                       />
@@ -844,9 +768,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM6_Strong ? 'Y' : ''}
-                        key="dropdown34"
+                        key="dropdown30"
                         placeholder="N"
-                        options={dropDownOptions[34]}
+                        options={dropDownOptions[30]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM6_Strong ? 'Y' : ''}
                       />
@@ -872,9 +796,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS2 ? 'Y' : ''}
-                        key="dropdown35"
+                        key="dropdown31"
                         placeholder="N"
-                        options={dropDownOptions[35]}
+                        options={dropDownOptions[31]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS2 ? 'Y' : ''}
                       />
@@ -892,9 +816,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PS2_VeryStrong ? 'Y' : ''}
-                        key="dropdown36"
+                        key="dropdown32"
                         placeholder="N"
-                        options={dropDownOptions[36]}
+                        options={dropDownOptions[32]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PS2_VeryStrong ? 'Y' : ''}
                       />
@@ -917,9 +841,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BP2 ? 'Y' : ''}
-                        key="dropdown37"
+                        key="dropdown33"
                         placeholder="N"
-                        options={dropDownOptions[37]}
+                        options={dropDownOptions[33]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BP2 ? 'Y' : ''}
                       />
@@ -928,26 +852,7 @@ const AcmgCriteria = (props) => {
                 </Table.Body>
               </Table>
             </Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="green">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>PM3_P</Table.Cell>
-                    <Table.Cell width={2}>Variant in trans does<br />not meet LP/P criteria</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.PM3_Supporting ? 'Y' : ''}
-                        key="dropdown38"
-                        placeholder="N"
-                        options={dropDownOptions[38]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.PM3_Supporting ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
+            <Table.Cell></Table.Cell>
             <Table.Cell>
               <Table size="small" color="orange">
                 <Table.Body>
@@ -957,9 +862,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM3 ? 'Y' : ''}
-                        key="dropdown39"
+                        key="dropdown34"
                         placeholder="N"
-                        options={dropDownOptions[39]}
+                        options={dropDownOptions[34]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM3 ? 'Y' : ''}
                       />
@@ -977,9 +882,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM3_Strong ? 'Y' : ''}
-                        key="dropdown40"
+                        key="dropdown35"
                         placeholder="N"
-                        options={dropDownOptions[40]}
+                        options={dropDownOptions[35]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM3_Strong ? 'Y' : ''}
                       />
@@ -997,9 +902,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PM3_VeryStrong ? 'Y' : ''}
-                        key="dropdown41"
+                        key="dropdown36"
                         placeholder="N"
-                        options={dropDownOptions[41]}
+                        options={dropDownOptions[36]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PM3_VeryStrong ? 'Y' : ''}
                       />
@@ -1008,6 +913,54 @@ const AcmgCriteria = (props) => {
                 </Table.Body>
               </Table>
             </Table.Cell>
+          </Table.Row>
+
+          <Table.Row>
+            <Table.Cell><span style={fontStyleWritingMode}>Other</span></Table.Cell>
+            <Table.Cell></Table.Cell>
+            <Table.Cell>
+              <Table size="small" color="blue">
+                <Table.Body>
+                  <Table.Row textAlign="center">
+                    <Table.Cell width={1}>BP6</Table.Cell>
+                    <Table.Cell width={2}>ClinVar expert panel = <br />benign</Table.Cell>
+                    <Table.Cell width={1}>
+                      <Dropdown
+                        value={criteriaUsed.BP6 ? 'Y' : ''}
+                        key="dropdown37"
+                        placeholder="N"
+                        options={dropDownOptions[37]}
+                        onChange={addOrRemoveCriteria}
+                        text={criteriaUsed.BP6 ? 'Y' : ''}
+                      />
+                    </Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table>
+            </Table.Cell>
+            <Table.Cell>
+              <Table size="small" color="green">
+                <Table.Body>
+                  <Table.Row textAlign="center">
+                    <Table.Cell width={1}>PP5</Table.Cell>
+                    <Table.Cell width={2}>ClinVar expert panel<br />pathogenic</Table.Cell>
+                    <Table.Cell width={1}>
+                      <Dropdown
+                        value={criteriaUsed.PP5 ? 'Y' : ''}
+                        key="dropdown38"
+                        placeholder="N"
+                        options={dropDownOptions[38]}
+                        onChange={addOrRemoveCriteria}
+                        text={criteriaUsed.PP5 ? 'Y' : ''}
+                      />
+                    </Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table>
+            </Table.Cell>
+            <Table.Cell></Table.Cell>
+            <Table.Cell></Table.Cell>
+            <Table.Cell></Table.Cell>
           </Table.Row>
 
           <Table.Row>
@@ -1022,9 +975,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.BP5 ? 'Y' : ''}
-                        key="dropdown42"
+                        key="dropdown39"
                         placeholder="N"
-                        options={dropDownOptions[42]}
+                        options={dropDownOptions[39]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.BP5 ? 'Y' : ''}
                       />
@@ -1042,9 +995,9 @@ const AcmgCriteria = (props) => {
                     <Table.Cell width={1}>
                       <Dropdown
                         value={criteriaUsed.PP4 ? 'Y' : ''}
-                        key="dropdown43"
+                        key="dropdown40"
                         placeholder="N"
-                        options={dropDownOptions[43]}
+                        options={dropDownOptions[40]}
                         onChange={addOrRemoveCriteria}
                         text={criteriaUsed.PP4 ? 'Y' : ''}
                       />

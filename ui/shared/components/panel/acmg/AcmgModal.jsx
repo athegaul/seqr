@@ -55,7 +55,7 @@ const isLikelyPath = (acmgCalculationValue) => {
 }
 
 const isLikelyBenign = (acmgCalculationValue) => {
-  if (acmgCalculationValue.BP >= 2 || acmgCalculationValue.BS >= 1) {
+  if (acmgCalculationValue.BP >= 2 || (acmgCalculationValue.BS >= 1 && acmgCalculationValue.BP >= 1)) {
     return 'Yes'
   }
   return 'No'
