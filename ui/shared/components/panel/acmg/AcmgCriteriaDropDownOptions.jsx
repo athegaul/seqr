@@ -13,18 +13,6 @@ export default [
   ],
   [
     {
-      key: 'PP_PM2-P-Supporting_Yes',
-      text: 'Y',
-      value: 'PP_PM2-P-Supporting_Yes',
-    },
-    {
-      key: 'PP_PM2-P-Supporting_No',
-      text: 'N',
-      value: 'PP_PM2-P-Supporting_No',
-    },
-  ],
-  [
-    {
       key: 'PM_PM2_Yes',
       text: 'Y',
       value: 'PM_PM2_Yes',
@@ -45,18 +33,6 @@ export default [
       key: 'BS_BS1_No',
       text: 'N',
       value: 'BS_BS1_No',
-    },
-  ],
-  [
-    {
-      key: 'BP_BS1-P-Supporting_Yes',
-      text: 'Y',
-      value: 'BP_BS1-P-Supporting_Yes',
-    },
-    {
-      key: 'BP_BS1-P-Supporting_No',
-      text: 'N',
-      value: 'BP_BS1-P-Supporting_No',
     },
   ],
   [
@@ -169,18 +145,6 @@ export default [
   ],
   [
     {
-      key: 'BS_BP4-S-Strong_Yes',
-      text: 'Y',
-      value: 'BS_BP4-S-Strong_Yes',
-    },
-    {
-      key: 'BS_BP4-S-Strong_No',
-      text: 'N',
-      value: 'BS_BP4-S-Strong_No',
-    },
-  ],
-  [
-    {
       key: 'BP_BP4_Yes',
       text: 'Y',
       value: 'BP_BP4_Yes',
@@ -249,18 +213,6 @@ export default [
       key: 'BP_BP7_No',
       text: 'N',
       value: 'BP_BP7_No',
-    },
-  ],
-  [
-    {
-      key: 'PP_PM4-S-Supporting_Yes',
-      text: 'Y',
-      value: 'PP_PM4-S-Supporting_Yes',
-    },
-    {
-      key: 'PP_PM4-S-Supporting_No',
-      text: 'N',
-      value: 'PP_PM4-S-Supporting_No',
     },
   ],
   [
@@ -457,18 +409,6 @@ export default [
   ],
   [
     {
-      key: 'PP_PM3-P-Supporting_Yes',
-      text: 'Y',
-      value: 'PP_PM3-P-Supporting_Yes',
-    },
-    {
-      key: 'PP_PM3-P-Supporting_No',
-      text: 'N',
-      value: 'PP_PM3-P-Supporting_No',
-    },
-  ],
-  [
-    {
       key: 'PM_PM3_Yes',
       text: 'Y',
       value: 'PM_PM3_Yes',
@@ -501,6 +441,30 @@ export default [
       key: 'PVS_PM3-VS-VeryStrong_No',
       text: 'N',
       value: 'PVS_PM3-VS-VeryStrong_No',
+    },
+  ],
+  [
+    {
+      key: 'BP_BP6_Yes',
+      text: 'Y',
+      value: 'BP_BP6_Yes',
+    },
+    {
+      key: 'BP_BP6_No',
+      text: 'N',
+      value: 'BP_BP6_No',
+    },
+  ],
+  [
+    {
+      key: 'PP_PP5_Yes',
+      text: 'Y',
+      value: 'PP_PP5_Yes',
+    },
+    {
+      key: 'PP_PP5_No',
+      text: 'N',
+      value: 'PP_PP5_No',
     },
   ],
   [
