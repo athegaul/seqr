@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Divider, Grid, Message, Tab } from 'semantic-ui-react'
+import { Divider, Grid, Message, Tab, Header, Image } from 'semantic-ui-react'
 import { reduxForm } from 'redux-form'
 import { connect } from 'react-redux'
 
@@ -211,6 +211,32 @@ class ReportUploadModal extends React.PureComponent {
     )
   }
 
+  howToTab = () => {
+    return (
+      <Tab.Pane>
+        <Header as="h1">Overview</Header>
+
+        <p>Generating a report is based around two tabs, Affected Patients and Upload Excel file.</p>
+
+        <Header as="h2">Affected Patients</Header>
+        <p>The Affected Patients tab represents all affected patients that are shown on the current page of found variants. These are either circles or squares that are filled with solid gray color.</p>
+        <Image src="/static/images/how-to/generate-report/affected-patients.png" size="massive" />
+
+        <Header as="h2">Upload Excel File</Header>
+        <p>Uplaod Excel File tab allows you to upload on the UI side additional patients information such as YOB, Sex, CRGD Accession ID, Test Codes, and similar. These are located at the top of the header docx file.</p>
+        <Image src="/static/images/how-to/generate-report/upload-excel-file.png" size="massive" />
+
+        <p>This excel file contains mapping that are mentioned above for each patient</p>
+        <Image src="/static/images/how-to/generate-report/excel-file-content.png" size="massive" />
+
+        <Header as="h3">Generating</Header>
+        <p>Once you upload your excel file with additional informaton, you will have to select from the Affected Patients tab a patient that you want to be included in the report, including additional information from the Upload Excel File tab. Upload Excel File will have only one patient selected when you select the patient in the Affected Patients tab - so you don&apos;t have to worry about which one to choose. This Affected Patients and Upload Excel File tab selection work based on their display name.</p>
+        <p>Once you select your patient, Generate button will become blue, where you can download your report.</p>
+        <Image src="/static/images/how-to/generate-report/generate-report.png" size="massive" />
+      </Tab.Pane>
+    )
+  }
+
   render() {
     const errorMessageStyle = {
       paddingTop: '15px',
@@ -223,6 +249,7 @@ class ReportUploadModal extends React.PureComponent {
     const modalPanes = [
       { menuItem: 'Affected Patients', render: () => this.getAffectedPatientsTab() },
       { menuItem: 'Upload Excel File', render: () => this.getUploadExcelFileTab(errorMessageStyle, errorMessageContent) },
+      { menuItem: 'How To', render: () => this.howToTab() },
     ]
     return (
       <ModalComponent
