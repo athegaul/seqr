@@ -103,6 +103,19 @@ const getScore = (acmgCalculationValue) => {
   return 'Unknown'
 }
 
+const getButonBackgroundColor = (score) => {
+  const categoryColors = {
+    Unknown: '#BABABA',
+    Benign: '#5E6F9E',
+    'Likely benign': '#5E6F9E',
+    Pathogenic: '#E6573D',
+    'Likely pathogenic': '#E6573D',
+    'Uncertain significance': '#FAB470',
+  }
+
+  return categoryColors[score]
+}
+
 const AcmgModal = (props) => {
   const { score, setScore, active, setActive, criteria, setCriteria } = props
 
@@ -116,10 +129,12 @@ const AcmgModal = (props) => {
     BP: 0,
   })
 
+  const buttonBackgroundColor = getButonBackgroundColor(score)
+
   return (
     <div>
-      <div className="ui blue labels">
-        <a className="ui label large" role="button" tabIndex={0} onClick={() => { setActive(true) }}>ACMG<div className="detail">{score}</div></a>
+      <div className="ui labels">
+        <a className="ui label large" role="button" style={{ backgroundColor: buttonBackgroundColor, color: 'white' }} tabIndex={0} onClick={() => { setActive(true) }}>ACMG<div className="detail">{score}</div></a>
         <Modal open={active} dimmer="blurring" size="fullscreen" >
           <Icon name="close" onClick={() => { setActive(false) }} />
 
@@ -135,6 +150,7 @@ const AcmgModal = (props) => {
               setAcmgCalculationValue={setAcmgCalculationValue}
               getScore={getScore}
               setScore={setScore}
+              setActive={setActive}
             />
           </Modal.Content>
         </Modal>

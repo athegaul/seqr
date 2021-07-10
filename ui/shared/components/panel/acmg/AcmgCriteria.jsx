@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { Table, Dropdown, Button } from 'semantic-ui-react'
+import { Table, Dropdown, Button, Message } from 'semantic-ui-react'
 import AcmgRuleSpecification from './AcmgRuleSpecification'
 import dropDownOptions from './AcmgCriteriaDropDownOptions'
 
 const AcmgCriteria = (props) => {
-  const { criteria, setCriteria } = props
+  const { criteria, setCriteria, setActive } = props
   const { acmgCalculationValue, setAcmgCalculationValue } = props
   const { getScore, setScore } = props
+  const [formWarning, setFormWarning] = useState('')
 
   const criteriaUsed = {}
   for (let i = 0; i < criteria.length; i++) {
@@ -64,12 +65,30 @@ const AcmgCriteria = (props) => {
     setScore('Unknown')
   }
 
+  const submitForm = () => {
+    if (getScore(acmgCalculationValue) === 'Unknown') {
+      setFormWarning('Please select at least one criteria from the table below.')
+    } else if (getScore(acmgCalculationValue) === 'Conflicting') {
+      setFormWarning('You have conflicting score. Please verify your selections.')
+    } else {
+      setFormWarning(false)
+      setActive(false)
+    }
+  }
+
   const fontStyleSize = { fontSize: '13px' }
   const fontStyleWritingMode = { writingMode: 'sideways-lr', marginLeft: '-10px' }
 
   return (
     <div>
-      <Button primary onClick={clearFields}>Clear Form</Button>
+      {formWarning !== '' &&
+      <Message warning>
+        <Message.Header>Warning</Message.Header>
+        <p>{formWarning}</p>
+      </Message>
+      }
+      <Button primary onClick={submitForm}>Submit</Button>
+      <Button onClick={clearFields} color="grey">Clear Form</Button>
       <Table celled structured textAlign="center" style={fontStyleSize}>
         <Table.Header>
           <Table.Row>
@@ -914,102 +933,6 @@ const AcmgCriteria = (props) => {
               </Table>
             </Table.Cell>
           </Table.Row>
-
-          <Table.Row>
-            <Table.Cell><span style={fontStyleWritingMode}>Other</span></Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="blue">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>BP6</Table.Cell>
-                    <Table.Cell width={2}>ClinVar expert panel = <br />benign</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.BP6 ? 'Y' : ''}
-                        key="dropdown37"
-                        placeholder="N"
-                        options={dropDownOptions[37]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.BP6 ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="green">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>PP5</Table.Cell>
-                    <Table.Cell width={2}>ClinVar expert panel<br />pathogenic</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.PP5 ? 'Y' : ''}
-                        key="dropdown38"
-                        placeholder="N"
-                        options={dropDownOptions[38]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.PP5 ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell></Table.Cell>
-          </Table.Row>
-
-          <Table.Row>
-            <Table.Cell><span style={fontStyleWritingMode}>Other Data</span></Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="blue">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>BP5</Table.Cell>
-                    <Table.Cell width={2}>Found in case with an<br />alternative cause</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.BP5 ? 'Y' : ''}
-                        key="dropdown39"
-                        placeholder="N"
-                        options={dropDownOptions[39]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.BP5 ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
-            <Table.Cell>
-              <Table size="small" color="green">
-                <Table.Body>
-                  <Table.Row textAlign="center">
-                    <Table.Cell width={1}>PP4</Table.Cell>
-                    <Table.Cell width={2}>Patient phenotype or<br />FH high specific for<br />gene</Table.Cell>
-                    <Table.Cell width={1}>
-                      <Dropdown
-                        value={criteriaUsed.PP4 ? 'Y' : ''}
-                        key="dropdown40"
-                        placeholder="N"
-                        options={dropDownOptions[40]}
-                        onChange={addOrRemoveCriteria}
-                        text={criteriaUsed.PP4 ? 'Y' : ''}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              </Table>
-            </Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell></Table.Cell>
-          </Table.Row>
         </Table.Body>
       </Table>
       <br />
@@ -1025,6 +948,7 @@ AcmgCriteria.propTypes = {
   setAcmgCalculationValue: PropTypes.func.isRequired,
   getScore: PropTypes.func.isRequired,
   setScore: PropTypes.func.isRequired,
+  setActive: PropTypes.func.isRequired,
 }
 
 export default AcmgCriteria
