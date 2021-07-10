@@ -94,12 +94,15 @@ const Variant = React.memo(({ variant, isCompoundHet, mainGeneId, affectedIndivi
         {!isCompoundHet && mainGeneId && <VariantGene geneId={mainGeneId} variant={variant} />}
         {!isCompoundHet && mainGeneId && Object.keys(variant.transcripts || {}).length > 1 && <Divider />}
         <VariantGenes mainGeneId={mainGeneId} variant={variant} />
-        <Acmg variantId={variant.variantId} />
         {isCompoundHet && Object.keys(variant.transcripts || {}).length > 1 && <VerticalSpacer height={20} />}
         {isCompoundHet && <VariantIndividuals variant={variant} affectedIndividuals={affectedIndividuals} isCompoundHet />}
         {isCompoundHet && showReads}
       </Grid.Column>
-      <Grid.Column><Annotations variant={variant} /></Grid.Column>
+      <Grid.Column>
+        <Annotations variant={variant} />
+        <VerticalSpacer height={12} />
+        <Acmg variantId={variant.variantId} />
+      </Grid.Column>
       <Grid.Column><Predictions variant={variant} /></Grid.Column>
       <Grid.Column><Frequencies variant={variant} /></Grid.Column>
       {!isCompoundHet &&
