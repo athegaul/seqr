@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Table, List, Label } from 'semantic-ui-react'
+import { Header, Table, List, Label, ListItem } from 'semantic-ui-react'
 
 const AcmgRuleSpecification = () => {
   return (
@@ -418,6 +418,42 @@ const AcmgRuleSpecification = () => {
                     <Table.Cell>Homozygous occurrence due to consanguinity, rare uncertain significance<br />(confirmed in trans) (Max point 0.5)</Table.Cell>
                     <Table.Cell>0.25</Table.Cell>
                     <Table.Cell>0</Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table>
+            </Table.Cell>
+          </Table.Row>
+
+          <Table.Row>
+            <Table.Cell textAlign="center">Disease-based Criteria Specifications- curated by ClinGen</Table.Cell>
+            
+            <Table.Cell colSpan="2">
+              <Table>
+                <Table.Body>
+                  <Table.Row>
+                    <Table.Cell>
+                      <List bulleted>
+                        <List.Item key="cardiomyopathy">Cardiomyopathy: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN002" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN002</a></List.Item>
+                        <List.Item key="rasopathy">RASopathy: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN004" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN004</a></List.Item>
+                        <List.Item key="hearing-loss">Hearing Loss: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN005" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN005</a></List.Item>
+                        <List.Item key="rett-angelman-disorders">Rett and Angelman-like Disorders: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN016" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN016</a></List.Item>
+                        <List.Item key="mitochondrial-disease-mitochondrial">Mitochondrial Disease Mitochondrial: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN015" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN015</a></List.Item>
+                        <List.Item key="mitochondrial-disease-nuclear">Mitochondrial Disease Nuclear: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN014" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN014</a></List.Item>
+                        <List.Item key="hypercholesterolemia:">Hypercholesterolemia: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN013" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN013</a></List.Item>
+                        <List.Item key="hyperthermia-susceptibility">Hyperthermia Susceptibility: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN012" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN012</a></List.Item>
+                        <List.Item key="platelet-discorders">Platelet Disorders: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN011" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN011</a></List.Item>
+                        <List.Item key="lysosmal-storage-disorders">Lysosomal Storage Disorders: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN010" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN010</a></List.Item>
+                        <List.Item key="pten">PTEN: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN003" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN003</a></List.Item>
+                        <List.Item key="myeloid-malignancy">Myeloid Malignancy: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN008" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN008</a></List.Item>
+                        <List.Item key="cdh1">CDH1: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN007" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN007</a></List.Item>
+                        <List.Item key="tps3">TPS3: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN009" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN009</a></List.Item>
+                        <List.Item key="pah">PAH: <a href="https://cspec.genome.network/cspec/ui/svi/svi/GN006" target="_blank">https://cspec.genome.network/cspec/ui/svi/svi/GN006</a></List.Item>
+                      </List>
+                    </Table.Cell>
+                  </Table.Row>
+
+                  <Table.Row>
+                    <Table.Cell>ClinGen Registry: <a href="https://cspec.genome.network/cspec/ui/svi/" target="_blank">https://cspec.genome.network/cspec/ui/svi/</a></Table.Cell>
                   </Table.Row>
                 </Table.Body>
               </Table>
