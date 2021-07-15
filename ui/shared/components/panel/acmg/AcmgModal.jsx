@@ -134,7 +134,7 @@ const AcmgModal = (props) => {
   return (
     <div>
       <div className="ui labels">
-        <a className="ui label large" role="button" style={{ backgroundColor: buttonBackgroundColor, color: 'white' }} tabIndex={0} onClick={() => { setActive(true) }}>ACMG<div className="detail">{score}</div></a>
+        <a className="ui label large" role="button" style={{ backgroundColor: buttonBackgroundColor, color: 'white' }} tabIndex={0} onClick={() => { setActive(true) }}>Classify<div className="detail">{score}</div></a>
         <Modal open={active} dimmer="blurring" size="fullscreen" >
           <Icon name="close" onClick={() => { setActive(false) }} />
 
