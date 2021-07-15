@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Table, List, Label, ListItem } from 'semantic-ui-react'
+import { Header, Table, List, Label } from 'semantic-ui-react'
 
 const AcmgRuleSpecification = () => {
   return (
@@ -426,7 +426,6 @@ const AcmgRuleSpecification = () => {
 
           <Table.Row>
             <Table.Cell textAlign="center">Disease-based Criteria Specifications- curated by ClinGen</Table.Cell>
-            
             <Table.Cell colSpan="2">
               <Table>
                 <Table.Body>
